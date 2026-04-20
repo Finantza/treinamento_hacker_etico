@@ -1,0 +1,16 @@
+{
+    "name": "Ethical Hacker",
+    "short_name": "EthicalHacker",
+    "description": "Treinamento avançado de Cibersegurança e Penetration Testing.",
+    "start_url": "/index.html",
+    "display": "standalone",
+    "background_color": "#0a0a0a",
+    "theme_color": "#20c997",
+    "icons": [
+        {
+            "src": "icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

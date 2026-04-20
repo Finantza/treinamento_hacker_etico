@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <meta name="msapplication-TileColor" content="#0a0a0a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Ethical Hacker - Simulador avançado de Cibersegurança. Treine suas habilidades em PenTest e proteção de redes num ambiente Cyberpunk imersivo.">
+    <meta name="keywords" content="hacker, ethical hacker, cibersegurança, segurança, redes, pentest, jogo, educativo, cybersecurity">
+    <meta name="author" content="Antigravity AI">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://alunosjk.com.br/">
+    <meta property="og:title" content="Ethical Hacker | Treinamento Cyber">
+    <meta property="og:description" content="Domine a exploração de vulnerabilidades com uma interface premium de última geração.">
+    <meta property="og:image" content="https://alunosjk.com.br/assets/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Ethical Hacker | Treinamento Cyber">
+    <meta property="twitter:description" content="O próximo nível do aprendizado de Cibersegurança.">
+    
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon.png">
+    <title>Ethical Hacker | Treinamento Cyber</title>
+    
+    <!-- Prism.js for Premium Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Orbitron:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="js/i18n.js"></script>
+    <script src="js/ai_generator.js"></script>
+    <script src="js/offline.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrado!', reg))
+                    .catch(err => console.log('Erro ao registrar Service Worker', err));
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Splash Screen Premium -->
+    <div id="splashScreen" class="splash-overlay d-flex flex-column align-items-center justify-content-center">
+        <div class="spinner-border text-primary mb-3 loader-lg" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h2 class="cyber-title glow-primary">INICIALIZANDO SISTEMA</h2>
+        <p class="text-muted small">Carregando Recursos de Elite...</p>
+    </div>
+
+    <header class="premium-glass m-3 sticky-top header-premium-bar">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+                <span class="text-primary fw-bold fs-4 glow-primary font-heading-main">EH</span>
+                <span class="ms-2 text-muted small d-none d-sm-inline">ETHICAL HACKER v1.0</span>
+            </div>
+            <div id="headerActions" class="d-flex align-items-center gap-2">
+                <select id="langSelect" class="form-select form-select-sm bg-dark text-white border-primary border-opacity-50 w-auto" aria-label="Idioma" title="Idioma" onchange="if(typeof setLanguage === 'function') setLanguage(this.value)">
+                    <option value="pt">🌐 PT</option>
+                    <option value="en">🌐 EN</option>
+                    <option value="es">🌐 ES</option>
+                </select>
+                <button id="muteBtn" class="btn-cyber px-3 py-1 small" title="Toggle Sound" onclick="toggleMute(this)">
+                    <i class="fas fa-volume-up"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-100">
+        <section class="hero-section bg-gradient-primary text-white py-5 position-relative overflow-hidden">
+            <div class="hero-overlay"></div>
+            <div class="hero-shimmer"></div>
+            <div class="container-fluid px-3 px-md-4">
+                <div class="row align-items-center min-vh-75">
+                    <div class="col-12 col-lg-6 order-2 order-lg-1">
+                        <div class="hero-content text-center text-lg-start">
+                            <div class="d-flex justify-content-center justify-content-lg-start mb-3">
+                                <span class="badge bg-warning text-dark px-2 px-md-3 py-2 fs-6 fw-bold">
+                                    <span class="challenge-icon">🔥</span>
+                                    <span id="challengeTitle" data-i18n="challenge_level">Nível 1: Desafio Inicial</span>
+                                </span>
+                            </div>
+                            <h1 id="heroHeadline" class="display-4 fw-bold glow-text mb-3 mb-md-4" data-i18n="title">
+                                🛡️ Ethical Hacker
+                            </h1>
+                            <p id="heroSubline" class="lead mb-3 mb-md-4 text-white-50" data-i18n="hero_desc">
+                                Treine penetração, descubra vulnerabilidades e proteja sistemas em tempo real.
+                            </p>
+                            <div class="d-flex flex-column flex-sm-row gap-2 gap-md-3 mb-3 mb-md-4 justify-content-center justify-content-lg-start">
+                                <button class="btn btn-warning btn-lg px-3 px-md-4 fw-bold pulse" onclick="startOfflineGame()">
+                                    <i class="fas fa-play-circle me-2"></i>
+                                    <span data-i18n="btn_start">INICIAR AGORA</span>
+                                </button>
+                                <button class="btn btn-outline-light btn-lg px-3 px-md-4" onclick="scrollToFeatures()">
+                                    <i class="fas fa-search me-2"></i>
+                                    <span data-i18n="Recussos Investigativos">EXPLORAR RECURSOS</span>
+                                </button>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start gap-2 gap-md-4 text-muted flex-wrap">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-users me-2 text-primary"></i>
+                                    <span class="small">+1000 Detetives</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-star me-2 text-warning"></i>
+                                    <span class="small">4.8/5 Avaliação</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-clock me-2 text-success"></i>
+                                    <span class="small">5 min/jogo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-6 order-1 order-lg-2">
+                        <div class="hero-image-container position-relative mb-4 mb-lg-0">
+                            <div class="card bg-dark border-secondary shadow-lg">
+                                <div class="card-header bg-secondary border-secondary">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-danger rounded-circle p-1 me-2">
+                                            <i class="fas fa-terminal text-white fs-6"></i>
+                                        </div>
+                                        <span class="text-white fw-bold small">Terminal Kali Linux</span>
+                                        <div class="ms-auto">
+                                            <span class="badge bg-success small">Online</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="bg-secondary rounded p-3 mb-3 font-monospace small">
+                                        <div class="text-success">root@kali:~# nmap -sS -p 1-65535 target.io</div>
+                                        <div class="text-white">Starting Nmap 7.93 ( https://nmap.org )</div>
+                                        <div class="text-white">Scanning target.io (192.168.1.5)...</div>
+                                        <div class="text-info">Discovered open port 22/tcp on 192.168.1.5</div>
+                                        <div class="text-warning">Discovered open port 80/tcp on 192.168.1.5</div>
+                                    </div>
+                                    <div class="progress mb-2 h-8px">
+                                        <div class="progress-bar bg-danger progress-bar-striped progress-bar-animated w-75"></div>
+                                    </div>
+                                    <div class="d-flex justify-content-between small text-muted">
+                                        <span>Bypass de segurança em andamento...</span>
+                                        <span>75%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="floating-elements">
+                                <div class="floating-badge badge bg-primary position-absolute top-0 end-0 p-2">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <div class="floating-badge badge bg-danger position-absolute top-50 end-0 translate-middle-y p-2">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <div class="floating-badge badge bg-success position-absolute bottom-0 start-0 p-2">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-4 py-md-5 bg-dark">
+            <div class="container px-3 px-md-4">
+                <div class="row justify-content-center mb-4 mb-md-5">
+                    <div class="col-12 col-lg-8 text-center">
+                        <h2 class="display-5 fw-bold text-white mb-3">Arsenal e Conhecimento</h2>
+                        <p class="lead text-muted mb-4 mb-md-0">Ferramentas avançadas para dominar a Cibersegurança</p>
+                    </div>
+                </div>
+
+                <div class="row g-3 g-md-4 justify-content-center">
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card h-100 bg-secondary border-secondary features-card">
+                            <div class="card-body text-center p-3 p-md-4">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-bug text-danger fs-1"></i>
+                                </div>
+                                <h5 class="card-title text-white fw-bold mb-3">Análise de Vulnerabilidades</h5>
+                                <p class="card-text text-muted mb-3">Identifique e explore falhas de segurança de forma interativa e educativa.</p>
+                                <div class="mt-3">
+                                    <span class="badge bg-danger">Essencial</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card h-100 bg-secondary border-secondary features-card">
+                            <div class="card-body text-center p-3 p-md-4">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-trophy text-warning fs-1"></i>
+                                </div>
+                                <h5 class="card-title text-white fw-bold mb-3">Sistema de Ranking</h5>
+                                <p class="card-text text-muted mb-3">Compita com outros detetives e suba no ranking resolvendo casos complexos.</p>
+                                <div class="mt-3">
+                                    <span class="badge bg-warning">Competitivo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card h-100 bg-secondary border-secondary features-card">
+                            <div class="card-body text-center p-3 p-md-4">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-brain text-primary fs-1"></i>
+                                </div>
+                                <h5 class="card-title text-white fw-bold mb-3">Aprendizado Progressivo</h5>
+                                <p class="card-text text-muted mb-3">Desafios que evoluem com seu conhecimento, desde básico até avançado.</p>
+                                <div class="mt-3">
+                                    <span class="badge bg-primary">Progressivo</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card h-100 bg-secondary border-secondary features-card">
+                            <div class="card-body text-center p-3 p-md-4">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-mobile-alt text-success fs-1"></i>
+                                </div>
+                                <h5 class="card-title text-white fw-bold mb-3">PWA Responsiva</h5>
+                                <p class="card-text text-muted mb-3">Jogue em qualquer dispositivo com experiência otimizada para mobile e desktop.</p>
+                                <div class="mt-3">
+                                    <span class="badge bg-success">Multiplataforma</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card h-100 bg-secondary border-secondary features-card">
+                            <div class="card-body text-center p-3 p-md-4">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-language text-info fs-1"></i>
+                                </div>
+                                <h5 class="card-title text-white fw-bold mb-3">Multi-idioma</h5>
+                                <p class="card-text text-muted mb-3">Interface disponível em português, inglês e espanhol para alcance global.</p>
+                                <div class="mt-3">
+                                    <span class="badge bg-info">Internacional</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-lg-4">
+                        <div class="card h-100 bg-secondary border-secondary features-card">
+                            <div class="card-body text-center p-3 p-md-4">
+                                <div class="feature-icon mb-3">
+                                    <i class="fas fa-shield-alt text-secondary fs-1"></i>
+                                </div>
+                                <h5 class="card-title text-white fw-bold mb-3">Modo Offline</h5>
+                                <p class="card-text text-muted mb-3">Jogue sem conexão com a internet, sincronizando progresso quando online.</p>
+                                <div class="mt-3">
+                                    <span class="badge bg-secondary">Offline</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center mt-4 mt-md-5">
+                    <div class="col-12 col-md-8 col-lg-6 text-center">
+                        <div class="alert alert-primary border-0 mx-3 mx-md-0" role="alert">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            <strong>Dica:</strong> Comece com casos simples e evolua para desafios mais complexos!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-dark text-white py-3">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2026 Ethical Hacker System. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // PWA install prompt mantido mas sem botão estático direto; ativavia snackbar/alert se necessário
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            console.log('PWA install prompt disponível.');
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Prism.js for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+</body>
+</html>
