@@ -126,12 +126,12 @@ class ProceduralAI {
                 {
                     id: 'cmd-1', description: 'Ping utility executes system command.',
                     vulnerableCode: "system("ping -c 4 " . $_GET['host']);",
-                    solution: "127.0.0.1; cat /etc/passwd", exploitType: 'command_injection'
+                    solution: `127.0.0.1; cat /etc/passwd`, exploitType: 'command_injection'
                 },
                 {
                     id: 'rce-php-1', description: 'File viewer with user input.',
                     vulnerableCode: "eval(\"\\$output = "\" . \\$_GET['cmd'] . \"";\";)",
-                    solution: "ls -la; whoami; id", exploitType: 'php_rce'
+                    solution: `ls -la; whoami; id`, exploitType: 'php_rce'
                 },
                 {
                     id: 'deserial-1', description: 'Unserialize user session.',

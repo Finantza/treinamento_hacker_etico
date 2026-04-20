@@ -277,6 +277,27 @@
             </div>
         </section>
 
+        <!-- Game Section -->
+        <section id="game" class="py-5 bg-black position-relative overflow-hidden" style="display: none;">
+            <div class="container px-3 px-md-4">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-8">
+                        <div class="card bg-dark border-primary shadow-lg">
+                            <div class="card-header bg-primary text-white">
+                                <h3 class="card-title mb-0">Terminal de Exploit</h3>
+                            </div>
+                            <div class="card-body">
+                                <div id="challengeCode" class="bg-black p-3 rounded mb-3 font-monospace text-success"></div>
+                                <div id="challengeOptions" class="mb-3"></div>
+                                <button id="submitAnswer" class="btn btn-primary">Enviar Resposta</button>
+                                <div id="feedback" class="mt-3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Features section aprimorada -->
         <section id="features" class="py-5 py-md-5 bg-dark position-relative overflow-hidden" aria-labelledby="featuresTitle">
             <div class="matrix-bg"></div>
@@ -556,7 +577,7 @@
         }
 
         // Game functions
-        function startGame() {
+        function startGame() { document.getElementById('game').style.display = 'block'; document.getElementById('game').scrollIntoView({ behavior: 'smooth' }); const challenge = ProceduralAI.gerar({}, 'iniciante'); document.getElementById('challengeCode').textContent = challenge.code; const optionsDiv = document.getElementById('challengeOptions'); optionsDiv.innerHTML = ''; challenge.options.forEach((option, index) => { const btn = document.createElement('button'); btn.className = 'btn btn-outline-light m-1'; btn.textContent = option; btn.onclick = () => checkAnswer(index, challenge.correct, challenge.explain); optionsDiv.appendChild(btn); }); } function checkAnswer(selected, correct, explain) { const feedback = document.getElementById('feedback'); if (selected === correct) { feedback.innerHTML = '<div class="alert alert-success">Correto! ' + explain + '</div>'; } else { feedback.innerHTML = '<div class="alert alert-danger">Errado. Tente novamente.</div>'; } } // old
             // Analytics tracking
             console.log('🎮 Game started by user');
             // Redirect or open modal
