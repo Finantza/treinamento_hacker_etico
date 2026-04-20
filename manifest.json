@@ -1,16 +1,145 @@
 {
-    "name": "Ethical Hacker",
-    "short_name": "EthicalHacker",
-    "description": "Treinamento avançado de Cibersegurança e Penetration Testing.",
+    "name": "Ethical Hacker Premium",
+    "short_name": "EHack",
+    "description": "🏴‍☠️ Treinamento Avançado Penetration Testing | ProceduralAI Challenges | SQLi/XSS/RCE/Buffer Overflow | 150+ Exploits Offline",
+    "lang": "pt-BR",
+    "dir": "ltr",
     "start_url": "/index.html",
+    "scope": "/",
     "display": "standalone",
+    "display_override": ["standalone", "minimal-ui", "browser"],
+    "orientation": "portrait-primary",
     "background_color": "#0a0a0a",
     "theme_color": "#20c997",
+    "theme_color_data": "#20c997",
+    
+    "categories": [
+        "education",
+        "productivity",
+        "utilities",
+        "games"
+    ],
+    
     "icons": [
         {
-            "src": "icon.png",
+            "src": "/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512.png",
             "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-192-maskable.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/icon-512-maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "/icons/icon-splash.png",
+            "sizes": "1080x1920",
             "type": "image/png"
         }
-    ]
+    ],
+    
+    "screenshots": [
+        {
+            "src": "/screenshots/terminal-challenge-720.png",
+            "sizes": "720x1280",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Desafio Terminal SQLi/XSS"
+        },
+        {
+            "src": "/screenshots/cyberpunk-ui-1080.png",
+            "sizes": "1080x1920",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Interface Cyberpunk + ProceduralAI"
+        },
+        {
+            "src": "/screenshots/darkweb-store-720.png",
+            "sizes": "720x1280",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Dark Web Store (sqlmap/Burp)"
+        }
+    ],
+    
+    "shortcuts": [
+        {
+            "name": "🚀 Novo Challenge",
+            "short_name": "Challenge",
+            "description": "Gerar challenge ProceduralAI (SQLi/XSS/RCE)",
+            "url": "/index.html#new-challenge",
+            "icons": [{"src": "/icons/challenge.png", "sizes": "96x96"}]
+        },
+        {
+            "name": "💾 Progresso",
+            "short_name": "Progress",
+            "description": "Perfil + Conquistas + Dark Web Store",
+            "url": "/index.html#profile",
+            "icons": [{"src": "/icons/profile.png", "sizes": "96x96"}]
+        },
+        {
+            "name": "🎯 Payloads",
+            "short_name": "Payloads",
+            "description": "Reverse Shells/Webshells/PrivEsc (Offline)",
+            "url": "/index.html#payloads",
+            "icons": [{"src": "/icons/payload.png", "sizes": "96x96"}]
+        },
+        {
+            "name": "⚔️ Multiplayer",
+            "short_name": "RedBlue",
+            "description": "Red Team vs Blue Team Leaderboards",
+            "url": "/index.html#multiplayer",
+            "icons": [{"src": "/icons/multiplayer.png", "sizes": "96x96"}]
+        }
+    ],
+    
+    "prefer_related_applications": false,
+    "related_applications": [],
+    
+    "iarc_rating_id": "ESRBe10",
+    
+    "features": [
+        "Offline",
+        "Background Sync",
+        "Push Notifications"
+    ],
+    
+    "protocol_handlers": [
+        {
+            "protocol": "web+hack",
+            "title": "Abrir Challenge Ethical Hacker",
+            "url": "/index.html?challenge=%s"
+        }
+    ],
+    
+    "share_target": {
+        "action": "/index.html#share-target",
+        "method": "POST",
+        "enctype": "multipart/form-data",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url",
+            "files": [
+                {
+                    "name": "file",
+                    "accept": ["*/*"]
+                }
+            ]
+        }
+    }
 }

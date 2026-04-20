@@ -1,299 +1,453 @@
+// i18n v3.0 - Enhanced Cyberpunk Multi-Language System w/ Pentest Resources
+// Full Authorization Activated - All Pentest Terminology & Procedural Integration
+
 const translations = {
     pt: {
-        title: "ETHICAL HACKER",
+        // CORE UI
+        title: "ETHICAL HACKER PREMIUM",
         hero_title: "TORNE-SE UM <span class='highlight'>PENTESTER DE ELITE</span>",
-        hero_desc: "Domine Cibersegurança através da prática. Encontre falhas e proteja sistemas.",
-        btn_start: "INICIAR OPERAÇÃO",
-        btn_features: "VER ARSENAL",
-        login_title: "LOGIN DO TERMINAL",
-        btn_access: "ACESSAR REDE",
-        level: "Nível",
-        xp: "XP",
-        coins: "Cyber Coins",
-        mission_select: "SELECIONE SEU ALVO",
-        logout: "DESCONECTAR",
-        login_placeholder: "Digite seu codinome",
-        tut_welcome: "🕵️‍♂️ Bem-vindo, Novo Analista!",
-        tut_welcome_desc: "Sua missão é vital: Identificar vulnerabilidades graves antes que cibercriminosos o façam.",
-        tut_how: "🔎 Como operar?",
-        tut_how_desc: "Em cada fase, analise a arquitetura ou código em busca de pontos cegos. Selecione qual vulnerabilidade foi identificada.",
-        tut_rules: "🌟 Regras de Engajamento",
-        tut_rules_desc: "Identificar a falha de primeira rende **10 pontos** de reputação em sua credencial!<br>Errar ativará alarmes.",
-        btn_next: "Próximo Passo",
-        btn_understand: "Entendido",
-        btn_career: "Iniciar Carreira Cyber!",
-        aluno: "PenTester",
-        sandbox_title: "TERMINAL DE EXPLOIT",
-        sandbox_desc: "Área limpa para testes. Digite e valide seus payloads ou scripts utilitários com segurança.",
-        btn_run: "EXECUTAR PAYLOAD",
-        btn_clear: "LIMPAR",
-        btn_back: "VOLTAR",
-        result: "RESULTADO",
-        shop_title: "DARK WEB",
-        shop_btn: "DARK WEB",
-        btn_level_1: "🟢 Reconhecimento",
-        btn_level_2: "🧠 Exploração",
-        challenge_level: "Nível 1: Penetração Básica",
-        btn_level_3: "🔥 Zero-Day",
-        btn_level_ai: "🤖 Ataque A.P.T",
-        btn_level_pro: "⌨️ Engenharia Reversa",
+        hero_desc: "Domine OWASP Top 10, CVEs reais e ataques avançados. Offline-first com ProceduralAI.",
+        btn_start: "🚀 INICIAR OPERAÇÃO",
+        btn_features: "🔍 VER ARSENAL COMPLETO",
+        login_title: "TERMINAL DE AUTENTICAÇÃO",
+        btn_access: "🔓 ACESSAR REDE CRÍTICA",
+        
+        // PLAYER DASHBOARD
+        level: "Nível", xp: "XP", coins: "Cyber Coins", reputation: "Reputação",
+        mission_select: "SELECIONE SEU ALVO OPERACIONAL",
+        logout: "DESCONECTAR SESSION",
+        
+        // TUTORIAL SYSTEM
+        tut_welcome: "🕵️‍♂️ Agente, bem-vindo ao C2!",
+        tut_welcome_desc: "Sua missão: Explorar vulnerabilidades reais (SQLi, XSS, RCE, Buffer Overflow) antes dos adversários.",
+        tut_how: "🎯 Metodologia de Ataque",
+        tut_how_desc: "1. Análise estática → 2. Identificação de vetores → 3. Exploit crafting → 4. Post-exploit.",
+        tut_rules: "⚔️ Regras de Engajamento",
+        tut_rules_desc: "Acerto 1º try: <strong>+25 REP</strong> | Erro: <strong>-10 REP + Alarme IDS</strong>",
+        
+        // CHALLENGE SYSTEM (ProceduralAI Integration)
+        challenge_level: "Desafio ProceduralAI",
+        btn_level_1: "🟢 Reconhecimento (Nmap, Gobuster)",
+        btn_level_2: "🧠 Exploração (SQLi, XSS, IDOR)",
+        btn_level_3: "🔥 Pós-Exploit (Reverse Shells)",
+        btn_level_ai: "🤖 ProceduralAI Massiva (CVE Chains)",
+        btn_level_pro: "⌨️ Buffer Overflow & Assembly",
         btn_level_multi: "🌐 Red Team vs Blue Team",
-        btn_hint: "Consultar Framework",
-        hint_applied: "INTEL Recebida",
-        btn_skip: "Bypass de Firewall",
-        skip_active: "Tunneling Ativo",
-        hint_title: "INTELIGÊNCIA GLOBAL",
-        ai_feedback_excellent: "Excelente! Você desviou do SOC e penetrou silenciosamente. 🥷",
-        ai_feedback_good: "Bom trabalho! O vetor de ataque foi sólido. 🎯",
-        ai_feedback_learning: "A defesa deles é forte, mas cada erro afia seu instinto hacker. 📡",
-        label_agent: "OP",
-        label_level: "CREDENCIAL",
-        label_coins: "BTCs",
-        label_credits: "CRÉDITOS",
-        dash_security_level: "COMANDO CIBERNÉTICO GERAL",
-        dash_change_agent: "TROCAR OP",
-        dash_reputation: "EXP CIBERNÉTICA",
-        dash_bugs_found: "FALHAS REPORTADAS",
-        dash_failures: "ALARMES DISPARADOS",
-        dash_best_streak: "SEQUÊNCIA STEALTH",
-        dash_reaction_time: "TEMPO DE EXFILTRAÇÃO",
-        dash_select_mission: "SELECIONE ALVO OPERACIONAL",
-        dash_achievements: "REGISTRO DE INFILTRAÇÃO",
-        dash_no_records: "SISTEMA LIMPO",
+        
+        // TERMINAL & SANDBOX
+        sandbox_title: "SANDBOX DE EXPLOIT",
+        sandbox_desc: "Teste payloads reais: Reverse shells, webshells, privilege escalation. 100% sandboxed.",
+        btn_run: "▶️ EXECUTAR PAYLOAD",
+        btn_clear: "🗑️ LIMPAR BUFFER",
+        result: "OUTPUT CRÍTICO",
+        terminal_prompt: "pentest@ethicalhacker:~$",
+        
+        // SHOP & ECONOMY (Dark Web)
+        shop_title: "DARK WEB MARKETPLACE",
+        shop_btn: "🌑 DARK WEB",
+        store_balance: "Saldo BTC",
+        store_decoder: "BRUTEFORCE v4.2",
+        store_decoder_desc: "Hashcat + JohnTheRipper bundle. GPU acceleration ready.",
+        store_bypass: "TOR + I2P Chain",
+        store_bypass_desc: "5-hop onion routing + perfect forward secrecy.",
+        store_price: "PREÇO", store_buy: "AQUIRIR", store_stock: "DISPONÍVEL",
+        store_acquired: "ATIVO", store_insufficient: "FUNDOS INSUFICIENTES",
+        
+        // PENTEST TERMINOLOGY (Full OWASP Coverage)
+        vuln_sqli: "SQL Injection (UNION/Tautology/Blind)",
+        vuln_xss: "Cross-Site Scripting (Reflected/Stored/DOM)",
+        vuln_rce: "Remote Code Execution (Command/Deserialization)",
+        vuln_idor: "Insecure Direct Object Reference",
+        vuln_ssrf: "Server-Side Request Forgery",
+        vuln_csrf: "Cross-Site Request Forgery",
+        vuln_xxe: "XML External Entity",
+        vuln_lfi: "Local File Inclusion → RCE",
+        vuln_buffer: "Buffer Overflow (Stack/Heap/Format String)",
+        vuln_deserial: "Unsafe Deserialization (PHP/Java)",
+        
+        // AI FEEDBACK (ProceduralAI Enhanced)
+        ai_feedback_excellent: "🎉 PERFEITO! Bypass IDS/IPS/WAF. Reverse shell estabelecido. +50 REP 🥷",
+        ai_feedback_good: "✅ Vetor sólido! Privilege escalation parcial. +25 REP 🎯",
+        ai_feedback_learning: "⚠️ Vetor detectado. Refine obfuscation e timing. +5 REP 📡",
+        ai_feedback_fail: "💥 IDS bloqueou. Fingerprint capturado. -15 REP 🚨",
+        
+        // GAME STATES
         game_mission: "OPERAÇÃO ATIVA",
-        game_analyze: "REALIZE A VARREDURA NA ESTRUTURA ABAIXO",
-        game_success: "SISTEMA COMPROMETIDO E ASSEGURADO!",
-        game_failure: "CONEXÃO BLOQUEADA PELO IDS!",
-        game_failure_desc: "O log capturou sua assinatura. A sequência stealth foi perdida.",
-        game_next: "PRÓXIMO ALVO",
-        game_retry: "FORJAR NOVO IP E TENTAR",
-        game_back_hq: "RETROCEDER AO C2",
-        store_balance: "CRIPTO",
-        store_decoder: "MÓDULO BRUTEFORCE",
-        store_decoder_desc: "Elimina barreiras falsas no alvo mitigando ruído na rede.",
-        store_bypass: "ROTEAMENTO TOR",
-        store_bypass_desc: "Muda o IP para pular um desafio sem disparar o SOC local.",
-        store_price: "VALOR",
-        store_buy: "BAIXAR TOOL",
-        store_buy_protocol: "ASSINAR PROXY",
-        store_stock: "ON-LINE",
-        store_acquired: "ATIVO",
-        store_insufficient: "CRIPTO INSUFICIENTE"
+        game_analyze: "🔍 ANALISE O CÓDIGO VULNERÁVEL",
+        game_success: "✅ SISTEMA COMPROMETIDO!",
+        game_failure: "🚫 BLOQUEADO POR IDS/IPS!",
+        game_next: "➡️ PRÓXIMO VETOR",
+        game_retry: "🔄 NOVO PAYLOAD",
+        
+        // DASHBOARD METRICS
+        dash_security_level: "COMANDO CIBERNÉTICO GLOBAL",
+        dash_reputation: "REP Cyber",
+        dash_bugs_found: "Vulnerabilidades Reportadas",
+        dash_failures: "Detectados por IDS",
+        dash_best_streak: "Maior Sequência Stealth",
+        dash_accuracy: "Precisão de Exploits",
+        
+        // HINTS & TOOLS
+        btn_hint: "🧠 MITRE ATT&CK Framework",
+        hint_applied: "INTEL CARREGADA",
+        btn_skip: "VPN Chain Bypass",
+        skip_active: "TUNNEL ATIVO",
+        
+        // ProceduralAI Specific
+        proc_ai_title: "ProceduralAI v3.0",
+        proc_ai_desc: "Geração procedural de 150+ desafios offline. Anti-repetição ativa.",
+        proc_category: "Categoria OWASP",
+        proc_difficulty: "Dificuldade Adaptativa",
+        proc_cve: "CVE Referência",
+        proc_payload: "Payload Sugerido",
+        
+        // BADGES & ACHIEVEMENTS
+        badge_sqli_master: "SQLi Master (50+ exploits)",
+        badge_xss_king: "XSS Kingdom (100+ DOM bypass)",
+        badge_rce_god: "RCE God (25 reverse shells)",
+        badge_stealth: "Ghost Mode (100% stealth rate)"
     },
+    
     en: {
-        title: "ETHICAL HACKER",
+        title: "ETHICAL HACKER PREMIUM",
         hero_title: "BECOME AN <span class='highlight'>ELITE PENTESTER</span>",
-        hero_desc: "Master Cybersecurity through practice. Find flaws and protect networks.",
-        btn_start: "START OPERATION",
-        btn_features: "VIEW ARSENAL",
-        login_title: "TERMINAL LOGIN",
-        btn_access: "ACCESS NETWORK",
-        level: "Level",
-        xp: "XP",
-        coins: "Cyber Coins",
-        mission_select: "SELECT YOUR TARGET",
-        logout: "DISCONNECT",
-        login_placeholder: "Enter your handle",
-        tut_welcome: "🕵️‍♂️ Welcome, New Analyst!",
-        tut_welcome_desc: "Your mission is critical: Identify severe vulnerabilities before cybercriminals do.",
-        tut_how: "🔎 How to operate?",
-        tut_how_desc: "Assess the architecture or code for blind spots. Select which vulnerability is present.",
-        tut_rules: "🌟 Rules of Engagement",
-        tut_rules_desc: "Spotting the flaw on the first try earns **10 rep points**!<br>Failing triggers the alarm.",
-        btn_next: "Next Step",
-        btn_understand: "Roger That",
-        btn_career: "Start Cyber Career!",
-        aluno: "PenTester",
-        sandbox_title: "EXPLOIT TERMINAL",
-        sandbox_desc: "Clean room testing area. Craft and validate your payloads and scripts safely.",
-        btn_run: "RUN PAYLOAD",
-        btn_clear: "CLEAR",
-        btn_back: "BACK",
-        result: "OUTPUT",
-        shop_title: "DARK WEB",
-        shop_btn: "DARK WEB",
-        btn_level_1: "🟢 Reconnaissance",
-        btn_level_2: "🧠 Exploitation",
-        challenge_level: "Level 1: Basic Penetration",
-        btn_level_3: "🔥 Zero-Day",
-        btn_level_ai: "🤖 A.P.T Campaign",
-        btn_level_pro: "⌨️ Reverse Engineering",
+        hero_desc: "Master OWASP Top 10, real CVEs, advanced attacks. Offline-first w/ ProceduralAI.",
+        btn_start: "🚀 START OPERATION",
+        btn_features: "🔍 VIEW FULL ARSENAL",
+        login_title: "AUTH TERMINAL",
+        btn_access: "🔓 ACCESS CRITICAL NET",
+        
+        level: "Level", xp: "XP", coins: "Cyber Coins", reputation: "Reputation",
+        mission_select: "SELECT OPERATIONAL TARGET",
+        logout: "DISCONNECT SESSION",
+        
+        tut_welcome: "🕵️‍♂️ Agent, welcome to C2!",
+        tut_welcome_desc: "Mission: Exploit real vulns (SQLi, XSS, RCE, Buffer Overflow) before adversaries.",
+        tut_how: "🎯 Attack Methodology",
+        tut_how_desc: "1. Static analysis → 2. Vector ID → 3. Exploit crafting → 4. Post-exploit.",
+        tut_rules: "⚔️ Rules of Engagement",
+        tut_rules_desc: "1st try hit: <strong>+25 REP</strong> | Miss: <strong>-10 REP + IDS Alarm</strong>",
+        
+        challenge_level: "ProceduralAI Challenge",
+        btn_level_1: "🟢 Recon (Nmap, Gobuster)",
+        btn_level_2: "🧠 Exploitation (SQLi, XSS, IDOR)",
+        btn_level_3: "🔥 Post-Exploitation (Rev Shells)",
+        btn_level_ai: "🤖 ProceduralAI Advanced (CVE Chains)",
+        btn_level_pro: "⌨️ Buffer Overflow & ASM",
         btn_level_multi: "🌐 Red vs Blue",
-        btn_hint: "Check Framework",
-        hint_applied: "INTEL Received",
-        btn_skip: "Firewall Bypass",
-        skip_active: "Tunneling Active",
-        hint_title: "GLOBAL INTEL",
-        ai_feedback_excellent: "Excellent! You bypassed the SOC and infiltrated silently. 🥷",
-        ai_feedback_good: "Good job! Attack vector was solid. 🎯",
-        ai_feedback_learning: "Their defense is strong, but errors hone your hacker instinct. 📡",
-        label_agent: "OP",
-        label_level: "CLEARANCE",
-        label_coins: "BTC",
-        label_credits: "CREDITS",
-        dash_security_level: "CYBER COMMAND CENTER",
-        dash_change_agent: "SWAP OP",
-        dash_reputation: "CYBER EXP",
-        dash_bugs_found: "FLAWS REPORTED",
-        dash_failures: "ALARMS TRIGGERED",
-        dash_best_streak: "STEALTH STREAK",
-        dash_reaction_time: "EXFILTRATION TIME",
-        dash_select_mission: "SELECT OPERATIONAL TARGET",
-        dash_achievements: "INFILTRATION LOG",
-        dash_no_records: "SYSTEM CLEAN",
+        
+        sandbox_title: "EXPLOIT SANDBOX",
+        sandbox_desc: "Test real payloads: Rev shells, webshells, priv esc. 100% sandboxed.",
+        btn_run: "▶️ RUN PAYLOAD",
+        btn_clear: "🗑️ CLEAR BUFFER",
+        result: "CRITICAL OUTPUT",
+        terminal_prompt: "pentest@ethicalhacker:~$",
+        
+        shop_title: "DARK WEB MARKETPLACE",
+        shop_btn: "🌑 DARK WEB",
+        store_balance: "BTC Balance",
+        store_decoder: "BRUTEFORCE v4.2",
+        store_decoder_desc: "Hashcat + John bundle. GPU ready.",
+        store_bypass: "TOR + I2P Chain",
+        store_bypass_desc: "5-hop onion + PFS.",
+        store_price: "PRICE", store_buy: "ACQUIRE", store_stock: "AVAILABLE",
+        store_acquired: "ACTIVE", store_insufficient: "INSUFFICIENT FUNDS",
+        
+        vuln_sqli: "SQL Injection (UNION/Tautology/Blind)",
+        vuln_xss: "XSS (Reflected/Stored/DOM)",
+        vuln_rce: "RCE (Command/Deserial)",
+        vuln_idor: "IDOR",
+        vuln_ssrf: "SSRF",
+        vuln_csrf: "CSRF",
+        vuln_xxe: "XXE",
+        vuln_lfi: "LFI → RCE",
+        vuln_buffer: "Buffer Overflow (Stack/Heap)",
+        vuln_deserial: "Unsafe Deserialization",
+        
+        ai_feedback_excellent: "🎉 PERFECT! Bypassed IDS/IPS/WAF. Revshell active. +50 REP 🥷",
+        ai_feedback_good: "✅ Solid vector! Partial priv esc. +25 REP 🎯",
+        ai_feedback_learning: "⚠️ Vector detected. Refine obfuscation. +5 REP 📡",
+        ai_feedback_fail: "💥 IDS blocked. Fingerprint captured. -15 REP 🚨",
+        
         game_mission: "ACTIVE OPERATION",
-        game_analyze: "SCAN THE STRUCTURE BELOW",
-        game_success: "SYSTEM COMPROMISED AND SECURED!",
-        game_failure: "CONNECTION BLOCKED BY IDS!",
-        game_failure_desc: "Logs captured your signature. Stealth streak lost.",
-        game_next: "NEXT TARGET",
-        game_retry: "SPOOF IP AND RETRY",
-        game_back_hq: "FALLBACK TO C2",
-        store_balance: "CRYPTO",
-        store_decoder: "BRUTEFORCE MODULE",
-        store_decoder_desc: "Eliminates false barriers during target enumeration.",
-        store_bypass: "TOR ROUTING",
-        store_bypass_desc: "Changes IP to skip a suspicious node without triggering the SOC.",
-        store_price: "VALUE",
-        store_buy: "DOWNLOAD TOOL",
-        store_buy_protocol: "RENT PROXY",
-        store_stock: "ONLINE",
-        store_acquired: "ACTIVE",
-        store_insufficient: "INSUFFICIENT CRYPTO"
+        game_analyze: "🔍 ANALYZE VULN CODE",
+        game_success: "✅ SYSTEM PWNED!",
+        game_failure: "🚫 IDS/IPS BLOCK!",
+        game_next: "➡️ NEXT VECTOR",
+        game_retry: "🔄 NEW PAYLOAD",
+        
+        dash_security_level: "CYBER COMMAND GLOBAL",
+        dash_reputation: "Cyber REP",
+        dash_bugs_found: "Vulns Reported",
+        dash_failures: "IDS Detections",
+        dash_best_streak: "Stealth Streak",
+        dash_accuracy: "Exploit Accuracy",
+        
+        btn_hint: "🧠 MITRE ATT&CK",
+        hint_applied: "INTEL LOADED",
+        btn_skip: "VPN Bypass",
+        skip_active: "TUNNEL UP",
+        
+        proc_ai_title: "ProceduralAI v3.0",
+        proc_ai_desc: "150+ procedural challenges offline. Anti-repeat enabled.",
+        proc_category: "OWASP Category",
+        proc_difficulty: "Adaptive Difficulty",
+        proc_cve: "CVE Reference",
+        proc_payload: "Suggested Payload",
+        
+        badge_sqli_master: "SQLi Master (50+)",
+        badge_xss_king: "XSS King (100+ DOM)",
+        badge_rce_god: "RCE God (25 shells)",
+        badge_stealth: "Ghost Mode (100% stealth)"
     },
+    
     es: {
-        title: "ETHICAL HACKER",
-        hero_title: "SÉ UN <span class='highlight'>PENTESTER DE ÉLITE</span>",
-        hero_desc: "Domina la Ciberseguridad paso a paso. Descubre fallas y protege redes.",
-        btn_start: "INICIAR OPERACIÓN",
-        btn_features: "VER ARSENAL",
-        login_title: "LOGIN DE TERMINAL",
-        btn_access: "ACCEDER A LA RED",
-        level: "Nivel",
-        xp: "XP",
-        coins: "Cyber Coins",
-        mission_select: "SELECCIONA TU OBJETIVO",
-        logout: "DESCONECTAR",
-        login_placeholder: "Introduce tu handle",
-        tut_welcome: "🕵️‍♂️ ¡Bienvenido, Nuevo Analista!",
-        tut_welcome_desc: "Tu misión es vital: Identificar vulnerabilidades graves antes de que lo hagan los atacantes.",
-        tut_how: "🔎 ¿Cómo operar?",
-        tut_how_desc: "Evalúa la arquitectura en busca de puntos ciegos. Selecciona qué vulnerabilidad está presente.",
-        tut_rules: "🌟 Reglas de Combate",
-        tut_rules_desc: "Detectar el fallo a la primera rinde **10 puntos** de reputación!<br>Si te equivocas, la alerta saltará.",
-        btn_next: "Próximo Paso",
-        btn_understand: "Entendido",
-        btn_career: "¡Iniciar Carrera Cyber!",
-        aluno: "PenTester",
-        sandbox_title: "TERMINAL EXPLOIT",
-        sandbox_desc: "Área de pruebas limpia. Construye y valida payloads o scripts de forma segura.",
-        btn_run: "EJECUTAR PAYLOAD",
-        btn_clear: "LIMPIAR",
-        btn_back: "VOLVER",
-        result: "OUTPUT",
-        shop_title: "DARK WEB",
-        shop_btn: "DARK WEB",
-        btn_level_1: "🟢 Reconocimiento",
-        btn_level_2: "🧠 Explotación",
-        challenge_level: "Nivel 1: Penetración Básica",
-        btn_level_3: "🔥 Zero-Day",
-        btn_level_ai: "🤖 Campaña A.P.T",
-        btn_level_pro: "⌨️ Ing. Inversa",
-        btn_level_multi: "🌐 Red Team vs Blue",
-        btn_hint: "Consultar Framework",
-        hint_applied: "INTEL Recibida",
-        btn_skip: "Bypass Firewall",
-        skip_active: "Tunneling Activo",
-        hint_title: "INTEL GLOBAL",
-        ai_feedback_excellent: "¡Excelente! Has vulnerado el SOC y entrado silenciosamente. 🥷",
-        ai_feedback_good: "¡Buen trabajo! Vector de ataque sólido. 🎯",
-        ai_feedback_learning: "Siguen defendiendo fuerte, pero cada error forja tu instinto. 📡",
-        label_agent: "OP",
-        label_level: "NIVEL",
-        label_coins: "BTC",
-        label_credits: "CRÉDITOS",
-        dash_security_level: "COMANDO CIBERNÉTICO CENTRAL",
-        dash_change_agent: "CAMBIAR OP",
-        dash_reputation: "CIBER EXP",
-        dash_bugs_found: "FALLOS REPORTADOS",
-        dash_failures: "ALERTAS DISPARADAS",
-        dash_best_streak: "RACHA INVISIBLE",
-        dash_reaction_time: "TIEMPO EXFILTRACIÓN",
-        dash_select_mission: "SELECCIONAR OBJETIVO",
-        dash_achievements: "REGISTROS",
-        dash_no_records: "SISTEMA LIMPIO",
+        title: "ETHICAL HACKER PREMIUM",
+        hero_title: "CONVIÉRTETE EN <span class='highlight'>PENTESTER ÉLITE</span>",
+        hero_desc: "Domina OWASP Top 10, CVEs reales, ataques avanzados. Offline con ProceduralAI.",
+        btn_start: "🚀 INICIAR OPERACIÓN",
+        btn_features: "🔍 VER ARSENAL COMPLETO",
+        login_title: "TERMINAL AUTENTICACIÓN",
+        btn_access: "🔓 ACCEDER RED CRÍTICA",
+        
+        level: "Nivel", xp: "XP", coins: "Cyber Coins", reputation: "Reputación",
+        mission_select: "SELECCIONA OBJETIVO OPERATIVO",
+        logout: "DESCONECTAR SESIÓN",
+        
+        tut_welcome: "🕵️‍♂️ ¡Agente, bienvenido al C2!",
+        tut_welcome_desc: "Misión: Explotar vulnerabilidades reales antes que los adversarios.",
+        tut_how: "🎯 Metodología",
+        tut_how_desc: "1. Análisis estático → 2. ID vectores → 3. Crafting → 4. Post-exploit.",
+        tut_rules: "⚔️ Reglas",
+        tut_rules_desc: "1er intento: <strong>+25 REP</strong> | Error: <strong>-10 REP + Alarma</strong>",
+        
+        challenge_level: "Desafío ProceduralAI",
+        btn_level_1: "🟢 Recon (Nmap, Gobuster)",
+        btn_level_2: "🧠 Explotación (SQLi, XSS)",
+        btn_level_3: "🔥 Post-Explotación",
+        btn_level_ai: "🤖 ProceduralAI Avanzado",
+        btn_level_pro: "⌨️ Buffer Overflow",
+        btn_level_multi: "🌐 Red vs Blue",
+        
+        sandbox_title: "SANDBOX EXPLOIT",
+        sandbox_desc: "Prueba payloads reales: Shells inversos, webshells, escalada.",
+        btn_run: "▶️ EJECUTAR",
+        btn_clear: "🗑️ LIMPIAR",
+        result: "OUTPUT CRÍTICO",
+        terminal_prompt: "pentest@ethicalhacker:~$",
+        
+        shop_title: "DARK WEB MARKET",
+        shop_btn: "🌑 DARK WEB",
+        store_balance: "Saldo BTC",
+        store_decoder: "BRUTEFORCE v4.2",
+        store_decoder_desc: "Hashcat + John. GPU ready.",
+        store_bypass: "TOR + I2P",
+        store_bypass_desc: "5 saltos onion + PFS.",
+        store_price: "PRECIO", store_buy: "ADQUIRIR", store_stock: "DISPONIBLE",
+        
+        vuln_sqli: "SQL Injection",
+        vuln_xss: "XSS",
+        vuln_rce: "RCE",
+        vuln_idor: "IDOR",
+        vuln_ssrf: "SSRF",
+        vuln_csrf: "CSRF",
+        vuln_xxe: "XXE",
+        vuln_lfi: "LFI→RCE",
+        vuln_buffer: "Buffer Overflow",
+        vuln_deserial: "Deserialización",
+        
+        ai_feedback_excellent: "🎉 ¡PERFECTO! IDS/IPS/WAF bypass. +50 REP 🥷",
+        ai_feedback_good: "✅ Vector sólido! +25 REP 🎯",
+        ai_feedback_learning: "⚠️ Detectado. Refina ofuscación. 📡",
+        ai_feedback_fail: "💥 IDS bloqueó. -15 REP 🚨",
+        
         game_mission: "OPERACIÓN ACTIVA",
-        game_analyze: "ESCANEA LA ESTRUCTURA INFERIOR",
-        game_success: "¡SISTEMA COMPROMETIDO Y ASEGURADO!",
-        game_failure: "¡CONEXIÓN BLOQUEADA POR IDS!",
-        game_failure_desc: "Tu firma de ataque fue capturada.",
-        game_next: "PRÓXIMO OBJETIVO",
-        game_retry: "FALSIFICAR IP Y REINTENTAR",
-        game_back_hq: "VOLVER AL C2",
-        store_balance: "SALDO",
-        store_decoder: "MÓDULO BRUTEFORCE",
-        store_decoder_desc: "Elimina rutas falsas para el ataque de diccionario.",
-        store_bypass: "RUTEO TOR",
-        store_bypass_desc: "Cambia tu IP evadiendo monitoreo sin comprometer racha.",
-        store_price: "VALOR",
-        store_buy: "DESCARGAR TOOL",
-        store_buy_protocol: "ALQUILAR PROXY",
-        store_stock: "EN LÍNEA",
-        store_acquired: "ACTIVO",
-        store_insufficient: "CRIPTOMONEDAS INSUFICIENTES"
+        game_analyze: "🔍 ANALIZA CÓDIGO",
+        game_success: "✅ ¡SISTEMA PWNED!",
+        game_failure: "🚫 ¡IDS BLOQUEÓ!",
+        game_next: "➡️ SIGUIENTE VECTOR",
+        game_retry: "🔄 NUEVO PAYLOAD",
+        
+        dash_security_level: "COMANDO CIBERNÉTICO",
+        dash_reputation: "REP Cyber",
+        dash_bugs_found: "Vulns Reportadas",
+        dash_failures: "Detecciones IDS",
+        dash_best_streak: "Racha Stealth",
+        dash_accuracy: "Precisión Exploits",
+        
+        btn_hint: "🧠 MITRE ATT&CK",
+        hint_applied: "INTEL CARGADA",
+        btn_skip: "VPN Bypass",
+        skip_active: "TÚNEL ACTIVO",
+        
+        proc_ai_title: "ProceduralAI v3.0",
+        proc_ai_desc: "150+ desafíos procedurales offline.",
+        proc_category: "Categoría OWASP",
+        proc_difficulty: "Dificultad Adaptativa",
+        proc_cve: "Referencia CVE",
+        proc_payload: "Payload Sugerido",
+        
+        badge_sqli_master: "SQLi Master",
+        badge_xss_king: "XSS King",
+        badge_rce_god: "RCE God",
+        badge_stealth: "Ghost Mode"
     }
 };
 
 let currentLang = localStorage.getItem('lang') || 'pt';
+let procAI = window.procAI || null; // ProceduralAI integration
 
-function t(key) {
-    return translations[currentLang][key] || key;
+// ENHANCED TRANSLATION SYSTEM w/ Pentest Context
+function t(key, params = {}) {
+    let translation = translations[currentLang][key] || key;
+    
+    // Dynamic pentest payload insertion
+    if (params.challenge) {
+        translation = translation.replace('{category}', t(`vuln_${params.challenge.category}`));
+        translation = translation.replace('{cve}', params.challenge.cveReference || 'N/A');
+        translation = translation.replace('{payload}', params.challenge.payloadHint?.slice(0, 30) + '...');
+    }
+    
+    return translation;
 }
 
+// FULL DYNAMIC APPLICATION
 function applyTranslations() {
     document.documentElement.lang = currentLang;
-
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.innerHTML = t(key);
+    
+    // Enhanced selector for all i18n elements
+    document.querySelectorAll('[data-i18n], [data-i18n-title], [data-i18n-placeholder]').forEach(el => {
+        const key = el.dataset.i18n || el.dataset.i18nTitle || el.dataset.i18nPlaceholder;
+        if (el.dataset.i18n) el.innerHTML = t(key);
+        if (el.dataset.i18nTitle) el.title = t(key);
+        if (el.dataset.i18nPlaceholder) el.placeholder = t(key);
     });
-
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        el.placeholder = t(key);
+    
+    // Real-time ProceduralAI challenge translation
+    if (procAI) {
+        updateChallengeDisplay();
+    }
+    
+    // Update terminal prompt
+    const terminals = document.querySelectorAll('.terminal-prompt');
+    terminals.forEach(term => {
+        term.textContent = t('terminal_prompt');
     });
 }
 
+function updateChallengeDisplay() {
+    const challengeEl = document.getElementById('currentChallenge');
+    if (challengeEl && procAI) {
+        const challenge = procAI.lastChallenge;
+        if (challenge) {
+            challengeEl.innerHTML = `
+                <div class="challenge-header">
+                    ${t('proc_category')}: ${t(`vuln_${challenge.category}`)} 
+                    | ${t('proc_difficulty')}: ${challenge.difficulty}
+                    | ${t('proc_cve')}: ${challenge.cveReference}
+                </div>
+                <code>${challenge.description}</code>
+            `;
+        }
+    }
+}
+
+// LANGUAGE SWITCHER w/ Animation
 function setLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('lang', lang);
-    applyTranslations();
+    
+    // Cyberpunk transition effect
+    document.body.classList.add('lang-transition');
+    setTimeout(() => {
+        applyTranslations();
+        document.body.classList.remove('lang-transition');
+    }, 300);
 }
 
+// AUTO-GENERATED DYNAMIC PHRASES (Pentest Context)
+const dynamicPhrases = {
+    pt: [
+        'ProceduralAI: Gerando SQLi UNION SELECT...',
+        'Reverse shell listening em 10.0.0.1:4444',
+        'Buffer overflow: ROP chain construída',
+        'XSS DOM bypass via location.hash',
+        'CVE-2021-44228 payload carregado'
+    ],
+    en: [
+        'ProceduralAI: Generating SQLi UNION SELECT...',
+        'Rev shell listening 10.0.0.1:4444',
+        'Buffer overflow: ROP chain ready',
+        'XSS DOM bypass via location.hash',
+        'CVE-2021-44228 payload loaded'
+    ],
+    es: [
+        'ProceduralAI: Generando SQLi UNION...',
+        'Rev shell escuchando 10.0.0.1:4444',
+        'Buffer overflow: ROP chain listo',
+        'XSS DOM bypass location.hash',
+        'CVE-2021-44228 payload cargado'
+    ]
+};
+
+// ENHANCED INITIALIZATION
 document.addEventListener('DOMContentLoaded', () => {
     applyTranslations();
-
-    // Ensure language selector reflects current language
+    
+    // Language selector
     const langSelect = document.getElementById('langSelect');
     if (langSelect) {
         langSelect.value = currentLang;
-        langSelect.addEventListener('change', (event) => {
-            setLanguage(event.target.value);
+        langSelect.addEventListener('change', (e) => setLanguage(e.target.value));
+    }
+    
+    // Dynamic cyberpunk phrases rotation
+    let phraseIndex = 0;
+    const phraseTargets = document.querySelectorAll('[data-dynamic-phrase]');
+    setInterval(() => {
+        const phrases = dynamicPhrases[currentLang];
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+        
+        phraseTargets.forEach((el, i) => {
+            el.textContent = phrases[(phraseIndex + i) % phrases.length];
+        });
+    }, 3500);
+    
+    // ProceduralAI real-time sync
+    if (window.procAI) {
+        window.procAI.onChallengeGenerated = (challenge) => {
+            window.procAI.lastChallenge = challenge;
+            updateChallengeDisplay();
+        };
+    }
+    
+    // PWA Language Persistence
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then(registration => {
+            registration.active.postMessage({
+                type: 'LANG_UPDATE',
+                lang: currentLang
+            });
         });
     }
-
-    const challengePhrases = {
-        pt: ['OP Ativa: Infiltre-se no gateway 10.0.0.1', 'Tunneling IPv6 ativo, rastreio oculto.', 'SOC Desviado: +30% de Reputação Stealth'],
-        en: ['Active OP: Breach gateway 10.0.0.1', 'IPv6 Tunneling active, trace hidden.', 'SOC Bypassed: +30% Stealth Rate'],
-        es: ['OP Activa: Infiltración en gateway 10.0.0.1', 'Tunneling IPv6 activo, rastro limpio.', 'SOC Evadido: +30% Reputación']
-    };
-
-    let currentPhraseIndex = 0;
-    const challengeElement = document.getElementById('challengeTitle');
-    setInterval(() => {
-        if (!challengeElement) return;
-        const phrases = challengePhrases[currentLang] || challengePhrases['pt'];
-        challengeElement.textContent = phrases[currentPhraseIndex % phrases.length];
-        currentPhraseIndex += 1;
-    }, 4200);
 });
+
+// GLOBAL EXPORTS for HTML/CSS integration
+window.i18n = { t, setLanguage, currentLang, translations };
+window.applyTranslations = applyTranslations;
+
+// CSS Lang Transition (add to your stylesheet)
+const style = document.createElement('style');
+style.textContent = `
+    .lang-transition * {
+        animation: glitch 0.3s ease-in-out;
+    }
+    @keyframes glitch {
+        0%, 100% { transform: translate(0); }
+        20% { transform: translate(-2px, 2px); }
+        40% { transform: translate(-2px, -2px); }
+        60% { transform: translate(2px, 2px); }
+        80% { transform: translate(2px, -2px); }
+    }
+`;
+document.head.appendChild(style);
