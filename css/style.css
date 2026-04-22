@@ -48,6 +48,12 @@
     --text-muted: hsl(215, 15%, 45%);
     --text-dim: hsl(215, 10%, 35%);
 
+    /* Glass Effects */
+    --glass: rgba(255, 255, 255, 0.02);
+    --glass-hover: rgba(255, 255, 255, 0.05);
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --shadow-glass: 0 0 50px rgba(0, 0, 0, 0.8);
+
     /* Glassmorphism v2 */
     --glass-bg: hsla(var(--void-800), 0.75);
     --glass-border: hsla(210, 40%, 98%, 0.12);
@@ -192,6 +198,142 @@ button {
 
 .text-glow {
     text-shadow: var(--glow-primary);
+}
+
+/* === GLASS CARD SYSTEM === */
+.glass-card {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-glass);
+    position: relative;
+    overflow: hidden;
+    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: 0.5s;
+}
+.glass-card:hover::before {
+    left: 150%;
+}
+.glass-card:hover {
+    border-color: rgba(255,255,255,0.12);
+}
+
+@keyframes reveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === SPLASH SCREEN === */
+.splash-overlay {
+    position: fixed;
+    inset: 0;
+    background: #050505;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s var(--motion-ease), visibility 0.8s;
+}
+
+.loading-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Progress bars */
+.progress-wrap {
+    display: grid;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+}
+.progress {
+    height: 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--success), hsl(var(--neon-green)));
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.progress-fill.danger {
+    background: linear-gradient(90deg, var(--warning), var(--danger));
+}
+
+/* Timer chip */
+.timer-chip {
+    text-align: center;
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+}
+.timer-chip span {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.timer-chip strong {
+    display: block;
+    font-size: 1.5rem;
+    margin-top: 0.2rem;
+    color: var(--text-primary);
+}
+
+/* Metric cards */
+.metric-card {
+    background: var(--bg-glass);
+    border: 1px solid var(--border-glass);
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+    border-radius: 16px;
+}
+.metric-card:nth-child(2) { animation-delay: 0.1s; }
+.metric-card:nth-child(3) { animation-delay: 0.2s; }
+.metric-card:nth-child(4) { animation-delay: 0.3s; }
+.metric-card:nth-child(5) { animation-delay: 0.4s; }
+.metric-card:nth-child(6) { animation-delay: 0.5s; }
+.metric-card:nth-child(7) { animation-delay: 0.6s; }
+.metric-card:hover {
+    background: var(--glass-hover);
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px rgba(6, 182, 212, 0.1);
+}
+
+/* Training buttons */
+.btn-training {
+    margin-top: 0.8rem;
+    background: rgba(255,255,255,0.1) !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    transition: all 0.2s;
+    color: white !important;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 16px;
+}
+.btn-training:hover {
+    background: rgba(255,255,255,0.2) !important;
+    transform: translateY(-1px);
 }
 
 .text-glow-secondary {

@@ -4,34 +4,16 @@ const CRITICAL_CACHE = 'critical-v5.0';
 const PENTEST_CACHE = 'pentest-v5.0';
 
 // ASSETS_CRITICAL - TODOS os recursos expandidos (150+ templates ProceduralAI, i18n completa, game engine, cyberpunk UI)
+// ASSETS_CRITICAL - Recursos fundamentais para funcionamento offline
 const ASSETS_CRITICAL = [
-  // HTML Core
-  '/', '/index.html', '/manifest.json', '/robots.txt',
-  
-  // Cyberpunk UI/CSS (glassmorphism/neon/glitch)
-  '/css/cyberpunk-ui.min.css', '/css/glassmorphism.css', '/css/neon-glows.css', '/css/glitch-terminal.css',
-  '/css/60fps-animations.css', '/css/accessibility-aaa.css',
-  
-  // Game Engine v4 (user mgmt/store/achievements/SFX)
-  '/js/game-engine-v4.min.js', '/js/user-profile.js', '/js/darkweb-store.js', '/js/achievements.js',
-  '/js/sfx-engine.js', '/js/cognitive-profile.js', '/js/streak-bonuses.js',
-  
-  // ProceduralAI v3 (150+ pentest templates w/ real payloads)
-  '/js/procedural-ai-v3.min.js', 
-  '/data/pentest-templates.json', // SQLi/XSS/RCE/Buffer Overflow/ROP chains/CVEs
-  '/data/exploits/sqlmap-payloads.json', '/data/exploits/burp-collaborator.json',
-  '/data/exploits/metasploit-modules.json', '/data/exploits/reverse-shells.json',
-  
-  // i18n v3 (pt/en/es w/ OWASP terminology)
-  '/i18n/pt.json', '/i18n/en.json', '/i18n/es.json',
-  '/i18n/pentest-terms-pt.json', '/i18n/pentest-terms-en.json', '/i18n/pentest-terms-es.json',
-  
-  // PWA Essentials + Icons
-  '/icons/icon-192.png', '/icons/icon-512.png', '/icons/maskable-icon.png',
-  
-  // SFX + Assets Offline
-  '/sfx/terminal-type.wav', '/sfx/exploit-success.mp3', '/sfx/cyberpunk-glitch.mp3',
-  '/img/cyberpunk-bg.jpg', '/img/neon-grid.png'
+  '/', 
+  '/index.html', 
+  '/manifest.json',
+  '/css/style.css', 
+  '/js/ai_generator.js', 
+  '/js/i18n.js', 
+  '/js/offline.js',
+  '/icon.png'
 ];
 
 // Recursos dinâmicos (CVEs recentes, leaderboards - network-first com cache fallback)
@@ -51,9 +33,7 @@ self.addEventListener('install', (event) => {
       // Precaching pentest payloads (alta prioridade)
       caches.open(PENTEST_CACHE).then(cache => 
         cache.addAll([
-          '/data/payloads/reverse-shells-all.json', // bash/python/php/perl/ruby
-          '/data/payloads/webshells-php.json', '/data/payloads/webshells-asp.json',
-          '/data/payloads/priv-esc-linux.json', '/data/payloads/priv-esc-windows.json'
+          '/data/arsenal.json'
         ])
       )
     ])

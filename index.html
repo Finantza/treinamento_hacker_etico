@@ -2,636 +2,338 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#20c997">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- SEO aprimorado -->
-    <meta name="description" content="Ethical Hacker - Simulador avançado de Cibersegurança. Treine suas habilidades em PenTest e proteção de redes num ambiente Cyberpunk imersivo.">
-    <meta name="keywords" content="hacker, ethical hacker, cibersegurança, segurança, redes, pentest, jogo, educativo, cybersecurity, ethical hacking">
-    <meta name="author" content="Antigravity AI">
-    <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#0a0a0a">
-    
-    <!-- Open Graph otimizado -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://alunosjk.com.br/">
-    <meta property="og:title" content="Ethical Hacker | Treinamento Cyber Premium">
-    <meta property="og:description" content="Domine a exploração de vulnerabilidades com interface cyberpunk de última geração. Jogue offline e suba no ranking global.">
-    <meta property="og:image" content="https://alunosjk.com.br/assets/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    
-    <!-- Twitter Cards -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Ethical Hacker | Treinamento Cyber">
-    <meta property="twitter:description" content="O próximo nível do aprendizado de Cibersegurança.">
-    <meta property="twitter:image" content="https://alunosjk.com.br/assets/og-image.png">
-    
-    <link rel="canonical" href="https://alunosjk.com.br/">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon.png">
-    <title>Ethical Hacker | Treinamento Cyber Premium</title>
-    
-    <!-- Preload crítico -->
-    <link rel="preload" href="css/style.css" as="style">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Orbitron:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" as="style">
-    <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style">
-    
-    <!-- Critical CSS inline para performance -->
-    <style>
-        :root {
-            --primary-glow: 0 0 20px rgba(0,123,255,0.5);
-            --cyber-glow: 0 0 30px #00ffff80;
-        }
-        .splash-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-            z-index: 9999;
-            transition: opacity 0.5s ease-out;
-        }
-        .cyber-title {
-            font-family: 'Orbitron', monospace;
-            background: linear-gradient(45deg, #00ffff, #00bfff);
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        @keyframes glow {
-            from { filter: drop-shadow(0 0 10px #00ffff80); }
-            to { filter: drop-shadow(0 0 20px #00ffff); }
-        }
-        .hero-shimmer {
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: shimmer 3s infinite;
-        }
-        @keyframes shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-        .loading-hidden { opacity: 0 !important; visibility: hidden !important; }
-    </style>
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Orbitron:wght@600;700;800;900&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- External CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberOS - Ethical Hacker Premium</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="css/style.css" rel="stylesheet">
-    
-    <!-- Service Worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                    .then(reg => console.log('SW registrado com sucesso'))
-                    .catch(err => console.error('Erro SW:', err));
-            });
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root { --neon-cyan: 180, 100%, 50%; --void-bg: #050505; --border-glass: rgba(0, 255, 255, 0.2); }
+        body { background-color: var(--void-bg); color: white; overflow: hidden; font-family: 'Segoe UI', Roboto, sans-serif; height: 100vh; }
+        .cyber-grid { position: fixed; inset: 0; background: linear-gradient(rgba(0,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; pointer-events: none; }
+        
+        /* Responsive Window System */
+        .window { position: absolute; width: 85vw; height: 80vh; max-width: 1200px; background: rgba(5, 5, 15, 0.9); border: 1px solid rgba(0, 255, 255, 0.15); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(0,255,255,0.05); display: flex; flex-direction: column; backdrop-filter: blur(25px); z-index: 100; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s; pointer-events: auto; overflow: hidden; }
+        
+        @media (max-width: 768px) {
+            .window { width: 98vw !important; height: 85vh !important; top: 45% !important; border-radius: 0; }
+            .desktop-icons { grid-template-columns: repeat(2, 1fr); top: 20px; left: 10px; right: 10px; width: auto; }
+            .task-item { padding: 5px 8px; font-size: 0.65rem; margin-right: 5px; }
+            .taskbar-time { display: none; }
         }
-    </script>
+
+        .window-header { padding: 12px 18px; background: linear-gradient(90deg, rgba(255,255,255,0.08), transparent); border-bottom: 1px solid rgba(255,255,255,0.1); cursor: move; display: flex; justify-content: space-between; align-items: center; }
+        .window-body { flex-grow: 1; overflow: auto; padding: 0; position: relative; }
+        .window-controls span { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-left: 8px; cursor: pointer; }
+        
+        /* Taskbar */
+        .cyber-taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: rgba(0,0,0,0.8); border-top: 1px solid rgba(0,255,255,0.2); backdrop-filter: blur(10px); z-index: 20000; display: flex; align-items: center; padding: 0 15px; }
+        .task-item { padding: 5px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; margin-right: 10px; cursor: pointer; font-size: 0.8rem; font-weight: bold; color: #0ff; transition: 0.2s; }
+        .task-item.active { background: rgba(0,255,255,0.1); border-color: #0ff; box-shadow: 0 0 10px rgba(0,255,255,0.3); }
+        
+        /* Notifications */
+        .notification-container { position: fixed; top: 20px; right: 20px; z-index: 30000; pointer-events: none; }
+        .notification-toast { background: rgba(10,10,10,0.95); border-left: 4px solid var(--neon-cyan); color: white; padding: 15px 25px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 5px 25px rgba(0,0,0,0.6); pointer-events: auto; min-width: 250px; }
+        
+        /* Desktop */
+        .desktop-icons { position: absolute; top: 30px; left: 30px; display: grid; grid-template-rows: repeat(auto-fill, 100px); gap: 20px; }
+        .desktop-icon { width: 80px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .desktop-icon:hover { transform: scale(1.1); filter: drop-shadow(0 0 10px #0ff); }
+        .icon-box { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        
+        #window-container { position: absolute; inset: 0; pointer-events: none; }
+    </style>
 </head>
 <body>
-    <!-- Splash Screen aprimorado -->
-    <div id="splashScreen" class="splash-overlay d-flex flex-column align-items-center justify-content-center" role="status" aria-live="polite">
-        <div class="spinner-border text-primary mb-3 loader-lg" role="status" aria-label="Carregando">
-            <span class="visually-hidden">Carregando recursos...</span>
+    <div class="cyber-grid"></div>
+
+    <!-- CINEMATIC SPLASH -->
+    <div id="splash-intro" class="splash-overlay d-flex flex-column align-items-center justify-content-center">
+        <div class="terminal-loader glass p-4" style="max-width: 600px; width: 90%;">
+            <div id="splash-terminal" class="font-monospace text-primary small"></div>
+            <div class="progress mt-4" style="height: 4px; background: rgba(255,255,255,0.1);">
+                <div id="splash-progress" class="progress-bar bg-info" style="width: 0%"></div>
+            </div>
+            <div class="text-center mt-3">
+                <button class="btn btn-link btn-sm text-muted text-decoration-none" onclick="os.hideSplash()" style="font-size: 0.7rem; opacity: 0.5;">[ PULAR INICIALIZAÇÃO ]</button>
+            </div>
         </div>
-        <h1 class="cyber-title glow-primary h3 mb-2" aria-label="Inicializando sistema">INICIALIZANDO SISTEMA</h1>
-        <div class="progress w-75 mx-auto" style="height: 4px;">
-            <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: 0%"></div>
-        </div>
-        <p class="text-muted small mt-2" id="splashText">Carregando Recursos de Elite...</p>
     </div>
 
-    <!-- Header aprimorado com melhor acessibilidade -->
-    <header class="premium-glass m-3 sticky-top header-premium-bar shadow-lg" role="banner">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center">
-                    <a href="/" class="d-flex align-items-center text-decoration-none">
-                        <span class="text-primary fw-bold fs-3 glow-primary font-heading-main me-2" aria-label="Ethical Hacker">EH</span>
-                        <span class="text-muted small d-none d-md-inline fw-medium" aria-label="Versão 1.0">ETHICAL HACKER v1.0</span>
-                    </a>
+    <!-- AUTH LAYER -->
+    <div id="auth-layer" class="animate__animated animate__fadeIn d-none">
+        <div class="container d-flex align-items-center justify-content-center min-vh-100">
+            <div class="glass-card p-5 rounded-4 shadow-glow" style="max-width: 450px; width: 100%;">
+                <div class="text-center mb-5">
+                    <h1 class="cyber-title fs-2 mb-2">ETHICAL HACKER</h1>
+                    <div class="badge bg-primary px-3 py-1">PREMIUM OS v5.2</div>
                 </div>
-                <nav aria-label="Controles principais" class="d-flex align-items-center gap-2">
-                    <div class="d-none d-md-flex gap-2">
-                        <span class="badge bg-success fs-6 px-2 py-1">🌐 Online</span>
-                        <span class="badge bg-info fs-6 px-2 py-1" id="connectionStatus">Conectado</span>
-                    </div>
-                    <select id="langSelect" class="form-select form-select-sm bg-dark text-white border-primary border-opacity-50 w-auto" 
-                            aria-label="Selecionar idioma" title="Idioma" onchange="changeLanguage(this.value)">
-                        <option value="pt" selected>🇧🇷 PT</option>
-                        <option value="en">🇺🇸 EN</option>
-                        <option value="es">🇪🇸 ES</option>
-                    </select>
-                    <button id="muteBtn" class="btn btn-sm btn-outline-primary px-3 py-1" 
-                            title="Alternar som" onclick="toggleMute()" aria-label="Alternar som">
-                        <i class="fas fa-volume-up" id="volumeIcon"></i>
-                    </button>
-                    <button class="btn btn-sm btn-primary d-none d-lg-flex" onclick="installPWA()" 
-                            id="installBtn" aria-label="Instalar aplicativo">
-                        <i class="fas fa-download me-1"></i>Instalar
-                    </button>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <main class="w-100" role="main">
-        <!-- Hero Section aprimorada -->
-        <section class="hero-section bg-gradient-primary text-white py-5 position-relative overflow-hidden" aria-labelledby="heroHeadline">
-            <div class="hero-overlay"></div>
-            <div class="hero-shimmer"></div>
-            <div class="container-fluid px-3 px-md-4">
-                <div class="row align-items-center min-vh-75">
-                    <div class="col-12 col-lg-6 order-2 order-lg-1">
-                        <div class="hero-content text-center text-lg-start">
-                            <!-- Nível atual com animação -->
-                            <div class="d-flex justify-content-center justify-content-lg-start mb-4 animate__animated animate__fadeInDown">
-                                <span class="badge bg-warning text-dark px-3 py-2 fs-5 fw-bold shadow-lg" 
-                                      role="img" aria-label="Nível atual">
-                                    <span class="challenge-icon me-1">🔥</span>
-                                    <span id="challengeTitle">Nível 1: Desafio Inicial</span>
-                                </span>
+                
+                <ul class="nav nav-pills nav-justified mb-4 bg-dark rounded-pill p-1">
+                    <li class="nav-item"><button class="nav-link active rounded-pill" id="login-tab" data-bs-toggle="pill" data-bs-target="#login-pane">Acesso</button></li>
+                    <li class="nav-item"><button class="nav-link rounded-pill" id="register-tab" data-bs-toggle="pill" data-bs-target="#register-pane">Novo Agente</button></li>
+                </ul>
+                
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="login-pane">
+                        <form id="loginForm">
+                            <div class="mb-4">
+                                <label class="form-label small text-muted">USUÁRIO</label>
+                                <input type="text" class="form-control cyber-input" id="loginUsername" placeholder="Digite seu nome" required>
                             </div>
+                            <div class="mb-4">
+                                <label class="form-label small text-muted">SENHA</label>
+                                <input type="password" class="form-control cyber-input" id="loginPassword" placeholder="Sua senha " required>
+                            </div>
+                            <button type="submit" class="btn btn-cyber primary w-100 py-3 mb-3">ENTRAR NO SISTEMA</button>
                             
-                            <h1 id="heroHeadline" class="display-3 fw-bold glow-text mb-4 animate__animated animate__fadeInUp" 
-                                data-i18n="title">
-                                🛡️ Ethical Hacker Premium
-                            </h1>
-                            
-                            <p id="heroSubline" class="lead mb-4 text-white-75 fs-4 animate__animated animate__fadeIn" 
-                               data-i18n="hero_desc">
-                                Treine penetração, descubra vulnerabilidades e proteja sistemas em tempo real.
-                            </p>
-                            
-                            <!-- CTAs aprimorados -->
-                            <div class="d-flex flex-column flex-sm-row gap-3 mb-5 justify-content-center justify-content-lg-start animate__animated animate__fadeIn">
-                                <button class="btn btn-warning btn-lg px-5 py-3 fw-bold pulse shadow-lg fs-5" 
-                                        onclick="startGame()" aria-label="Iniciar jogo agora">
-                                    <i class="fas fa-play-circle me-2"></i>
-                                    <span data-i18n="btn_start">🚀 INICIAR JOGO</span>
-                                </button>
-                                <button class="btn btn-outline-light btn-lg px-5 py-3 shadow-lg" 
-                                        onclick="scrollToFeatures()" aria-label="Explorar recursos">
-                                    <i class="fas fa-rocket me-2"></i>
-                                    <span data-i18n="explore_resources">EXPLORAR RECURSOS</span>
+                            <div class="text-center">
+                                <p class="text-muted small mb-3">OU</p>
+                                <button type="button" class="btn btn-outline-warning w-100 py-2" onclick="loginGuest()">
+                                    <i class="fas fa-user-secret me-2"></i> ACESSO RÁPIDO (MODO CONVIDADO)
                                 </button>
                             </div>
-                            
-                            <!-- Stats com microanimações -->
-                            <div class="d-flex align-items-center justify-content-center justify-content-lg-start gap-4 text-muted flex-wrap animate__animated animate__fadeInUp">
-                                <div class="d-flex align-items-center stat-item" data-count="1000">
-                                    <i class="fas fa-users text-primary me-2 fs-4"></i>
-                                    <span class="h6 mb-0 fw-bold" id="userCount">1K+</span>
-                                    <span class="small ms-1">Detetives</span>
-                                </div>
-                                <div class="d-flex align-items-center stat-item" data-count="4.8">
-                                    <i class="fas fa-star text-warning me-2 fs-4"></i>
-                                    <span class="h6 mb-0 fw-bold" id="rating">4.8</span>
-                                    <span class="small ms-1">/5</span>
-                                </div>
-                                <div class="d-flex align-items-center stat-item" data-count="5">
-                                    <i class="fas fa-clock text-success me-2 fs-4"></i>
-                                    <span class="h6 mb-0 fw-bold" id="timeCount">5</span>
-                                    <span class="small ms-1">min/jogo</span>
-                                </div>
-                            </div>
-                        </div>
+                        </form>
                     </div>
-                    
-                    <!-- Terminal demo aprimorado -->
-                    <div class="col-12 col-lg-6 order-1 order-lg-2">
-                        <div class="hero-image-container position-relative mb-4 mb-lg-0 animate__animated animate__fadeInRight">
-                            <div class="card bg-dark border-0 shadow-2xl h-100" style="backdrop-filter: blur(20px);">
-                                <div class="card-header bg-gradient-dark border-0 p-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-danger rounded-circle p-2 me-3 shadow">
-                                            <i class="fas fa-terminal text-white fs-5"></i>
-                                        </div>
-                                        <div>
-                                            <div class="text-white fw-bold small">Kali Linux 2024.1</div>
-                                            <div class="text-muted tiny">root@kali:~/pentest</div>
-                                        </div>
-                                        <div class="ms-auto d-flex align-items-center gap-1">
-                                            <span class="badge bg-success tiny px-2">LIVE</span>
-                                            <span class="dot-pulse bg-success ms-1"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body p-4 position-relative">
-                                    <!-- Terminal output com scroll -->
-                                    <div id="terminalOutput" class="terminal-output bg-black rounded p-3 mb-3 font-monospace small lh-sm overflow-auto" 
-                                         style="height: 200px; font-size: 0.85rem;" tabindex="0" aria-label="Saída do terminal">
-                                        <div class="text-success mb-1"><span class="text-white">root@kali</span>:<span class="text-cyan">~</span>$ nmap -sS -A -p- target.io</div>
-                                        <div class="text-white mb-1">Nmap scan report for target.io (192.168.1.100)</div>
-                                        <div class="text-white mb-1">Host is up (0.012s latency).</div>
-                                        <div class="text-info mb-1">PORT    STATE SERVICE  VERSION</div>
-                                        <div class="text-warning mb-1">22/tcp  open  ssh     OpenSSH 8.9p1</div>
-                                        <div class="text-warning mb-1">80/tcp  open  http    Apache 2.4.52</div>
-                                        <div class="text-danger mb-1">⚠️  CRITICAL: SQLi detected on /login</div>
-                                        <div class="text-primary mb-2">[+] Exploit ready. Press ENTER to pwn...</div>
-                                        <div class="blink">_</div>
-                                    </div>
-                                    
-                                    <!-- Progress bar animada -->
-                                    <div class="progress mb-3" style="height: 8px;">
-                                        <div class="progress-bar bg-gradient-danger progress-bar-striped progress-bar-animated" 
-                                             role="progressbar" style="width: 87%" aria-valuenow="87" aria-valuemin="0" aria-valuemax="100">
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-between small text-muted">
-                                        <span>Exploit chain: Nmap → Nikto → SQLMap → Meterpreter</span>
-                                        <span><strong>87%</strong></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Badges flutuantes aprimorados -->
-                            <div class="floating-elements">
-                                <div class="floating-badge badge bg-gradient-primary position-absolute top-0 end-0 m-3 p-3 shadow-lg animate__animated animate__pulse animate__infinite">
-                                    <i class="fas fa-bolt fs-5"></i>
-                                </div>
-                                <div class="floating-badge badge bg-gradient-danger position-absolute top-50 end-0 translate-middle-y m-3 p-3 shadow-lg animate__animated animate__bounceIn">
-                                    <i class="fas fa-bug fs-5"></i>
-                                </div>
-                                <div class="floating-badge badge bg-gradient-success position-absolute bottom-0 start-0 m-3 p-3 shadow-lg animate__animated animate__tada">
-                                    <i class="fas fa-shield-alt fs-5"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Game Section -->
-        <section id="game" class="py-5 bg-black position-relative overflow-hidden" style="display: none;">
-            <div class="container px-3 px-md-4">
-                <div class="row justify-content-center">
-                    <div class="col-12 col-lg-8">
-                        <div class="card bg-dark border-primary shadow-lg">
-                            <div class="card-header bg-primary text-white">
-                                <h3 class="card-title mb-0">Terminal de Exploit</h3>
-                            </div>
-                            <div class="card-body">
-                                <div id="challengeCode" class="bg-black p-3 rounded mb-3 font-monospace text-success"></div>
-                                <div id="challengeOptions" class="mb-3"></div>
-                                <button id="submitAnswer" class="btn btn-primary">Enviar Resposta</button>
-                                <div id="feedback" class="mt-3"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Features section aprimorada -->
-        <section id="features" class="py-5 py-md-5 bg-dark position-relative overflow-hidden" aria-labelledby="featuresTitle">
-            <div class="matrix-bg"></div>
-            <div class="container px-3 px-md-4">
-                <div class="row justify-content-center mb-5">
-                    <div class="col-12 col-lg-8 text-center">
-                        <h2 id="featuresTitle" class="display-4 fw-bold text-white mb-4 glow-text" data-i18n="features_title">
-                            🛠️ Arsenal Cyber Elite
-                        </h2>
-                        <p class="lead text-white-50 mb-0 fs-4" data-i18n="features_desc">
-                            Ferramentas profissionais para dominar todas as fases do Penetration Testing
-                        </p>
-                    </div>
-                </div>
-
-                <div class="row g-4 g-md-4 justify-content-center">
-                    <!-- Feature cards aprimoradas -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="card h-100 feature-card bg-gradient-secondary border-0 shadow-xl hover-lift" tabindex="0">
-                            <div class="card-body text-center p-4 p-md-5">
-                                <div class="feature-icon mb-4">
-                                    <div class="icon-circle bg-danger">
-                                        <i class="fas fa-bug fs-1"></i>
-                                    </div>
-                                </div>
-                                <h3 class="card-title text-white fw-bold mb-3 fs-5" data-i18n="vuln_analysis">Análise Avançada</h3>
-                                <p class="card-text text-muted mb-4 lead" data-i18n="vuln_desc">
-                                    Nmap, Nikto, SQLMap, Burp Suite e 50+ ferramentas integradas
-                                </p>
-                                <div class="badges-container">
-                                    <span class="badge bg-danger fs-6 px-3 py-2 me-1">🔴 CVSS 9.8</span>
-                                    <span class="badge bg-success fs-6 px-3 py-2">Pro</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="card h-100 feature-card bg-gradient-secondary border-0 shadow-xl hover-lift" tabindex="0">
-                            <div class="card-body text-center p-4 p-md-5">
-                                <div class="feature-icon mb-4">
-                                    <div class="icon-circle bg-warning">
-                                        <i class="fas fa-trophy fs-1"></i>
-                                    </div>
-                                </div>
-                                <h3 class="card-title text-white fw-bold mb-3 fs-5" data-i18n="ranking">Ranking Global</h3>
-                                <p class="card-text text-muted mb-4 lead" data-i18n="ranking_desc">
-                                    Compita em tempo real com 1000+ hackers éticos
-                                </p>
-                                <div class="badges-container">
-                                    <span class="badge bg-warning fs-6 px-3 py-2 me-1">🥇 #1 Brasil</span>
-                                    <span class="badge bg-primary fs-6 px-3 py-2">Live</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Mais 4 cards... (mantive a estrutura, adicionei os outros) -->
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="card h-100 feature-card bg-gradient-secondary border-0 shadow-xl hover-lift" tabindex="0">
-                            <div class="card-body text-center p-4 p-md-5">
-                                <div class="feature-icon mb-4">
-                                    <div class="icon-circle bg-primary">
-                                        <i class="fas fa-brain fs-1"></i>
-                                    </div>
-                                </div>
-                                <h3 class="card-title text-white fw-bold mb-3 fs-5">IA Adaptativa</h3>
-                                <p class="card-text text-muted mb-4 lead">Desafios que evoluem com seu skill level</p>
-                                <div class="badges-container">
-                                    <span class="badge bg-primary fs-6 px-3 py-2 me-1">🤖 AI</span>
-                                    <span class="badge bg-info fs-6 px-3 py-2">100% Adaptativo</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="card h-100 feature-card bg-gradient-secondary border-0 shadow-xl hover-lift" tabindex="0">
-                            <div class="card-body text-center p-4 p-md-5">
-                                <div class="feature-icon mb-4">
-                                    <div class="icon-circle bg-success">
-                                        <i class="fas fa-mobile-alt fs-1"></i>
-                                    </div>
-                                </div>
-                                <h3 class="card-title text-white fw-bold mb-3 fs-5">PWA 100% Native</h3>
-                                <p class="card-text text-muted mb-4 lead">60fps em qualquer dispositivo</p>
-                                <div class="badges-container">
-                                    <span class="badge bg-success fs-6 px-3 py-2 me-1">📱 iOS/Android</span>
-                                    <span class="badge bg-secondary fs-6 px-3 py-2">Offline</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="card h-100 feature-card bg-gradient-secondary border-0 shadow-xl hover-lift" tabindex="0">
-                            <div class="card-body text-center p-4 p-md-5">
-                                <div class="feature-icon mb-4">
-                                    <div class="icon-circle bg-info">
-                                        <i class="fas fa-language fs-1"></i>
-                                    </div>
-                                </div>
-                                <h3 class="card-title text-white fw-bold mb-3 fs-5">Multi-idioma</h3>
-                                <p class="card-text text-muted mb-4 lead">PT-BR, EN, ES + RTL support</p>
-                                <div class="badges-container">
-                                    <span class="badge bg-info fs-6 px-3 py-2 me-1">🌐 3 idiomas</span>
-                                    <span class="badge bg-light text-dark fs-6 px-3 py-2">Voice AI</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-12 col-sm-6 col-lg-4">
-                        <div class="card h-100 feature-card bg-gradient-secondary border-0 shadow-xl hover-lift" tabindex="0">
-                            <div class="card-body text-center p-4 p-md-5">
-                                <div class="feature-icon mb-4">
-                                    <div class="icon-circle bg-secondary">
-                                        <i class="fas fa-shield-alt fs-1"></i>
-                                    </div>
-                                </div>
-                                <h3 class="card-title text-white fw-bold mb-3 fs-5">Zero Trust</h3>
-                                <p class="card-text text-muted mb-4 lead">Modo offline + sync inteligente</p>
-                                <div class="badges-container">
-                                    <span class="badge bg-secondary fs-6 px-3 py-2 me-1">🔒 Seguro</span>
-                                    <span class="badge bg-dark fs-6 px-3 py-2">PWA v3</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CTA final -->
-                <div class="row justify-content-center mt-5 pt-5 border-top border-secondary">
-                    <div class="col-12 col-md-8 col-lg-6 text-center">
-                        <div class="alert alert-dark border-0 shadow-lg p-4" role="alert">
-                            <div class="row align-items-center">
-                                <div class="col-auto">
-                                    <i class="fas fa-lightbulb text-warning fs-1"></i>
-                                </div>
-                                <div class="col">
-                                    <h4 class="text-white mb-2">💡 Primeiros Passos</h4>
-                                    <p class="mb-0 text-white-50">Comece com <strong>Nível 1</strong> e evolua até <strong>CTF Master</strong> em 30 dias!</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Footer aprimorado -->
-    <footer class="bg-gradient-darker text-white py-4 border-top border-secondary" role="contentinfo">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-3 mb-md-0 small">
-                        <i class="fas fa-shield-alt text-primary me-1"></i>
-                        © 2026 Ethical Hacker System. Todos os direitos reservados. | 
-                        <a href="/privacy" class="text-muted text-decoration-none">Privacidade</a> | 
-                        <a href="/terms" class="text-muted text-decoration-none">Termos</a>
-                    </p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <div class="social-links d-flex justify-content-center justify-content-md-end gap-3 small">
-                        <a href="#" class="text-muted" title="Discord" aria-label="Comunidade Discord"><i class="fab fa-discord fs-5"></i></a>
-                        <a href="#" class="text-muted" title="GitHub" aria-label="Repositório GitHub"><i class="fab fa-github fs-5"></i></a>
-                        <a href="#" class="text-muted" title="YouTube" aria-label="Tutoriais YouTube"><i class="fab fa-youtube fs-5"></i></a>
+                    <div class="tab-pane fade" id="register-pane">
+                        <form id="registerForm">
+                            <div class="mb-3"><label class="form-label small text-muted">NOME REAL</label><input type="text" class="form-control cyber-input" id="registerName" required></div>
+                            <div class="mb-3"><label class="form-label small text-muted">CODINOME</label><input type="text" class="form-control cyber-input" id="registerUsername" required></div>
+                            <div class="mb-3"><label class="form-label small text-muted">SENHA</label><input type="password" class="form-control cyber-input" id="registerPassword" required></div>
+                            <button type="submit" class="btn btn-success w-100 py-3">CADASTRAR</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
-    <!-- Scripts otimizados (defer + async) -->
-    <script src="js/i18n.js" defer></script>
-    <script src="js/ai_generator.js" defer></script>
-    <script src="js/offline.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-    
-    <!-- Core functionality -->
+    <!-- DESKTOP LAYER -->
+    <div id="desktop-layer" class="d-none animate__animated animate__fadeIn">
+        <div class="desktop-icons">
+            <div class="desktop-icon" onclick="showDashboard()">
+                <div class="icon-box bg-primary"><i class="fas fa-id-card fs-3"></i></div>
+                <span class="small fw-bold">PERFIL</span>
+            </div>
+            <div class="desktop-icon" onclick="startGame('logica')">
+                <div class="icon-box bg-danger"><i class="fas fa-bug fs-3"></i></div>
+                <span class="small fw-bold">PENTEST</span>
+            </div>
+            <div class="desktop-icon" onclick="startDefenseMode()">
+                <div class="icon-box bg-info"><i class="fas fa-shield-alt fs-3"></i></div>
+                <span class="small fw-bold">SOC</span>
+            </div>
+            <div class="desktop-icon" onclick="startBotWar()">
+                <div class="icon-box bg-warning"><i class="fas fa-bolt fs-3"></i></div>
+                <span class="small fw-bold">ARENA</span>
+            </div>
+            <div class="desktop-icon" onclick="showGlossary()">
+                <div class="icon-box bg-success"><i class="fas fa-book fs-3"></i></div>
+                <span class="small fw-bold">GLOSSÁRIO</span>
+            </div>
+        </div>
+
+        <div id="window-container"></div>
+
+        <div class="cyber-taskbar">
+            <div id="taskbar-items" class="d-flex align-items-center flex-grow-1"></div>
+            <div class="taskbar-actions me-3">
+                <button class="btn btn-outline-danger btn-sm px-3" onclick="logout()" title="Encerrar Sessão">
+                    <i class="fas fa-power-off me-1"></i> SAIR
+                </button>
+            </div>
+            <div class="taskbar-time text-end">
+                <div id="os-clock" class="fw-bold">00:00</div>
+                <div id="os-date" class="small text-muted">22 APR</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core OS Logic -->
     <script>
-        // Performance monitoring
-        window.addEventListener('load', () => {
-            // Hide splash screen
-            const splash = document.getElementById('splashScreen');
-            const progress = splash.querySelector('.progress-bar');
-            const splashText = document.getElementById('splashText');
-            
-            let progressValue = 0;
-            const progressInterval = setInterval(() => {
-                progressValue += Math.random() * 15;
-                if (progressValue >= 95) progressValue = 95;
-                progress.style.width = progressValue + '%';
-                splashText.textContent = ['Carregando módulos...', 'Compilando shaders...', 'Inicializando IA...', 'Sincronizando...'][Math.floor(progressValue / 25)];
-            }, 150);
-            
-            setTimeout(() => {
-                clearInterval(progressInterval);
-                progress.style.width = '100%';
-                setTimeout(() => {
-                    splash.classList.add('loading-hidden');
-                    document.body.style.overflow = 'auto';
-                }, 500);
-            }, 2500);
-            
-            // Animate counters
-            animateCounters();
-            initTerminal();
-            initPWA();
-        });
+        const os = {
+            windows: {},
+            zindex: 100,
+            introInterval: null,
 
-        // Counter animation
-        function animateCounters() {
-            const counters = document.querySelectorAll('.stat-item');
-            counters.forEach(counter => {
-                const target = parseFloat(counter.dataset.count);
-                const countEl = counter.querySelector('span[id]');
-                let current = 0;
-                const increment = target / 100;
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        countEl.textContent = counter.dataset.count + (counter.dataset.suffix || '');
-                        clearInterval(timer);
-                    } else {
-                        countEl.textContent = Math.floor(current) + (counter.dataset.suffix || '');
-                    }
-                }, 30);
-            });
-        }
+            init() {
+                this.initIntro();
+                this.updateClock();
+                this.createNotificationContainer();
+                setInterval(() => this.updateClock(), 60000);
+            },
 
-        // Terminal simulation
-        function initTerminal() {
-            const terminal = document.getElementById('terminalOutput');
-            const blink = terminal.querySelector('.blink');
-            
-            // Type effect simulation
-            const commands = [
-                'sqlmap -u "http://target.io/login" --dbs',
-                'Discovered 3 databases: users_db, admin_db, logs',
-                '[+] Payload: \' OR 1=1 --',
-                'meterpreter > shell',
-                'msfvenom -p windows/meterpreter/reverse_tcp'
-            ];
-            
-            let cmdIndex = 0;
-            setInterval(() => {
-                if (cmdIndex < commands.length) {
-                    const newLine = document.createElement('div');
-                    newLine.className = 'text-primary mb-1';
-                    newLine.textContent = commands[cmdIndex];
-                    terminal.insertBefore(newLine, blink);
-                    terminal.scrollTop = terminal.scrollHeight;
-                    cmdIndex++;
+            updateClock() {
+                const now = new Date();
+                const clock = document.getElementById('os-clock');
+                if (clock) clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            },
+
+            createNotificationContainer() {
+                if (!document.getElementById('notification-container')) {
+                    const container = document.createElement('div');
+                    container.id = 'notification-container';
+                    container.className = 'notification-container';
+                    document.body.appendChild(container);
                 }
-            }, 4000);
-        }
+            },
 
-        // PWA Installation
-        let deferredPrompt;
-        function initPWA() {
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                document.getElementById('installBtn').classList.remove('d-none');
-            });
-        }
+            showNotification(msg, type = 'info') {
+                const container = document.getElementById('notification-container');
+                if (!container) return;
+                const toast = document.createElement('div');
+                toast.className = `notification-toast animate__animated animate__slideInRight`;
+                if (type === 'success') toast.style.borderLeftColor = '#00ff88';
+                if (type === 'danger') toast.style.borderLeftColor = '#ff3366';
+                toast.innerHTML = `<div class="d-flex align-items-center"><i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'danger' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-3"></i><div>${msg}</div></div>`;
+                container.appendChild(toast);
+                setTimeout(() => {
+                    toast.classList.replace('animate__slideInRight', 'animate__slideOutRight');
+                    setTimeout(() => toast.remove(), 500);
+                }, 4000);
+            },
 
-        async function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-                document.getElementById('installBtn').classList.add('d-none');
+            hideSplash() {
+                const splash = document.getElementById('splash-intro');
+                if (splash) {
+                    splash.classList.add('loading-hidden');
+                    if (this.introInterval) clearInterval(this.introInterval);
+                }
+            },
+
+            initIntro() {
+                const term = document.getElementById('splash-terminal');
+                const progress = document.getElementById('splash-progress');
+                const logs = ["> INITIALIZING KERNEL...", "> LOADING NEURAL MODULES...", "> ESTABLISHING TUNNEL...", "> SYSTEM READY."];
+                let i = 0;
+                this.introInterval = setInterval(() => {
+                    if (i < logs.length) {
+                        const div = document.createElement('div');
+                        div.textContent = logs[i];
+                        if (term) term.appendChild(div);
+                        if (progress) progress.style.width = ((i+1)/logs.length)*100 + '%';
+                        i++;
+                    } else {
+                        clearInterval(this.introInterval);
+                        setTimeout(() => {
+                            this.hideSplash();
+                            if (!localStorage.getItem('currentUser')) {
+                                const auth = document.getElementById('auth-layer');
+                                if (auth) auth.classList.remove('d-none');
+                            }
+                        }, 500);
+                    }
+                }, 400);
+            },
+
+            openWindow(id) {
+                if (this.windows[id]) { this.focusWindow(id); return; }
+                const win = document.createElement('div');
+                win.id = `win-${id}`;
+                win.className = 'window animate__animated animate__zoomIn';
+                const w = Math.min(window.innerWidth * 0.85, 1200);
+                const h = window.innerHeight * 0.8;
+                win.style.width = w + 'px';
+                win.style.height = h + 'px';
+                win.style.left = ((window.innerWidth - w) / 2) + 'px';
+                win.style.top = ((window.innerHeight - h) / 2) + 'px';
+                win.style.zIndex = ++this.zindex;
+                win.innerHTML = `<div class="window-header"><span class="fw-bold"><i class="fas fa-terminal me-2"></i> ${id.toUpperCase()}</span><div class="window-controls"><span class="bg-warning" onclick="os.minimizeWindow('${id}')"></span><span class="bg-danger" onclick="os.closeWindow('${id}')"></span></div></div><div class="window-body" id="body-${id}"><div class="p-5 text-center"><i class="fas fa-spinner fa-spin fa-3x"></i></div></div>`;
+                const container = document.getElementById('window-container');
+                if (container) {
+                    container.appendChild(win);
+                    this.windows[id] = win;
+                    this.addToTaskbar(id);
+                    this.makeDraggable(win);
+                }
+            },
+
+            closeWindow(id) {
+                if (this.windows[id]) {
+                    this.windows[id].classList.add('animate__zoomOut');
+                    setTimeout(() => {
+                        if (this.windows[id]) { this.windows[id].remove(); delete this.windows[id]; }
+                        const t = document.getElementById(`task-${id}`);
+                        if (t) t.remove();
+                    }, 200);
+                }
+            },
+
+            minimizeWindow(id) {
+                if (this.windows[id]) {
+                    const isMin = this.windows[id].style.display === 'none';
+                    this.windows[id].style.display = isMin ? 'flex' : 'none';
+                    const task = document.getElementById(`task-${id}`);
+                    if (task) task.classList.toggle('active', !isMin);
+                }
+            },
+
+            focusWindow(id) {
+                if (this.windows[id]) {
+                    this.windows[id].style.display = 'flex';
+                    this.windows[id].style.zIndex = ++this.zindex;
+                    document.querySelectorAll('.task-item').forEach(el => el.classList.remove('active'));
+                    const task = document.getElementById(`task-${id}`);
+                    if (task) task.classList.add('active');
+                }
+            },
+
+            toggleWindow(id) {
+                const win = this.windows[id];
+                if (!win) {
+                    if (id === 'dashboard') showDashboard();
+                    else if (id === 'pentest') startGame('logica');
+                    else if (id === 'soc') startDefenseMode();
+                    else if (id === 'botwar') startBotWar();
+                    else if (id === 'glossary') showGlossary();
+                    return;
+                }
+                if (win.style.display === 'none') { this.minimizeWindow(id); this.focusWindow(id); }
+                else if (win.style.zIndex == this.zindex) { this.minimizeWindow(id); }
+                else { this.focusWindow(id); }
+            },
+
+            addToTaskbar(id) {
+                const items = document.getElementById('taskbar-items');
+                if (items) {
+                    const item = document.createElement('div');
+                    item.id = `task-${id}`;
+                    item.className = 'task-item active';
+                    item.textContent = id.toUpperCase();
+                    item.onclick = () => this.toggleWindow(id);
+                    items.appendChild(item);
+                }
+            },
+
+            makeDraggable(el) {
+                const header = el.querySelector('.window-header');
+                let nx = 0, ny = 0, x = 0, y = 0;
+                header.onmousedown = (e) => {
+                    e.preventDefault(); nx = e.clientX; ny = e.clientY;
+                    this.focusWindow(el.id.replace('win-', ''));
+                    document.onmouseup = () => { document.onmouseup = null; document.onmousemove = null; };
+                    document.onmousemove = (e) => {
+                        e.preventDefault(); x = nx - e.clientX; y = ny - e.clientY; nx = e.clientX; ny = e.clientY;
+                        el.style.top = (el.offsetTop - y) + "px"; el.style.left = (el.offsetLeft - x) + "px";
+                    };
+                };
             }
-        }
+        };
+        window.os = os;
+    </script>
 
-        // Game functions
-        function startGame() { document.getElementById('game').style.display = 'block'; document.getElementById('game').scrollIntoView({ behavior: 'smooth' }); const challenge = ProceduralAI.gerar({}, 'iniciante'); document.getElementById('challengeCode').textContent = challenge.code; const optionsDiv = document.getElementById('challengeOptions'); optionsDiv.innerHTML = ''; challenge.options.forEach((option, index) => { const btn = document.createElement('button'); btn.className = 'btn btn-outline-light m-1'; btn.textContent = option; btn.onclick = () => checkAnswer(index, challenge.correct, challenge.explain); optionsDiv.appendChild(btn); }); } function checkAnswer(selected, correct, explain) { const feedback = document.getElementById('feedback'); if (selected === correct) { feedback.innerHTML = '<div class="alert alert-success">Correto! ' + explain + '</div>'; } else { feedback.innerHTML = '<div class="alert alert-danger">Errado. Tente novamente.</div>'; } } // old
-            // Analytics tracking
-            console.log('🎮 Game started by user');
-            // Redirect or open modal
-            document.querySelector('.hero-content').scrollIntoView({ behavior: 'smooth' });
-        }
+    <!-- Dependencies -->
+    <script src="js/i18n.js"></script>
+    <script src="js/ai_generator.js"></script>
+    <script src="js/gemma_optimizer.js"></script>
+    <script src="js/defense_engine.js"></script>
+    <script src="js/bot_war.js"></script>
+    <script src="js/offline.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-        function scrollToFeatures() {
-            document.getElementById('features').scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-
-        function changeLanguage(lang) {
-            if (typeof setLanguage === 'function') {
-                setLanguage(lang);
-            }
-            document.documentElement.lang = lang;
-        }
-
-        function toggleMute() {
-            const icon = document.getElementById('volumeIcon');
-            const isMuted = icon.classList.contains('fa-volume-mute');
-            icon.classList.toggle('fa-volume-up', !isMuted);
-            icon.classList.toggle('fa-volume-mute', isMuted);
-        }
-
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && e.target === document.body) {
-                startGame();
-            }
-        });
-
-        // Network status
-        window.addEventListener('online', () => {
-            document.getElementById('connectionStatus').textContent = 'Conectado';
-            document.getElementById('connectionStatus').className = 'badge bg-success fs-6 px-2 py-1';
-        });
-
-        window.addEventListener('offline', () => {
-            document.getElementById('connectionStatus').textContent = 'Offline';
-            document.getElementById('connectionStatus').className = 'badge bg-warning fs-6 px-2 py-1';
-        });
-// Registra SW otimizado
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js', {scope: '/'});
-  
-  // Precaching dinâmico de novos payloads
-  navigator.serviceWorker.controller.postMessage({
-    type: 'PRECACHE_PENTEST',
-    resources: ['/data/payloads/novos-exploits.json']
-  });
-}
+    <script>
+        window.addEventListener('load', () => os.init());
     </script>
 </body>
 </html>
