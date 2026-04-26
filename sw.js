@@ -79,12 +79,12 @@ self.addEventListener('fetch', (event) => {
   
   // 4. IMAGENS/SFX: Stale-while-revalidate (60fps performance)
   if (event.request.destination === 'image' || event.request.destination === 'audio') {
-    event.respondWith(staleWhileRevalidate(event.request));
+    event.respondWith(staleWhileRevalidate(event.request, event));
     return;
   }
   
   // 5. DEFAULT: Stale-while-revalidate (app shell)
-  event.respondWith(staleWhileRevalidate(event.request));
+  event.respondWith(staleWhileRevalidate(event.request, event));
 });
 
 // IMPLEMENTAÇÕES DAS ESTRATÉGIAS
@@ -114,7 +114,7 @@ async function networkFirst(request) {
   }
 }
 
-async function staleWhileRevalidate(request) {
+async function staleWhileRevalidate(request, event) {
   const cache = await caches.open(CACHE_NAME);
   let response = await cache.match(request);
   

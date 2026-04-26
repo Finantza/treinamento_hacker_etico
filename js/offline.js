@@ -368,11 +368,30 @@ const socHandlers = {
         const level = e.detail.level;
         progress.style.width = level + '%';
         val.textContent = level + '%';
+        const mttdEl = document.getElementById('socMTTD');
+        const blockedEl = document.getElementById('socBlocked');
+        if (mttdEl && e.detail.mttd) mttdEl.textContent = e.detail.mttd;
+        if (blockedEl && e.detail.blocked !== undefined) blockedEl.textContent = e.detail.blocked + '/' + (e.detail.detected || 0);
         if (level > 70) { progress.className = 'progress-bar bg-danger'; badge.className = 'badge bg-danger'; badge.textContent = 'STATUS: CRÍTICO'; }
         else if (level > 30) { progress.className = 'progress-bar bg-warning'; badge.className = 'badge bg-warning'; badge.textContent = 'STATUS: ALERTA'; }
         else { progress.className = 'progress-bar bg-success'; badge.className = 'badge bg-success'; badge.textContent = 'STATUS: NORMAL'; }
     }
 };
+
+window.addEventListener('defense_won', (e) => {
+    const body = document.getElementById('body-soc');
+    if (!body) return;
+    body.innerHTML = `<div class="d-flex flex-column align-items-center justify-content-center h-100 p-5 animate__animated animate__zoomIn">
+        <div class="mx-auto mb-4 bg-success rounded-circle d-flex align-items-center justify-content-center" style="width:100px;height:100px;box-shadow:0 0 30px #0f0">
+            <i class="fas fa-trophy fa-3x text-dark"></i>
+        </div>
+        <h1 class="text-success glitch-text mb-2">BLUE TEAM VENCEU!</h1>
+        <p class="text-white-50 mb-2">Sistema protegido com sucesso! MTTD: <strong class="text-info">${e.detail.mttd}</strong></p>
+        <p class="text-white-50 mb-4">${e.detail.ticks} ciclos de ataque neutralizados.</p>
+        <button class="btn btn-outline-success btn-lg px-5 py-3 fw-bold" onclick="startDefenseMode()">NOVA SIMULAÇÃO SOC</button>
+    </div>`;
+    if (window.os) os.showNotification('🏆 BLUE TEAM VENCEU! Sistema protegido!', 'success');
+});
 
 const arenaHandlers = {
     log: (e) => {
@@ -420,55 +439,47 @@ function startDefenseMode() {
             <div class="row g-4">
                 <div class="col-lg-8">
                     <div class="premium-glass p-4 h-100 border-success">
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-                            <h5 class="text-success mb-0"><i class="fas fa-satellite-dish me-2"></i>MONITORAMENTO DE TRÁFEGO</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="text-success mb-0"><i class="fas fa-satellite-dish me-2"></i>SIEM - MONITORAMENTO</h5>
                             <span id="threatBadge" class="badge bg-success">STATUS: NORMAL</span>
                         </div>
-                        <div id="socLogs" class="bg-black p-3 rounded font-monospace small overflow-auto" style="height: 400px; border: 1px solid #0f03;">
+                        <div class="row g-2 mb-3">
+                            <div class="col-4"><div class="bg-black p-2 rounded text-center small border border-success"><div class="text-success fw-bold" id="threatValue">0%</div><div class="text-muted" style="font-size:0.65rem">THREAT LEVEL</div></div></div>
+                            <div class="col-4"><div class="bg-black p-2 rounded text-center small border border-info"><div class="text-info fw-bold" id="socMTTD">N/A</div><div class="text-muted" style="font-size:0.65rem">MTTD</div></div></div>
+                            <div class="col-4"><div class="bg-black p-2 rounded text-center small border border-warning"><div class="text-warning fw-bold" id="socBlocked">0/0</div><div class="text-muted" style="font-size:0.65rem">BLOQUEADO/DETECT.</div></div></div>
+                        </div>
+                        <div class="progress mb-3" style="height:8px;background:rgba(0,0,0,0.5);">
+                            <div id="threatProgress" class="progress-bar bg-success" style="width:0%"></div>
+                        </div>
+                        <div id="socLogs" class="bg-black p-3 rounded font-monospace small overflow-auto" style="height:340px;border:1px solid #0f03;">
                             <div class="text-muted">Aguardando telemetria do Firewall...</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
-                    <div class="premium-glass p-4 mb-4 border-warning">
-                        <h6 class="text-warning mb-3"><i class="fas fa-radiation me-2"></i>NÍVEL DE AMEAÇA</h6>
-                        <div class="progress mb-2" style="height: 10px; background: rgba(0,0,0,0.5);">
-                            <div id="threatProgress" class="progress-bar bg-success" style="width: 0%"></div>
-                        </div>
-                        <div class="text-center fw-bold text-white h4" id="threatValue">0%</div>
-                    </div>
-                    <div class="premium-glass p-4 mb-4 border-info">
-                        <h6 class="text-info mb-3"><i class="fas fa-shield-virus me-2"></i>CONTRA-MEDIDAS PADRÃO</h6>
-                        <div class="d-grid gap-2 mb-4">
-                            <button class="btn btn-outline-info btn-sm text-start" onclick="defense.deployCountermeasure('WAF_SQLI')">
-                                <i class="fas fa-code me-2"></i> Ativar WAF (SQLi)
-                            </button>
-                            <button class="btn btn-outline-info btn-sm text-start" onclick="defense.deployCountermeasure('WAF_XSS')">
-                                <i class="fas fa-terminal me-2"></i> Ativar WAF (XSS)
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm text-start" onclick="defense.deployCountermeasure('IP_BLOCK')">
-                                <i class="fas fa-user-slash me-2"></i> Bloquear IP Suspeito
-                            </button>
-                            <button class="btn btn-outline-warning btn-sm text-start" onclick="defense.deployCountermeasure('VIRTUAL_PATCH')">
-                                <i class="fas fa-tools me-2"></i> Aplicar Patch Virtual
-                            </button>
-                        </div>
-
-                        <h6 class="text-white small mb-3 border-top pt-3">CRIAR REGRA PERSONALIZADA</h6>
-                        <div class="mb-3">
-                            <input type="text" id="customRuleName" class="form-control form-control-sm bg-dark text-white border-primary mb-2" placeholder="Nome da Regra">
-                            <input type="text" id="customRulePattern" class="form-control form-control-sm bg-dark text-white border-primary mb-2" placeholder="Padrão (Ex: SELECT|alert)">
-                            <button class="btn btn-primary btn-sm w-100" onclick="applyCustomRule()">APLICAR FILTRO</button>
+                    <div class="premium-glass p-3 mb-3 border-info">
+                        <h6 class="text-info mb-2"><i class="fas fa-shield-virus me-2"></i>CONTRA-MEDIDAS</h6>
+                        <div class="d-grid gap-1">
+                            <button class="btn btn-outline-info btn-sm text-start" onclick="defense.deployCountermeasure('WAF_SQLI')"><i class="fas fa-code me-2"></i>WAF Anti-SQLi/XSS</button>
+                            <button class="btn btn-outline-info btn-sm text-start" onclick="defense.deployCountermeasure('WAF_XSS')"><i class="fas fa-terminal me-2"></i>WAF Anti-XSS/CSP</button>
+                            <button class="btn btn-outline-danger btn-sm text-start" onclick="defense.deployCountermeasure('IP_BLOCK')"><i class="fas fa-user-slash me-2"></i>IPS: Bloquear IP</button>
+                            <button class="btn btn-outline-warning btn-sm text-start" onclick="defense.deployCountermeasure('VIRTUAL_PATCH')"><i class="fas fa-tools me-2"></i>Virtual Patch (RCE/ZeroDay)</button>
+                            <button class="btn btn-outline-danger btn-sm text-start" onclick="defense.deployCountermeasure('EDR')"><i class="fas fa-virus-slash me-2"></i>EDR: Anti-Ransomware</button>
+                            <button class="btn btn-outline-primary btn-sm text-start" onclick="defense.deployCountermeasure('ZERO_TRUST')"><i class="fas fa-lock me-2"></i>Zero Trust (Lateral Move)</button>
+                            <button class="btn btn-outline-warning btn-sm text-start" onclick="defense.deployCountermeasure('EMAIL_FILTER')"><i class="fas fa-envelope-open-text me-2"></i>Anti-Phishing/DMARC</button>
+                            <button class="btn btn-outline-success btn-sm text-start" onclick="defense.deployCountermeasure('MFA')"><i class="fas fa-key me-2"></i>MFA (Credential Dump)</button>
+                            <button class="btn btn-outline-secondary btn-sm text-start" onclick="defense.deployCountermeasure('SCA_SCAN')"><i class="fas fa-cubes me-2"></i>SCA: Supply Chain</button>
                         </div>
                     </div>
-
-                    <div class="premium-glass p-4 border-muted">
-                        <h6 class="text-muted small mb-2"><i class="fas fa-book me-2"></i>MANUAL RÁPIDO</h6>
-                        <p class="text-white-50" style="font-size: 0.7rem;">
-                            <b>WAF:</b> Filtra requisições web maliciosas.<br>
-                            <b>IP BLOCK:</b> Corta conexão de origens suspeitas.<br>
-                            <b>PATCH:</b> Corrige a falha no código fonte.
-                        </p>
+                    <div class="premium-glass p-3 mb-3 border-warning">
+                        <h6 class="text-warning small mb-2">REGRA PERSONALIZADA</h6>
+                        <input type="text" id="customRuleName" class="form-control form-control-sm bg-dark text-white border-primary mb-1" placeholder="Nome da Regra">
+                        <input type="text" id="customRulePattern" class="form-control form-control-sm bg-dark text-white border-primary mb-2" placeholder="Padrão Regex (Ex: SELECT|UNION)">
+                        <button class="btn btn-primary btn-sm w-100" onclick="applyCustomRule()">APLICAR FILTRO</button>
+                    </div>
+                    <div class="premium-glass p-3 border-muted">
+                        <h6 class="text-muted small mb-1"><i class="fas fa-book me-2"></i>MITRE ATT&CK</h6>
+                        <p class="text-white-50" style="font-size:0.65rem;"><b>T1190:</b> Exploit Public App<br><b>T1110:</b> Brute Force<br><b>T1486:</b> Ransomware<br><b>T1566:</b> Phishing<br><b>T1195:</b> Supply Chain<br><b>T1550:</b> Pass-the-Hash<br><b>T1003:</b> Credential Dumping</p>
                     </div>
                 </div>
             </div>
@@ -486,50 +497,12 @@ function startDefenseMode() {
         }
     };
 
-    // Initialize Defense Listeners
-    const logHandler = (e) => {
-        const logsContainer = document.getElementById('socLogs');
-        if (!logsContainer) return;
-        const entry = document.createElement('div');
-        entry.className = `mb-1 ${e.detail.type === 'danger' ? 'text-danger' : e.detail.type === 'success' ? 'text-success' : 'text-info'}`;
-        entry.innerHTML = `<span class="opacity-50">[${e.detail.time}]</span> ${e.detail.msg}`;
-        logsContainer.insertBefore(entry, logsContainer.firstChild);
-    };
-
-    const threatHandler = (e) => {
-        const progress = document.getElementById('threatProgress');
-        const val = document.getElementById('threatValue');
-        const badge = document.getElementById('threatBadge');
-        if (!progress) return;
-
-        const level = e.detail.level;
-        progress.style.width = level + '%';
-        val.textContent = level + '%';
-
-        if (level > 70) {
-            progress.className = 'progress-bar bg-danger';
-            badge.className = 'badge bg-danger';
-            badge.textContent = 'STATUS: CRÍTICO';
-        } else if (level > 30) {
-            progress.className = 'progress-bar bg-warning';
-            badge.className = 'badge bg-warning';
-            badge.textContent = 'STATUS: ALERTA';
-        } else {
-            progress.className = 'progress-bar bg-success';
-            badge.className = 'badge bg-success';
-            badge.textContent = 'STATUS: NORMAL';
-        }
-    };
-
     window.removeEventListener('defense_log', socHandlers.log);
     window.removeEventListener('threat_update', socHandlers.threat);
     window.addEventListener('defense_log', socHandlers.log);
     window.addEventListener('threat_update', socHandlers.threat);
 
-    // Start Simulation
-    if (window.defense) {
-        window.defense.startSimulation();
-    }
+    if (window.defense) window.defense.startSimulation();
 }
 
 function startUrgentMission(type = null) {
@@ -604,53 +577,6 @@ function startBotWar(missionType = 'duel') {
     `;
     renderToModule('botwar', arenaHTML);
 
-    const logHandler = (e) => {
-        const logsContainer = document.getElementById('arenaLogs');
-        if (!logsContainer) return;
-        const entry = document.createElement('div');
-        entry.className = `mb-1 ${e.detail.type === 'danger' ? 'text-danger' : e.detail.type === 'success' ? 'text-success' : e.detail.type === 'warning' ? 'text-warning' : 'text-info'}`;
-        entry.innerHTML = `<span class="opacity-50">[${e.detail.time}]</span> ${e.detail.msg}`;
-        logsContainer.insertBefore(entry, logsContainer.firstChild);
-    };
-
-    const updateHandler = (e) => {
-        const integrityBar = document.getElementById('integrityProgress');
-        const exploitBar = document.getElementById('exploitProgress');
-        const integrityVal = document.getElementById('integrityVal');
-        const exploitVal = document.getElementById('exploitVal');
-        
-        if (integrityBar) {
-            integrityBar.style.width = e.detail.integrity + '%';
-            integrityVal.textContent = e.detail.integrity + '%';
-        }
-        if (exploitBar) {
-            exploitBar.style.width = e.detail.progress + '%';
-            exploitVal.textContent = e.detail.progress + '%';
-        }
-    };
-
-    const overHandler = (e) => {
-        const arenaBody = document.getElementById('body-botwar');
-        if (!arenaBody) return;
-
-        const isWin = e.detail.result === 'red_win'; // Or blue_win if implemented
-        arenaBody.innerHTML = `
-            <div class="d-flex flex-column align-items-center justify-content-center h-100 p-5 animate__animated animate__zoomIn">
-                <div class="mx-auto mb-4 bg-${isWin ? 'danger' : 'info'} rounded-circle d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; box-shadow: 0 0 30px ${isWin ? '#f00' : '#0ff'};">
-                    <i class="fas ${isWin ? 'fa-skull' : 'fa-shield-alt'} fa-3x text-dark"></i>
-                </div>
-                <h1 class="text-${isWin ? 'danger' : 'info'} glitch-text mb-2">${isWin ? 'SISTEMA COMPROMETIDO' : 'SISTEMA PROTEGIDO'}</h1>
-                <p class="text-white-50 mb-4 text-center">O duelo IA chegou ao fim. Resultados processados pelo CyberOS.</p>
-                <div class="row g-3 w-100 mb-5" style="max-width: 400px;">
-                    <div class="col-6"><div class="bg-black p-3 rounded border border-primary text-center small">+50 XP</div></div>
-                    <div class="col-6"><div class="bg-black p-3 rounded border border-primary text-center small">+20 REP</div></div>
-                </div>
-                <button class="btn btn-outline-primary btn-lg px-5 py-3 fw-bold" onclick="startBotWar()">REINICIAR PROTOCOLO</button>
-            </div>
-        `;
-        if (window.os) os.showNotification(isWin ? 'Alerta: Sistema Derrubado!' : 'Sucesso: Defesa Concluída!', isWin ? 'danger' : 'success');
-    };
-
     window.removeEventListener('bot_war_log', arenaHandlers.log);
     window.removeEventListener('bot_war_update', arenaHandlers.update);
     window.removeEventListener('bot_war_over', arenaHandlers.over);
@@ -661,6 +587,52 @@ function startBotWar(missionType = 'duel') {
     if (window.botWar) {
         window.botWar.startDuel();
     }
+}
+
+// ================= PENTEST TOOLKIT =================
+function showToolkit() {
+    const tools = [
+        { id:'nmap', name:'Nmap', icon:'fa-network-wired', color:'info', desc:'Scanner de rede e portas', cmd:'nmap -sV -sC -A 192.168.1.1', output:`Starting Nmap 7.94 scan...\n22/tcp  open  ssh      OpenSSH 8.9p1\n80/tcp  open  http     Apache httpd 2.4.51\n443/tcp open  ssl/http nginx 1.18.0\n3306/tcp open  mysql   MySQL 8.0.31\nOS: Linux 5.15 (Ubuntu 22.04)\n[!] Apache 2.4.51 vulnerável a CVE-2021-41773 (Path Traversal)` },
+        { id:'sqlmap', name:'SQLmap', icon:'fa-database', color:'danger', desc:'Exploração automática de SQLi', cmd:"sqlmap -u 'http://alvo.com/page?id=1' --dbs --batch", output:`[*] testing connection...\n[*] testing parameter 'id'\n[!] GET parameter 'id' is vulnerable to UNION-based injection!\n[*] backend DBMS: MySQL >= 8.0\navailable databases [3]:\n[*] information_schema\n[*] mysql\n[*] webapp_db\n[+] Done! Use --dump to extract data.` },
+        { id:'metasploit', name:'Metasploit', icon:'fa-bomb', color:'danger', desc:'Framework de exploração', cmd:'msfconsole -q -x "use exploit/multi/handler"', output:`msf6 > search apache 2.4.51\n  0  exploit/multi/handler\n  1  exploit/unix/http/apache_normalize_path_rce\nmsf6 > use 1\nmsf6 exploit(apache_normalize_path_rce) > set RHOSTS 192.168.1.1\nmsf6 exploit(apache_normalize_path_rce) > run\n[*] Started reverse handler on 0.0.0.0:4444\n[+] Shell opened!\nwhoami: www-data` },
+        { id:'burpsuite', name:'Burp Suite', icon:'fa-bug', color:'warning', desc:'Proxy web para testes de API', cmd:'Interceptar requisição POST /login', output:`POST /login HTTP/1.1\nHost: alvo.com\nContent-Type: application/json\n\n{"username":"admin","password":"test"}\n\n--- RESPONSE ---\nHTTP/1.1 200 OK\n{"token":"eyJhbGciOiJub25lIn0.eyJyb2xlIjoidXNlciJ9."}\n[!] JWT com alg=none detectado! Possível bypass de auth.` },
+        { id:'nikto', name:'Nikto', icon:'fa-search', color:'info', desc:'Scanner de vulnerabilidades web', cmd:'nikto -h http://192.168.1.1', output:`Nikto v2.1.6\n+ Target IP: 192.168.1.1\n+ Server: Apache/2.4.51\n+ /: Apache default page found\n+ /admin/: Admin interface found (no auth)\n+ /phpMyAdmin/: phpMyAdmin found\n+ OSVDB-3092: /.git/ found - might contain source\n+ CVE-2021-41773: Path traversal possible\n35 items checked, 6 vulnerabilities found.` },
+        { id:'hashcat', name:'Hashcat', icon:'fa-key', color:'warning', desc:'Quebra de hashes por dicionário', cmd:'hashcat -m 0 hash.txt rockyou.txt', output:`hashcat v6.2.6\nHash: 5f4dcc3b5aa765d61d8327deb882cf99\nAlgorithm: MD5\nDictionary: rockyou.txt (14M palavras)\n\n5f4dcc3b5aa765d61d8327deb882cf99:password\n\nSession..........: hashcat\nStatus...........: Cracked\nTime.Estimated...: 00:00:01\nSpeed.#1.........: 1258.4 MH/s` }
+    ];
+    const toolsHTML = `
+        <div class="p-4 animate__animated animate__fadeIn">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="text-primary mb-0"><i class="fas fa-toolbox me-2"></i>PENTEST TOOLKIT</h3>
+                <span class="badge bg-danger">APENAS EM AMBIENTES AUTORIZADOS</span>
+            </div>
+            <div class="row g-3">
+                ${tools.map(t => `
+                <div class="col-md-6">
+                    <div class="premium-glass p-3 border-${t.color} h-100">
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="bg-${t.color} p-2 rounded me-2"><i class="fas ${t.icon}"></i></div>
+                            <div><h6 class="mb-0 text-${t.color}">${t.name}</h6><small class="text-muted">${t.desc}</small></div>
+                        </div>
+                        <code class="small text-success d-block bg-black p-2 rounded mb-2">$ ${t.cmd}</code>
+                        <button class="btn btn-${t.color} btn-sm w-100" onclick="runTool('${t.id}')"><i class="fas fa-play me-2"></i>EXECUTAR SIMULAÇÃO</button>
+                        <pre id="output-${t.id}" class="mt-2 small text-success bg-black p-2 rounded d-none" style="font-size:0.65rem;max-height:120px;overflow:auto;"></pre>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+    `;
+    renderToModule('toolkit', toolsHTML);
+    const toolMap = {};
+    tools.forEach(t => toolMap[t.id] = t.output);
+    window.runTool = (id) => {
+        const el = document.getElementById('output-' + id);
+        if (!el) return;
+        el.classList.remove('d-none');
+        el.textContent = '';
+        const lines = toolMap[id].split('\n');
+        lines.forEach((line, i) => setTimeout(() => { el.textContent += line + '\n'; el.scrollTop = el.scrollHeight; }, i * 80));
+        if (window.os) os.showNotification(id.toUpperCase() + ' executado com sucesso!', 'success');
+    };
 }
 
 // ================= BRIEFING =================
@@ -699,18 +671,36 @@ window.addEventListener('load', () => {
 
     document.getElementById('loginForm')?.addEventListener('submit', (e) => {
         e.preventDefault();
-        const u = document.getElementById('loginUsername').value;
+        const u = document.getElementById('loginUsername').value.trim();
         const p = document.getElementById('loginPassword').value;
-        if (u === 'admin' && p === 'admin123') {
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        if (users[u] && users[u].password === p) {
+            localStorage.setItem('currentUser', u);
+            window.location.reload();
+        } else if (u === 'admin' && p === 'admin123') {
             localStorage.setItem('currentUser', 'admin');
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
             if (!users['admin']) {
-                users['admin'] = { name: 'Admin', username: 'admin', reputation: 500, xp: 1000, level: 10, briefingShown: false, performance: {}, inventory: { hints: 5, skips: 3 } };
+                users['admin'] = { name:'Admin', username:'admin', password:'admin123', reputation:500, xp:1000, level:10, briefingShown:false, performance:{}, inventory:{hints:5,skips:3}, coins:500 };
                 localStorage.setItem('users', JSON.stringify(users));
             }
             window.location.reload();
         } else {
-            alert('Acesso Negado');
+            if (window.os) os.showNotification('Acesso Negado: credenciais inválidas.', 'danger');
+            else alert('Acesso Negado');
         }
+    });
+
+    document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('registerName').value.trim();
+        const username = document.getElementById('registerUsername').value.trim().toLowerCase();
+        const password = document.getElementById('registerPassword').value;
+        if (!name || !username || !password) return;
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        if (users[username]) { alert('Codinome já em uso. Escolha outro.'); return; }
+        users[username] = { name, username, password, reputation:0, xp:0, level:1, coins:100, briefingShown:false, performance:{}, inventory:{hints:5, skips:3} };
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('currentUser', username);
+        window.location.reload();
     });
 });

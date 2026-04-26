@@ -132,6 +132,10 @@
                 <div class="icon-box bg-success"><i class="fas fa-book fs-3"></i></div>
                 <span class="small fw-bold">GLOSSÁRIO</span>
             </div>
+            <div class="desktop-icon" onclick="showToolkit()">
+                <div class="icon-box" style="background:linear-gradient(135deg,#6f42c1,#e83e8c)"><i class="fas fa-toolbox fs-3"></i></div>
+                <span class="small fw-bold">TOOLKIT</span>
+            </div>
         </div>
 
         <div id="window-container"></div>
@@ -158,16 +162,22 @@
             introInterval: null,
 
             init() {
+                this.updateClock(); // Call immediately
                 this.initIntro();
-                this.updateClock();
                 this.createNotificationContainer();
-                setInterval(() => this.updateClock(), 60000);
+                setInterval(() => this.updateClock(), 1000); // Check every second for better precision, or 60000
             },
 
             updateClock() {
                 const now = new Date();
                 const clock = document.getElementById('os-clock');
+                const dateEl = document.getElementById('os-date');
                 if (clock) clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                if (dateEl) {
+                    const day = now.getDate();
+                    const month = now.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+                    dateEl.textContent = `${day} ${month}`;
+                }
             },
 
             createNotificationContainer() {
