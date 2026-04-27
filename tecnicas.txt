@@ -1,0 +1,674 @@
+Vou realizar uma pesquisa abrangente para reunir as técnicas de invasão, defesa e contramedidas mais atuais e relevantes.Agora vou buscar informações detalhadas sobre o MITRE D3FEND (framework de defesa) e técnicas específicas para completar o documento.Agora vou buscar algumas técnicas específicas para web, mobile, wireless e engenharia social.Com todo o material pesquisado, compilei o documento abrangente abaixo. É um arquivo completo e estruturado que cobre todas as principais técnicas de ataque, defesa e contramedidas — ideal para um treinamento de alto nível.
+
+---
+
+# 📘 COMPÊNDIO COMPLETO DE TÉCNICAS DE INVASÃO, DEFESA E CONTRAMEDIDAS
+### *Para Treinamento de Alto Nível em Segurança Ofensiva e Defensiva*
+
+---
+
+## SUMÁRIO
+
+1. **Frameworks de Referência**
+2. **Faseamento do Pentest (Metodologias)**
+3. **Catálogo de Técnicas de Ataque (MITRE ATT&CK por Tática)**
+4. **Técnicas de Defesa e Contramedidas (MITRE D3FEND & OWASP)**
+5. **Técnicas Específicas por Ambiente**
+6. **Ferramentas Essenciais**
+7. **Playbooks de Defesa (Blue Team)**
+8. **Matriz Ataque × Defesa (Cross-Reference)**
+
+---
+
+## 1. FRAMEWORKS DE REFERÊNCIA
+
+### 1.1 Frameworks Ofensivos
+| Framework | Descrição |
+|-----------|-----------|
+| **MITRE ATT&CK v16+** | 14 táticas, ~250+ técnicas, ~500+ sub-técnicas. Padrão-ouro para classificar TTPs de adversários |
+| **OWASP Top 10 (2021/2024)** | Top 10 riscos críticos em aplicações web |
+| **OWASP MASVS** | Padrão de verificação de segurança para apps mobile |
+| **Cyber Kill Chain (Lockheed Martin)** | 7 fases: Recon → Weaponization → Delivery → Exploitation → Installation → C2 → Actions on Objectives |
+| **Unified Kill Chain** | 18 fases, combina CKC + MITRE ATT&CK |
+
+### 1.2 Frameworks Defensivos
+| Framework | Descrição |
+|-----------|-----------|
+| **MITRE D3FEND** | Knowledge graph com 267+ técnicas defensivas mapeadas contra ATT&CK |
+| **NIST CSF 2.0** | 6 funções: Govern, Identify, Protect, Detect, Respond, Recover |
+| **NIST SP 800-115** | Guia técnico para teste e avaliação de segurança |
+| **OWASP ASVS** | Padrão de verificação de segurança de aplicações |
+| **CIS Controls v8** | 18 controls prioritários para defesa cibernética |
+| **NIST SP 800-53** | Catálogo de controles de segurança |
+
+---
+
+## 2. FASEAMENTO DO PENTEST (METODOLOGIAS)
+
+### 2.1 PTES (Penetration Testing Execution Standard)
+1. **Pre-Engagement Interactions** — Escopo, regras de engajamento, contatos de emergência
+2. **Intelligence Gathering** — OSINT, footprinting, reconhecimento passivo e ativo
+3. **Threat Modeling** — Modelagem de ameaças, análise de superfície de ataque
+4. **Vulnerability Analysis** — Scanning automatizado + validação manual
+5. **Exploitation** — Exploração controlada dentro dos limites acordados
+6. **Post-Exploitation** — Persistência, pivoting, exfiltração simulada
+7. **Reporting** — Relatório executivo + técnico + recomendações de remediação
+
+### 2.2 NIST SP 800-115
+1. **Planning** — Documentação do plano de teste e RoE
+2. **Discovery** — Recon + scanning ativo com validação manual
+3. **Attack** — Exploração controlada com restrições de segurança
+4. **Reporting** — Relatório bifurcado (executivo + técnico)
+
+### 2.3 OWASP Web Security Testing Guide (WSTG)
+- Information Gathering → Configuration Management → Authentication → Authorization → Session Management → Input Validation → Error Handling → Cryptography → Business Logic → Client-Side Testing → API Testing
+
+---
+
+## 3. CATÁLOGO DE TÉCNICAS DE ATAQUE (MITRE ATT&CK)
+
+### 3.1 RECONNAISSANCE (TA0043) — 11 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1595** | Active Scanning | Port scanning, vulnerability scanning |
+| T1595.001 | Scanning IP Blocks | Varredura de blocos IP |
+| T1595.002 | Vulnerability Scanning | Scan de vulnerabilidades |
+| T1595.003 | Wordlist Scanning | Fuzzing/brute force de diretórios |
+| **T1598** | Phishing for Information | Spearphishing para coletar informações |
+| **T1592** | Gather Victim Host Information | Identificar SO, software, configurações |
+| **T1589** | Gather Victim Identity Information | Identificar funcionários, emails, credenciais |
+| **T1590** | Gather Victim Network Information | Domínios, sub-redes, DNS, topologia |
+| **T1591** | Gather Victim Org Information | Estrutura organizacional, hierarquias |
+| **T1593** | Search Open Websites/Domains | OSINT em sites públicos |
+| **T1594** | Search Victim-Owned Websites | Scraping do site da vítima |
+| **T1596** | Search Open Technical Databases | WHOIS, DNS records, SSL certs |
+| **T1597** | Search Closed Sources | Dark web, fórums privados, intel sharing |
+
+### 3.2 RESOURCE DEVELOPMENT (TA0042) — 8 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1583** | Acquire Infrastructure | Comprar/alugar domínios, VPS, servidores |
+| T1583.001 | Domains | Registro de domínios maliciosos |
+| T1583.003 | Virtual Private Server | Contratação de VPS para C2 |
+| T1583.006 | Web Services | Contas em serviços cloud legítimos |
+| **T1587** | Develop Capabilities | Desenvolvimento de exploits, malwares |
+| T1587.001 | Malware | Desenvolvimento de malware personalizado |
+| T1587.002 | Code Signing Certificates | Certificados de código |
+| T1587.003 | Digital Certificates | Certificados SSL para sites falsos |
+| **T1588** | Obtain Capabilities | Aquisição de exploits prontos (CVE PoCs) |
+| **T1608** | Stage Capabilities | Upload de payloads em infraestrutura |
+
+### 3.3 INITIAL ACCESS (TA0001) — 11 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1190** | Exploit Public-Facing Application | Exploração de apps web, VPNs, RDP |
+| **T1133** | External Remote Services | VPN, RDP, Citrix, VDI |
+| **T1078** | Valid Accounts | Uso de credenciais válidas |
+| T1078.001 | Default Accounts | Contas padrão do sistema |
+| T1078.002 | Domain Accounts | Contas AD comprometidas |
+| T1078.003 | Local Accounts | Contas locais |
+| T1078.004 | Cloud Accounts | Contas cloud (AWS, Azure, GCP) |
+| **T1199** | Trusted Relationship | Relações de confiança entre orgs |
+| **T1566** | Phishing | Spearphishing, whaling |
+| T1566.001 | Spearphishing Attachment | Anexo malicioso |
+| T1566.002 | Spearphishing Link | Link malicioso |
+| T1566.003 | Spearphishing via Service | Mensagens em redes sociais/SaaS |
+| **T1189** | Drive-by Compromise | Comprometimento via navegador |
+| **T1200** | Hardware Additions | BadUSB, Raspberry Pi, keyloggers físicos |
+| **T1091** | Replication Through Removable Media | Autoinfecção via USB |
+| **T1475** | Deliver Malicious App via Other Means | App stores, sideloading |
+
+### 3.4 EXECUTION (TA0002) — 17 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1059** | Command and Scripting Interpreter | Shell, PowerShell, Python, JavaScript |
+| T1059.001 | PowerShell | PowerShell scripts maliciosos |
+| T1059.003 | Windows Command Shell | CMD.exe, batch scripts |
+| T1059.004 | Unix Shell | Bash, sh, zsh |
+| T1059.005 | Visual Basic | VBA macros em Office |
+| T1059.007 | JavaScript | JS malicioso |
+| T1059.008 | Network Device CLI | Comandos em switches/routers |
+| **T1204** | User Execution | Execução induzida pelo usuário |
+| T1204.001 | Malicious Link | Usuário clica em link |
+| T1204.002 | Malicious File | Usuário abre arquivo |
+| **T1053** | Scheduled Task/Job | Agendamento de tarefas maliciosas |
+| T1053.002 | At | Linux at jobs |
+| T1053.005 | Scheduled Task | Windows Task Scheduler |
+| T1053.006 | Systemd Timers | Linux systemd timers |
+| **T1569** | System Services | Execução via serviços do sistema |
+| T1569.002 | Service Execution | Criação/execução de serviços |
+| **T1106** | Native API | Chama API nativa do SO |
+| **T1559** | Inter-Process Communication | COM, DDE, Named Pipes |
+| **T1072** | Software Deployment Tools | SCCM, PDQ, GPO, Chef, Puppet |
+
+### 3.5 PERSISTENCE (TA0003) — 23 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1098** | Account Manipulation | Criação/modificação de contas |
+| T1098.001 | Additional Cloud Credentials | Adição de credenciais cloud |
+| T1098.002 | Additional Email Delegate Permissions | Permissões de delegação de email |
+| T1098.005 | Device Registration | Registro de devices não autorizados |
+| **T1136** | Create Account | Criação de contas locais/domínio/cloud |
+| **T1543** | Create or Modify System Process | Serviços, daemons, agentes |
+| T1543.001 | Launch Agent (macOS) | Agentes de lançamento |
+| T1543.002 | Systemd Service | Serviços Linux systemd |
+| T1543.003 | Windows Service | Criação de serviços Windows |
+| **T1053** | Scheduled Task/Job | Tarefas agendadas persistentes |
+| **T1547** | Boot or Logon Autostart Execution | Inicialização automática |
+| T1547.001 | Registry Run Keys / Startup Folder | Run keys, startup folder |
+| T1547.009 | Shortcut Modification | Atalhos LNK maliciosos |
+| **T1542** | Pre-OS Boot | Bootkits, firmware |
+| **T1505** | Server Software Component | Web shells, backdoors em servidores |
+| T1505.003 | Web Shell | Shell persistente em web server |
+| **T1554** | Compromise Client Software Binary | DLL hijacking, sideloading |
+| **T1137** | Office Application Startup | Add-ins, macros, COM add-ins |
+| **T1197** | BITS Jobs | Background Intelligent Transfer Service |
+| **T1525** | Implant Internal Image | Imagem Docker maliciosa |
+| **T1574** | Hijack Execution Flow | DLL search order hijacking |
+| **T1556** | Modify Authentication Process | Password filter DLL, Skeleton Key |
+| **T1484** | Domain Policy Modification | GPO, trust modification |
+| **T1092** | Communication Through Removable Media | Air gap exfiltration |
+
+### 3.6 PRIVILEGE ESCALATION (TA0004) — 14 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1068** | Exploitation for Privilege Escalation | Exploração de vulnerabilidades locais |
+| **T1548** | Abuse Elevation Control Mechanism | Uso indevido de sudo, UAC |
+| T1548.001 | Setuid and Setgid | Binários SUID/SGID |
+| T1548.002 | Bypass User Access Control | Bypass de UAC |
+| T1548.003 | Sudo and Sudo Caching | Exploração de sudo - cache |
+| T1548.004 | Elevated Execution with Prompt | Prompt de elevação |
+| **T1547** | Boot or Logon Autostart Execution | Execução automática como SYSTEM |
+| **T1543** | Create or Modify System Process | Serviço executando como SYSTEM/root |
+| **T1055** | Process Injection | Injeção em processos privilegiados |
+| T1055.001 | Dynamic-link Library Injection | DLL injection |
+| T1055.002 | Portable Executable Injection | PE injection |
+| T1055.003 | Thread Execution Hijacking | Thread hijacking |
+| T1055.004 | Asynchronous Procedure Call | APC injection |
+| T1055.005 | Thread Local Storage | TLS callback |
+| T1055.008 | Ptrace System Calls | Ptrace (Linux) |
+| T1055.011 | Extra Window Memory Injection | EWM injection |
+| T1055.012 | Process Hollowing | Process hollowing |
+| **T1134** | Access Token Manipulation | Token stealing, impersonation |
+| T1134.001 | Token Impersonation/Theft | Impersonação de tokens |
+| T1134.002 | Create Process with Token | Criação de processo com token |
+| T1134.003 | Make and Impersonate Token | Criação de token |
+| T1134.004 | Parent PID Spoofing | Spoofing de PID pai |
+| T1134.005 | SID-History Injection | Injeção de SID-History (AD) |
+| **T1078** | Valid Accounts | Contas com privilégios elevados |
+| **T1574** | Hijack Execution Flow | PATH hijacking, DLL hijacking |
+| **T1611** | Escape to Host | Container escape → host root |
+
+### 3.7 DEFENSE EVASION (TA0005) — 47 Técnicas (maior tática)
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1055** | Process Injection | Injeção para esconder execução |
+| **T1562** | Impair Defenses | Desabilitar AV, EDR, firewall, logs |
+| T1562.001 | Disable or Modify Tools | Parar serviços de segurança |
+| T1562.004 | Disable or Modify System Firewall | Regras de firewall |
+| T1562.006 | Indicator Blocking | Bloquear telemetria |
+| T1562.007 | Disable or Modify Cloud Firewall | Cloud firewall rules |
+| T1562.008 | Disable or Modify Cloud Logs | Desabilitar logging cloud |
+| **T1622** | Debugger Evasion | Anti-debug, anti-VM |
+| **T1027** | Obfuscated Files or Information | Ofuscação, criptografia, packing |
+| T1027.001 | Binary Padding | Adição de junk data |
+| T1027.002 | Software Packing | Empacotamento |
+| T1027.003 | Steganography | Esteganografia |
+| T1027.004 | Compiled HTML Help | CHM files maliciosos |
+| T1027.005 | Indicator Removal from Tools | Remoção de IoCs |
+| T1027.006 | HTML Smuggling | Contrabando via HTML |
+| T1027.007 | Dynamic API Resolution | Resolução dinâmica de APIs |
+| T1027.010 | Command Obfuscation | Ofuscação de comandos |
+| **T1070** | Indicator Removal | Limpeza de logs, artefatos |
+| T1070.001 | Clear Windows Event Logs | wevtutil, Clear-EventLog |
+| T1070.002 | Clear Linux or Mac System Logs | journalctl, log rotation |
+| T1070.003 | Clear Command History | history -c |
+| T1070.004 | File Deletion | Apagar arquivos |
+| T1070.005 | Network Connection Removal | Limpeza de conexões ativas |
+| T1070.006 | Timestomp | Modificação de timestamps |
+| T1070.007 | Clear Network Connection History | Limpeza de histórico de rede |
+| T1070.008 | Email Account Access Removal | Remoção de acesso a email |
+| T1070.009 | Clear Persistence Records | Remoção de registros de persistência |
+| **T1036** | Masquerading | Disfarçar malware como legítimo |
+| T1036.001 | Invalid Code Signature | Assinatura inválida |
+| T1036.002 | Right-to-Left Override | Unicode spoofing |
+| T1036.003 | Rename System Utilities | Renomear ferramentas |
+| T1036.004 | Masquerade Task or Service | Disfarçar tarefa/serviço |
+| T1036.005 | Match Legitimate Name or Location | Similaridade com legítimo |
+| T1036.006 | Space after Filename | Espaço no final do nome |
+| T1036.007 | Double File Extension | Dupla extensão.pdf.exe |
+| **T1202** | Indirect Command Execution | Forfiles, WMIC, Mshta, Msiexec |
+| **T1218** | Signed Binary Proxy Execution | LOLBins (Mshta, Msiexec, Regsvr32, Rundll32) |
+| **T1553** | Subvert Trust Controls | Instalação de certificados falsos |
+| **T1497** | Virtualization/Sandbox Evasion | Detecção de VM/sandbox |
+| **T1112** | Modify Registry | Modificação de chaves de registro |
+| **T1600** | Weaken Encryption | Redução de força criptográfica |
+| **T1578** | Modify Cloud Compute Infrastructure | Snapshots, AMIs modificadas |
+| **T1480** | Execution Guardrails | Execução condicional (data, IP, usuário) |
+| **T1014** | Rootkit | Kernel rootkits, bootkits |
+| **T1092** | Communication Through Removable Media | Comunicação via USB |
+| **T1678** | Delay Execution | Temporização para evasão |
+| **T1542** | Pre-OS Boot | Bootkit, firmware BIOS/UEFI |
+
+### 3.8 CREDENTIAL ACCESS (TA0006) — 17 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1555** | Credentials from Password Stores | Dump de password managers |
+| T1555.001 | Keychain (macOS) | Keychain |
+| T1555.003 | Credentials from Web Browsers | Chrome, Firefox, Edge |
+| T1555.004 | Windows Credential Manager | Credential Manager |
+| T1555.005 | Password Managers | KeePass, 1Password, LastPass |
+| **T1003** | OS Credential Dumping | Dump de LSASS, SAM, NTDS.dit |
+| T1003.001 | LSASS Memory | Procdump, Mimikatz |
+| T1003.002 | Security Account Manager | SAM hive |
+| T1003.003 | NTDS | Domain controller - NTDS.dit |
+| T1003.004 | LSA Secrets | LSA secrets |
+| T1003.005 | Cached Domain Credentials | Cache de credenciais |
+| T1003.006 | DCSync | Replicação AD via DCSync |
+| T1003.007 | Proc Filesystem | /proc/mem (Linux) |
+| T1003.008 | /etc/passwd and /etc/shadow | Shadow file |
+| **T1558** | Steal or Forge Kerberos Tickets | Golden, Silver, Kerberoasting |
+| T1558.001 | Golden Ticket | KRBTGT hash → forjar TGT |
+| T1558.002 | Silver Ticket | Forjar TGS para serviço |
+| T1558.003 | Kerberoasting | Solicitar TGS e crack offline |
+| T1558.004 | AS-REP Roasting | Contas sem pré-autenticação |
+| **T1056** | Input Capture | Keylogging, screen capture |
+| T1056.001 | Keylogging | Captura de teclas |
+| T1056.002 | GUI Input Capture | Captura de tela |
+| T1056.003 | Web Portal Capture | Phishing web |
+| T1056.004 | Credential API Hooking | Hook de APIs de login |
+| **T1040** | Network Sniffing | Sniffing de tráfego não criptografado |
+| **T1110** | Brute Force | Força bruta de credenciais |
+| T1110.001 | Password Guessing | Adivinhação de senhas |
+| T1110.002 | Password Cracking | Cracking offline de hashes |
+| T1110.003 | Password Spraying | Spray de senhas comuns |
+| T1110.004 | Credential Stuffing | Reuso de vazamentos |
+| **T1212** | Exploitation for Credential Access | Exploração para obter credenciais |
+| **T1528** | Steal Application Access Token | Roubo de tokens OAuth/cloud |
+| **T1606** | Forge Web Credentials | SAML forgery, JWT manipulation |
+| **T1552** | Unsecured Credentials | Credenciais em texto claro |
+
+### 3.9 DISCOVERY (TA0007) — 34 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1087** | Account Discovery | Enumeração de contas |
+| T1087.001 | Local Account | net user, /etc/passwd |
+| T1087.002 | Domain Account | net group, PowerView |
+| T1087.003 | Email Account | Enumeração de emails |
+| T1087.004 | Cloud Account | IAM enumeration |
+| **T1482** | Domain Trust Discovery | Enumeração de trusts AD |
+| **T1083** | File and Directory Discovery | Enumeração de arquivos/diretórios |
+| **T1613** | Container and Resource Discovery | Enumeração K8s, Docker |
+| **T1046** | Network Service Discovery | Port scanning interno |
+| **T1135** | Network Share Discovery | Enumeração de shares |
+| **T1049** | System Network Connections Discovery | netstat, conexões ativas |
+| **T1018** | Remote System Discovery | Ping sweep, AD enumeration |
+| **T1069** | Permission Groups Discovery | Enumeração de grupos |
+| T1069.001 | Local Groups | net localgroup |
+| T1069.002 | Domain Groups | PowerView, BloodHound |
+| T1069.003 | Cloud Groups | IAM groups |
+| **T1057** | Process Discovery | ps, tasklist |
+| **T1012** | Query Registry | Enumeração de registro |
+| **T1016** | System Network Configuration Discovery | ipconfig, ifconfig, route |
+| **T1033** | System Owner/User Discovery | whoami, id |
+| **T1007** | System Service Discovery | sc query, systemctl |
+| **T1124** | System Time Discovery | Network time syncing |
+| **T1497** | Virtualization/Sandbox Evasion | Verificação de VM |
+| **T1614** | System Location Discovery | Geolocalização |
+| **T1082** | System Information Discovery | OS, hardware, patches |
+| **T1045** | Software Discovery | Software installed |
+| **T1201** | Password Policy Discovery | net accounts |
+| **T1518** | Software Discovery | Software inventory |
+| **T1615** | Group Policy Discovery | GPO enumeration |
+| **T1087.001** | Cloud Infrastructure Discovery | Resource inventory |
+
+### 3.10 LATERAL MOVEMENT (TA0008) — 9 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1550** | Use Alternate Authentication Material | Pass-the-Hash, Pass-the-Ticket |
+| T1550.001 | Application Access Token | Tokens de aplicação |
+| T1550.002 | Pass-the-Hash | NTLM hash → autenticação |
+| T1550.003 | Pass-the-Ticket | Kerberos ticket → autenticação |
+| T1550.004 | Web Session Cookie | Cookies de sessão |
+| **T1021** | Remote Services | RDP, SSH, WinRM, VNC |
+| T1021.001 | Remote Desktop Protocol | RDP |
+| T1021.002 | SMB/Windows Admin Shares | ADMIN$, IPC$ - PsExec |
+| T1021.003 | Distributed Component Object Model | DCOM |
+| T1021.004 | SSH | SSH |
+| T1021.005 | VNC | VNC |
+| T1021.006 | Windows Remote Management | WinRM/WMI |
+| T1021.007 | Cloud Services | Cloud consoles |
+| T1021.008 | Azure Arc | Hybrid connections |
+| **T1570** | Lateral Tool Transfer | Transferência de ferramentas |
+| **T1091** | Replication Through Removable Media | USB propagation |
+| **T1563** | Remote Service Session Hijacking | RDP session hijacking |
+| T1563.002 | RDP Hijacking | Sequestering de sessão RDP |
+| **T1072** | Software Deployment Tools | SCCM, Chef, Puppet, Ansible |
+| **T1210** | Exploitation of Remote Services | Exploração de serviços remotos |
+| **T1534** | Internal Spearphishing | Spearphishing interno |
+| **T1080** | Taint Shared Content | Malware em arquivos compartilhados |
+
+### 3.11 COLLECTION (TA0009) — 17 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1560** | Archive Collected Data | Compactação para exfiltração |
+| **T1114** | Email Collection | Coleta de emails |
+| T1114.001 | Local Email Collection | OST/PST files |
+| T1114.002 | Remote Email Collection | EWS, Graph API |
+| T1114.003 | Email Forwarding Rule | Regra de encaminhamento |
+| **T1005** | Data from Local System | Dados locais |
+| **T1039** | Data from Network Shared Drive | Dados de compartilhamentos |
+| **T1213** | Data from Information Repositories | SharePoint, Confluence, Wiki |
+| **T1074** | Data Staged | Centralização de dados para exfiltração |
+| **T1056** | Input Capture | Keylogging |
+| **T1025** | Data from Removable Media | Dados de mídia removível |
+| **T1115** | Clipboard Data | Captura de clipboard |
+| **T1123** | Audio Capture | Gravação de áudio |
+| **T1125** | Video Capture | Gravação de tela/webcam |
+| **T1557** | Man-in-the-Middle | ARP spoofing, relay |
+| **T1185** | Man-in-the-Browser | Browser hooking |
+| **T1119** | Automated Collection | Coleta automatizada |
+| **T1602** | Data from Configuration Repository | Dados de configuração |
+
+### 3.12 COMMAND AND CONTROL (TA0011) — 18 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1071** | Application Layer Protocol | HTTP/S, DNS, SSH como C2 |
+| T1071.001 | Web Protocols | HTTP/HTTPS C2 |
+| T1071.002 | File Transfer Protocols | FTP, SMB |
+| T1071.003 | Mail Protocols | SMTP, IMAP como C2 |
+| T1071.004 | DNS | DNS tunneling |
+| **T1092** | Communication Through Removable Media | USB como canal |
+| **T1573** | Encrypted Channel | Criptografia no C2 |
+| T1573.001 | Symmetric Cryptography | AES, RC4 |
+| T1573.002 | Asymmetric Cryptography | RSA, ECC |
+| **T1008** | Fallback Channels | Canais alternativos |
+| **T1105** | Ingress Tool Transfer | Download de ferramentas |
+| **T1104** | Multi-Stage Channels | Canais multi-estágio |
+| **T1095** | Non-Application Layer Protocol | ICMP, raw TCP/UDP |
+| **T1571** | Non-Standard Port | Portas não padrão |
+| **T1572** | Protocol Tunneling | SSH tunneling, DNS tunneling |
+| **T1219** | Remote Access Software | TeamViewer, AnyDesk |
+| **T1205** | Traffic Signaling | Port knocking, time-based |
+| **T1090** | Proxy | SOCKS, HTTP proxy, redirectors |
+| T1090.001 | Internal Proxy | Proxy interno |
+| T1090.002 | External Proxy | Proxy externo |
+| T1090.003 | Multi-hop Proxy | Cadeia de proxies |
+| T1090.004 | Domain Fronting | CDN fronting |
+| **T1102** | Web Service | Pastebin, GitHub, Discord como C2 |
+| **T1608** | Stage Capabilities | Payload staging |
+
+### 3.13 EXFILTRATION (TA0010) — 9 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1048** | Exfiltration Over Alternative Protocol | FTP, HTTP, DNS tunneling |
+| **T1041** | Exfiltration Over C2 Channel | Mesmo canal do C2 |
+| **T1052** | Exfiltration Over Physical Medium | USB, impressão |
+| **T1011** | Exfiltration Over Other Network Medium | Wi-Fi, Bluetooth |
+| **T1567** | Exfiltration Over Web Service | Cloud storage, paste sites |
+| **T1537** | Transfer Data to Cloud Account | Cloud-to-cloud |
+| **T1020** | Automated Exfiltration | Exfiltração automatizada |
+| **T1030** | Data Transfer Size Limits | Fragmentação |
+| **T1029** | Scheduled Transfer | Exfiltração agendada |
+
+### 3.14 IMPACT (TA0040) — 15 Técnicas
+| ID | Técnica | Descrição |
+|----|---------|-----------|
+| **T1486** | Data Encrypted for Impact | Ransomware |
+| **T1485** | Data Destruction | Exclusão de dados |
+| **T1565** | Data Manipulation | Modificação de dados |
+| **T1491** | Defacement | Desfiguração de site |
+| **T1498** | Network Denial of Service | DDoS |
+| **T1499** | Endpoint Denial of Service | Resource exhaustion |
+| **T1529** | System Shutdown/Reboot | Shutdown forçado |
+| **T1496** | Resource Hijacking | Cryptominers |
+| **T1495** | Firmware Corruption | Brick de dispositivos |
+| **T1561** | Disk Wipe | MBR/GPT wipe |
+| **T1489** | Service Stop | Parada de serviços críticos |
+| **T1490** | Inhibit System Recovery | Apagar backups, shadow copies |
+| **T1488** | Disk Content Wipe | Sobrescrita de disco |
+| **T1487** | Disk Structure Wipe | Formatação de disco |
+| **T1578.002** | Create Cloud Instance | Cloud resource hijacking |
+
+---
+
+## 4. TÉCNICAS DE DEFESA E CONTRAMEDIDAS
+
+### 4.1 MITRE D3FEND — 7 Táticas Defensivas (~267 técnicas)
+
+| Tática D3FEND | Descrição | Exemplos de Técnicas |
+|---------------|-----------|----------------------|
+| **Harden** | Endurecer configurações e reduzir superfície de ataque | Least Privilege, Patch Management, Config Hardening, Account Lockdown |
+| **Detect** | Identificar atividade adversária | Network Traffic Analysis, Process Monitoring, File Analysis, Log Analysis |
+| **Isolate** | Conter e segmentar | Network Segmentation, Container Isolation, Process Sandboxing, Air Gap |
+| **Deceive** | Enganar atacantes | Honeypots, Decoy Credentials, Fake Telemetry, Canary Tokens |
+| **Evict** | Remover presença adversária | Process Termination, Account Disablement, Quarantine, Reimage |
+| **Assess** | Avaliar postura de segurança | Vulnerability Scanning, Penetration Testing, Red Teaming, Risk Scoring |
+| **Model** | Modelar ameaças e defesas | Attack Path Analysis, Threat Modeling, Gap Analysis, Control Validation |
+
+### 4.2 NIST CSF 2.0 — 6 Funções Defensivas
+
+| Função | Objetivo | Controles Principais |
+|--------|----------|---------------------|
+| **Govern (GV)** | Governança de risco cibernético | Políticas, oversight, estratégia, supply chain risk |
+| **Identify (ID)** | Mapear ativos e riscos | Asset management, risk assessment, improvement |
+| **Protect (PR)** | Implementar salvaguardas | Identity management, access control, data security, training, platform security, tech resilience |
+| **Detect (DE)** | Descobrir anomalias | Continuous monitoring, event detection, anomaly analysis |
+| **Respond (RS)** | Responder a incidentes | Incident management, analysis, mitigation, reporting, communication |
+| **Recover (RC)** | Restaurar operações | Incident recovery plan, improvements, communications |
+
+### 4.3 CIS Controls v8 — 18 Controles Prioritários
+
+| # | Controle | Descrição |
+|---|----------|-----------|
+| 1 | Inventory and Control of Enterprise Assets | Inventário completo de HW/SW |
+| 2 | Inventory and Control of Software Assets | Catálogo de software autorizado |
+| 3 | Data Protection | Proteção de dados em repouso/trânsito |
+| 4 | Secure Configuration of Enterprise Assets | Hardening por baseline |
+| 5 | Account Management | Provisionamento, revisão, remoção de contas |
+| 6 | Access Control Management | MFA, least privilege, RBAC |
+| 7 | Continuous Vulnerability Management | Patch + scan contínuo |
+| 8 | Audit Log Management | Logging centralizado e protegido |
+| 9 | Email and Web Browser Protections | DMARC, SPF, DKIM, bloqueio de anexos |
+| 10 | Malware Defenses | AV, EDR, whitelisting |
+| 11 | Data Recovery | Backups offline, testados |
+| 12 | Network Infrastructure Management | Firewall, segmentação, 802.1X |
+| 13 | Network Monitoring and Defense | IDS/IPS, NDR, network anomoly detection |
+| 14 | Security Awareness and Skills Training | Treinamento de phishing, engenharia social |
+| 15 | Service Provider Management | Due diligence em fornecedores |
+| 16 | Application Software Security | SAST, DAST, SCA, ASVS |
+| 17 | Incident Response Management | Planos testados, playbooks |
+| 18 | Penetration Testing | Testes regulares com frameworks |
+
+### 4.4 OWASP ASVS — Níveis de Verificação
+
+| Nível | Descrição | Aplicabilidade |
+|-------|-----------|----------------|
+| **L1** | Controles básicos (automatizáveis) | Todas as aplicações |
+| **L2** | Defesa em profundidade | Apps que processam dados sensíveis |
+| **L3** | Alta segurança | Apps críticas (financeiro, saúde, militar) |
+
+**Categorias ASVS:**
+- V1: Architecture, Design and Threat Modeling
+- V2: Authentication Verification
+- V3: Session Management
+- V4: Access Control
+- V5: Validation, Sanitization and Encoding
+- V6: Stored Cryptography
+- V7: Error Handling and Logging
+- V8: Data Protection
+- V9: Communications
+- V10: Malicious Code
+- V11: Business Logic
+- V12: Files and Resources
+- V13: API and Web Service
+- V14: Configuration
+
+### 4.5 OWASP Top 10 — Ameaças e Contramedidas
+
+| # | Risco | Descrição | Contramedidas |
+|---|-------|-----------|---------------|
+| 1 | **Broken Access Control** | Ausência de restrições de acesso | RBAC, ACLs, Deny-by-default, CORS validation |
+| 2 | **Cryptographic Failures** | Criptografia fraca/ausente | TLS 1.3, criptografia forte, hashing com salt |
+| 3 | **Injection** | SQL, NoSQL, OS, LDAP injection | Prepared statements, parameterized queries, input validation |
+| 4 | **Insecure Design** | Falhas no design de segurança | Threat modeling, secure design patterns |
+| 5 | **Security Misconfiguration** | Configurações padrão inseguras | Hardening baselines, automated scanning |
+| 6 | **Vulnerable Components** | Bibliotecas/versões desatualizadas | SCA, SBOM, patch management |
+| 7 | **Identification & Auth Failures** | Fraquezas de autenticação | MFA, rate limiting, password policies |
+| 8 | **Data Integrity Failures** | Falhas de integridade | Assinaturas digitais, code signing |
+| 9 | **Logging & Monitoring Failures** | Ausência de logging efetivo | SIEM, centralized logging, alerting |
+| 10 | **SSRF** | Server-side request forgery | Input validation, allowlists, network segmentation |
+
+---
+
+## 5. TÉCNICAS ESPECÍFICAS POR AMBIENTE
+
+### 5.1 Active Directory — Técnicas de Ataque e Defesa
+
+#### Ataques a Credenciais AD
+| Técnica | Descrição | Defesa |
+|---------|-----------|--------|
+| **Kerberoasting** | Solicitar TGS e crack offline | Contas de serviço com senhas fortes (+25 chars), Managed Service Accounts |
+| **AS-REP Roasting** | Contas sem pré-autenticação Kerberos | Forçar pré-autenticação em todas as contas |
+| **DCSync** | Replicar NTDS.dit via DRSUAPI | Proteger contas com privilégios de replicação, monitorar evento 4662 |
+| **Golden Ticket** | Forjar TGT com hash KRBTGT | Rotacionar KRBTGT hash a cada 12 meses ou após incidente |
+| **Silver Ticket** | Forjar TGS para serviço | Logging de falhas Kerberos, monitorar eventos 4768/4769 |
+| **Pass-the-Hash** | Autenticar com hash NTLM | LAPS, Protected Users group, Credential Guard |
+| **Pass-the-Ticket** | Reutilizar ticket Kerberos | Kerberos armoring, monitorar reuso de tickets |
+| **Overpass-the-Hash** | Converter hash NTLM em TGT | Credential Guard, LSA Protection |
+| **Skeleton Key** | DLL maliciosa no LSASS | LSA Protection, Credential Guard, monitoramento de DLLs |
+| **DCSync Shadow** | DC fantasma para persistência | Monitorar criação de DCs, evento 4742 |
+
+#### Movimentação Lateral AD
+| Técnica | Descrição | Defesa |
+|---------|-----------|--------|
+| **PsExec** | Execução remota via SMB ADMIN$ | Remover PsExec, monitorar eventos 5145/5140 |
+| **WMI** | Execução via WMI/CIM | Monitorar WMI activity, bloquear WMI de endpoints |
+| **WinRM** | PowerShell remoto | Just Enough Administration (JEA), logging |
+| **DCOM** | Execução via DCOM | Restringir DCOM, monitorar eventos de criação de processo |
+| **SMB Sessions** | Named pipes, scheduled tasks | SMB signing, SMB encryption |
+| **BloodHound** | Mapear caminhos de ataque AD | Monitorar consultas LDAP anômalas, proteger grupos privilegiados |
+| **ACL Abuse** | Abusar de permissões delegadas | Revisar ACLs, monitorar modificações em objetos AD |
+| **AdminSDHolder** | Persistência via SDProp | Proteger AdminSDHolder, monitorar modificações |
+| **Group Policy Abuse** | Malware via GPO | Restringir quem pode modificar GPOs, auditar |
+| **LAPS** | Senhas locais gerenciadas | Implementar LAPS, evitar reuso de senhas locais |
+
+### 5.2 Cloud (AWS, Azure, GCP)
+
+#### Ataques Cloud
+| Técnica | Descrição |
+|---------|-----------|
+| **IAM Privilege Escalation** | Abusar de permissões IAM para escalar privilégios |
+| **S3 Bucket Enumeration/Exposure** | Listagem e acesso a buckets públicos/misconfigurados |
+| **Cloud Credential Harvesting** | Roubo de credenciais de instâncias EC2/metadata |
+| **Cloud Metadata Service Attack** | SSRF → 169.254.169.254 → credenciais |
+| **Cloud Instance Compromise** | Exploração de VMs cloud (SSH, RDP) |
+| **Cloud Resource Hijacking** | Cryptomining em instâncias cloud |
+| **Cloud Data Exfiltration** | Exfiltração via cloud services |
+| **Cloud Account Takeover** | Apropriação de conta cloud |
+| **Kubernetes Pod Escape** | Container break → host |
+| **Kubernetes RBAC Abuse** | Escalar privilégios via RBAC misconfigured |
+| **Kubernetes Secrets Dump** | Dump de secrets do etcd/K8s API |
+| **Shadow IT Discovery** | Recursos cloud não autorizados |
+| **Cloud API Abuse** | Abuso de rate limits, API enumeration |
+
+#### Defesas Cloud
+| Contramedida | Descrição |
+|--------------|-----------|
+| **CSPM** | Cloud Security Posture Management (configuração contínua) |
+| **CIEM** | Cloud Infrastructure Entitlement Management (IAM rightsizing) |
+| **CWPP** | Cloud Workload Protection Platform (proteção de workloads) |
+| **CASB** | Cloud Access Security Broker (controle de acesso SaaS) |
+| **IAM Least Privilege** | Políticas de menor privilégio |
+| **Network Segmentation** | VPC, subnets, security groups, NACLs |
+| **Cloud Trail/Logging** | Logging centralizado (CloudTrail, Azure Monitor) |
+| **Container Security** | Falco, Tetragon, Pod Security Standards |
+| **Admission Controllers** | OPA/Gatekeeper, Kyverno |
+| **Secrets Management** | Vault, AWS Secrets Manager, Azure Key Vault |
+| **Metadata Defense** | IMDSv2, restrição de acesso a metadata |
+
+### 5.3 Web Application
+
+#### Ataques Web (OWASP Top 10 +)
+| Técnica | Descrição | Contramedida |
+|---------|-----------|--------------|
+| **SQL Injection** | Injeção SQL | Prepared statements, WAF, input validation |
+| **XSS** | Cross-Site Scripting | Output encoding, CSP, HttpOnly cookies |
+| **CSRF** | Cross-Site Request Forgery | Anti-CSRF tokens, SameSite cookies |
+| **SSRF** | Server-Side Request Forgery | Allowlists, URL validation, network segmentation |
+| **RCE** | Remote Code Execution | Input validation, sandboxing |
+| **LFI/RFI** | File Inclusion | Whitelist de paths, desabilitar allow_url_include |
+| **XXE** | XML External Entity | Desabilitar DTDs, usar JSON |
+| **IDOR** | Insecure Direct Object Reference | Authorization checks |
+| **SSTI** | Server-Side Template Injection | Sandbox templates, input sanitization |
+| **Deserialization** | Insecure Deserialization | Allowlists, integrity checks, monitoring |
+| **API Abuse** | Abuso de APIs REST/GraphQL | Rate limiting, authentication, input validation |
+| **GraphQL Injection** | Injeção em GraphQL | Depth limiting, query whitelisting |
+| **JWT Manipulation** | Modificação de tokens JWT | Verificação de assinatura, algoritmo forçado |
+| **Web Cache Poisoning** | Envenenamento de cache | Cache key design, input validation |
+| **HTTP Request Smuggling** | Contrabando de requisições | HTTP/2, configurar parsers corretamente |
+
+### 5.4 Mobile (iOS/Android)
+
+#### Ataques Mobile (OWASP MASVS)
+| Técnica | Descrição |
+|---------|-----------|
+| **Insecure Data Storage** | Dados sensíveis em SharedPreferences, SQLite, plists |
+| **Insecure Communication** | SSL pinning bypass, MITM |
+| **Broken Authentication** | Session tokens fracos, biometric bypass |
+| **Reverse Engineering** | Extrair código, resources, certificados do APK/IPA |
+| **Runtime Manipulation** | Frida, Objection — hooking de métodos |
+| **Root/Jailbreak Detection Bypass** | Bypass de detecção de device modificado |
+| **Insecure Deep Links** | URL scheme hijacking |
+| **Insecure IPC** | Content providers, intents maliciosas |
+| **WebView Vulnerabilities** | XSS em WebView, JavaScript bridge abuse |
+| **Hardcoded Secrets** | API keys, tokens hardcoded |
+
+#### Defesas Mobile
+- **MASVS L1/L2** compliance verification
+- **Certificate Pinning** contra MITM
+- **Runtime Protection** (RASP) contra hooking
+- **Obfuscation** (ProGuard, DexGuard)
+- **Root/Jailbreak Detection** + action
+- **Biometric + Strong Authentication**
+- **Secure Key Storage** (Keychain, Android Keystore)
+- **App Transport Security** (ATS no iOS)
+- **Minimum OS Version Enforcement**
+- **SAST/DAST Integration** no CI/CD
+
+### 5.5 Wireless (Wi-Fi, Bluetooth)
+
+#### Ataques Wireless
+| Técnica | Descrição |
+|---------|-----------|
+| **WPA2 KRACK** | Key Reinstallation Attack — quebra criptografia WPA2 |
+| **WPA3 Downgrade** | Downgrade para WPA2 (transitional mode) |
+| **Evil Twin** | AP falso para MITM |
+| **Deauthentication Attack** | Desconexão forçada de clientes |
+| **PMKID Attack** | Captura e cracking de PMKID (WPA2/3) |
+| **WPS PIN Brute Force** | Quebra de WPS |
+| **Rogue AP** | Ponto de acesso não autorizado |
+| **Karma Attack** | Responder a probes de SSIDs conhecidos |
+| **Bluetooth Bluesnarfing** | Extração de dados via Bluetooth |
+| **Bluetooth Bluejacking** | Spam via Bluetooth |
+| **Bluetooth BlueBorne** | Execução remota via Bluetooth |
+| **AirDrop Abuse** | Airdrop phishing |
+
+#### Defesas Wireless
+- **WPA3-Enterprise (192-bit) ou superior**
+- **Desabilitar WPS e modos de transição**
+- **802.1X com EAP-TLS** (certificados)
+- **Wireless IDS/IPS** (WIPS)
+- **Desabilitar SSID broadcast** (controvérsia — segurança por obscuridade)
+- **Network segmentation** (rede guest vs. corporativa separada)
+- **MAC filtering** (não é segurança real, mas dificulta)
+- **Bluetooth desabilitado quando não necessário**
+- **Descoberta Bluetooth configurada como não-descobrível**
+- **Monitoramento de rogue APs** (spectrum analysis)
+
+### 5.6 Engenharia Social
+
+#### Técnicas de Engenharia Social
+| Técnica | Descrição |
+|---------|-----------|
+| **Phishing** | Email falso com link/anexo malicios

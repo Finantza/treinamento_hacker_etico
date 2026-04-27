@@ -6,23 +6,33 @@
 class ProceduralAI {
     constructor() {
         this.categories = {
-            injection: { weight: 25, templates: 25 },
-            xss: { weight: 20, templates: 20 },
-            auth: { weight: 15, templates: 18 },
-            rce: { weight: 20, templates: 22 },
-            idor: { weight: 10, templates: 12 },
-            ssrf: { weight: 8, templates: 10 },
-            deserialization: { weight: 7, templates: 8 },
-            buffer_overflow: { weight: 10, templates: 15 },
-            lfi_rfi: { weight: 12, templates: 14 },
-            csrf: { weight: 8, templates: 10 },
-            open_redirect: { weight: 5, templates: 8 },
-            network_hacking: { weight: 15, templates: 10 },
-            api_security: { weight: 12, templates: 10 },
-            cloud_security: { weight: 10, templates: 8 },
-            social_engineering: { weight: 8, templates: 6 },
-            cryptography: { weight: 7, templates: 6 },
-            mobile_security: { weight: 8, templates: 6 }
+            // MITRE ATT&CK based categories
+            injection: { weight: 25, templates: 25, mitre: 'T1190' },
+            xss: { weight: 20, templates: 20, mitre: 'T1059.007' },
+            auth: { weight: 15, templates: 18, mitre: 'T1078' },
+            rce: { weight: 20, templates: 22, mitre: 'T1059' },
+            idor: { weight: 10, templates: 12, mitre: 'T1080' },
+            ssrf: { weight: 8, templates: 10, mitre: 'T1552.005' },
+            deserialization: { weight: 7, templates: 8, mitre: 'T1059.005' },
+            buffer_overflow: { weight: 10, templates: 15, mitre: 'T1068' },
+            lfi_rfi: { weight: 12, templates: 14, mitre: 'T1083' },
+            csrf: { weight: 8, templates: 10, mitre: 'T1076' },
+            open_redirect: { weight: 5, templates: 8, mitre: 'T1566.002' },
+            network_hacking: { weight: 15, templates: 10, mitre: 'T1595' },
+            api_security: { weight: 12, templates: 10, mitre: 'T1190' },
+            cloud_security: { weight: 10, templates: 8, mitre: 'T1078.004' },
+            social_engineering: { weight: 8, templates: 6, mitre: 'T1566' },
+            cryptography: { weight: 7, templates: 6, mitre: 'T1600' },
+            mobile_security: { weight: 8, templates: 6, mitre: 'T1475' },
+            // New categories from MITRE ATT&CK
+            privilege_escalation: { weight: 12, templates: 10, mitre: 'T1068' },
+            defense_evasion: { weight: 15, templates: 12, mitre: 'T1055' },
+            credential_access: { weight: 12, templates: 10, mitre: 'T1003' },
+            lateral_movement: { weight: 10, templates: 8, mitre: 'T1021' },
+            persistence: { weight: 12, templates: 10, mitre: 'T1547' },
+            collection: { weight: 8, templates: 6, mitre: 'T1056' },
+            exfiltration: { weight: 7, templates: 5, mitre: 'T1041' },
+            impact: { weight: 8, templates: 6, mitre: 'T1486' }
         };
         
         this.templates = this.loadTemplates();
@@ -465,6 +475,8 @@ class ProceduralAI {
             options: generatedOptions,
             correct: correctIndex,
             explain: challenge.payloadHint || `A vulnerabilidade de ${challenge.category.toUpperCase()} permite este exploit: ${challenge.solution}.`,
+            cve: challenge.cveReference || null,
+            mitre: challenge.mitre || null,
             xp: reward.xp,
             rep: reward.rep
         };
@@ -483,7 +495,13 @@ class ProceduralAI {
             auth: ["Cookie: user=guest", "Header: X-Auth-False", "Session: {id:0}", "Token: null"],
             deserialization: ["{\"user\":\"admin\"}", "O:4:\"Test\":0:{}", "new Buffer('abc')", "eval('1+1')"],
             open_redirect: ["/logout", "/home", "http://internal-site.local", "javascript:history.back()"],
-            xxe: ["<!ENTITY test '123'>", "<foo>bar</foo>", "<?xml version='1.1'?>", "<!ELEMENT doc ANY>"]
+            xxe: ["<!ENTITY test '123'>", "<foo>bar</foo>", "<?xml version='1.1'?>", "<!ELEMENT doc ANY>"],
+            network_hacking: ["nmap -sP 192.168.1.1", "ping 192.168.1.1", "traceroute 192.168.1.1", "netstat -an"],
+            api_security: ["{\"role\": \"moderator\"}", "Authorization: Basic YWRtaW46", "X-API-Key: test123", "Bearer null"],
+            cloud_security: ["http://localhost/metadata", "http://192.168.0.1/admin", "file:///etc/hosts", "aws sts get-caller-identity"],
+            social_engineering: ["c0rp.net", "corp-security.com", "corp.com.evil.io", "corp-it-support.xyz"],
+            cryptography: ["hashcat -m 100", "hashcat -m 1000", "hashcat -m 1400", "john hash.txt --wordlist=rockyou.txt"],
+            mobile_security: ["adb shell dumpsys", "adb shell ps", "adb pull /data/data/", "frida -U -l hook.js"]
         };
         
         const choices = wrongAnswers[category] || ["Opção inválida 1", "Opção inválida 2", "Opção inválida 3", "Opção inválida 4"];

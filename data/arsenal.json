@@ -1,6 +1,7 @@
 {
-    "version": "1.0",
-    "generated_at": "2026-04-22T11:27:29.946239",
+    "version": "2.0",
+    "generated_at": "2026-04-27T10:00:00.000000",
+    "updated_with": "MITRE ATT&CK v16+ techniques from tecnicas.txt",
     "challenges": [
         {
             "id": "py-idor-0",

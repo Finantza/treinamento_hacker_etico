@@ -7,66 +7,96 @@ let currentChallenge = null;
 let currentChallengeData = null;
 let gameStartTime = 0;
 
-function showGlossary() {
-    const glossaryHTML = `
-        <div class="p-4 animate__animated animate__fadeIn">
-            <h3 class="text-primary mb-4"><i class="fas fa-book-open me-2"></i>GLOSSÁRIO DE CIBERSEGURANÇA</h3>
-            
-            <ul class="nav nav-tabs border-primary mb-4" id="glossaryTabs">
-                <li class="nav-item"><button class="nav-link active text-danger" data-bs-toggle="tab" data-bs-target="#attacksTab">ATAQUES (RED)</button></li>
-                <li class="nav-item"><button class="nav-link text-info" data-bs-toggle="tab" data-bs-target="#defenseTab">DEFESAS (BLUE)</button></li>
-            </ul>
+let cachedGlossaryHTML = null;
+let isGlossaryCaching = false;
 
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="attacksTab">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <div class="bg-black p-3 rounded border-start border-danger border-4 mb-3">
-                                <h6 class="text-danger">SQL INJECTION (SQLi)</h6>
-                                <p class="small text-white-50">Inserção de comandos SQL maliciosos em campos de entrada. Permite ler, modificar ou deletar dados do banco de dados.</p>
-                                <code class="text-muted">Ex: ' OR '1'='1</code>
-                            </div>
-                            <div class="bg-black p-3 rounded border-start border-danger border-4 mb-3">
-                                <h6 class="text-danger">CROSS-SITE SCRIPTING (XSS)</h6>
-                                <p class="small text-white-50">Injeção de scripts (geralmente JavaScript) em páginas web visualizadas por outros usuários. Pode roubar cookies e sessões.</p>
-                                <code class="text-muted">Ex: &lt;script&gt;alert(1)&lt;/script&gt;</code>
-                            </div>
-                            <div class="bg-black p-3 rounded border-start border-danger border-4 mb-3">
-                                <h6 class="text-danger">REMOTE CODE EXECUTION (RCE)</h6>
-                                <p class="small text-white-50">O ataque mais grave. Permite que o invasor execute comandos diretamente no sistema operacional do servidor.</p>
-                                <code class="text-muted">Ex: ; cat /etc/passwd</code>
-                            </div>
-                            <div class="bg-black p-3 rounded border-start border-danger border-4 mb-3">
-                                <h6 class="text-danger">IDOR / LFI</h6>
-                                <p class="small text-white-50">Falhas de controle de acesso que permitem visualizar arquivos internos ou perfis de outros usuários sem permissão.</p>
-                                <code class="text-muted">Ex: ../../../etc/passwd</code>
-                            </div>
-                        </div>
+async function initGlossaryCache() {
+    if (cachedGlossaryHTML || isGlossaryCaching) return;
+    isGlossaryCaching = true;
+    try {
+        const data = window.TECNICAS_DATA;
+        if (!data) throw new Error("Base de dados offline não encontrada.");
+        
+        const attacks = data.attacks || [];
+        const defenses = data.defenses || [];
+
+        const card = (title, icon, badge, badgeColor, body, example, extra, extraLabel, extraColor) => `
+            <div class="bg-black rounded mb-3 border-start border-4 border-${badgeColor}" style="overflow:hidden;">
+                <div class="p-3">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas ${icon} text-${badgeColor} me-2"></i>
+                        <h6 class="mb-0 text-${badgeColor}">${title}</h6>
+                        <span class="badge bg-${badgeColor} ms-auto opacity-75" style="font-size:0.6rem;">${badge}</span>
+                    </div>
+                    <p class="small text-white-50 mb-2">${body}</p>
+                    ${example ? `<div class="bg-dark rounded p-2 mb-2"><code class="text-warning" style="font-size:0.7rem;">📌 ${example}</code></div>` : ''}
+                    ${extra ? `<div class="bg-dark rounded p-2"><span class="text-${extraColor}" style="font-size:0.7rem;"><i class="fas fa-shield-alt me-1"></i><b>${extraLabel}:</b> ${extra}</span></div>` : ''}
+                </div>
+            </div>`;
+
+        const attackCards = attacks.map(a => card(a.name, a.icon, a.mitre || 'TTP', 'danger', a.simple, a.example, a.defense, '🛡️ Defesa', 'success')).join('');
+        const defenseCards = defenses.map(d => card(d.name, d.icon, 'Defesa', d.color, d.simple, null, d.protects, '✅ Protege contra', d.color)).join('');
+
+        cachedGlossaryHTML = `
+            <div class="p-4 animate__animated animate__fadeIn">
+                <div class="d-flex align-items-center mb-4 flex-wrap">
+                    <h3 class="text-primary mb-0"><i class="fas fa-book-open me-2"></i>GLOSSÁRIO COMPLETO DE CIBERSEGURANÇA</h3>
+                    <span class="badge bg-primary ms-3">${attacks.length} Ataques | ${defenses.length} Defesas</span>
+                </div>
+                <ul class="nav nav-pills mb-4 gap-2" id="glossaryTabs">
+                    <li class="nav-item"><button class="nav-link active btn-sm" data-bs-toggle="pill" data-bs-target="#gAttacks"><i class="fas fa-skull me-1"></i>${attacks.length} Ataques</button></li>
+                    <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#gDefenses"><i class="fas fa-shield-alt me-1"></i>${defenses.length} Defesas</button></li>
+                    <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#gFrameworks"><i class="fas fa-chess me-1"></i>Frameworks</button></li>
+                    <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#gCerts"><i class="fas fa-certificate me-1"></i>Certificações</button></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="gAttacks">
+                        <p class="text-muted small mb-3"><i class="fas fa-info-circle me-1"></i>Todas as técnicas MITRE ATT&CK v16+ com explicações, exemplos e contramedidas.</p>
+                        ${attackCards}
+                    </div>
+                    <div class="tab-pane fade" id="gDefenses">
+                        <p class="text-muted small mb-3"><i class="fas fa-info-circle me-1"></i>Ferramentas, controles e práticas de segurança — do básico ao avançado.</p>
+                        ${defenseCards}
+                    </div>
+                    <div class="tab-pane fade" id="gFrameworks">
+                        ${defenses.filter(d => ['MITRE ATT&CK','MITRE D3FEND','NIST CSF 2.0','PTES','OWASP Top 10','CIS Controls v8'].includes(d.name)).map(d => card(d.name, d.icon, 'Framework', d.color, d.simple, null, d.protects, '✅ Uso', d.color)).join('')}
+                    </div>
+                    <div class="tab-pane fade" id="gCerts">
+                        ${defenses.filter(d => d.name.includes('Security+') || d.name.includes('CEH') || d.name.includes('OSCP') || d.name.includes('CISSP') || d.name.includes('CISM') || d.name.includes('AWS Security')).map(d => card(d.name, d.icon, 'Certificação', d.color, d.simple, null, d.protects, '🎯 Benefício', d.color)).join('')}
                     </div>
                 </div>
-                <div class="tab-pane fade" id="defenseTab">
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <div class="bg-black p-3 rounded border-start border-info border-4 mb-3">
-                                <h6 class="text-info">WAF (Web Application Firewall)</h6>
-                                <p class="small text-white-50">Proteção que analisa o tráfego HTTP e bloqueia padrões suspeitos de SQLi e XSS antes que cheguem à aplicação.</p>
-                            </div>
-                            <div class="bg-black p-3 rounded border-start border-info border-4 mb-3">
-                                <h6 class="text-info">IPS / IP BLOCK</h6>
-                                <p class="small text-white-50">Intrusion Prevention System. Detecta comportamentos anômalos (como força bruta) e bloqueia o endereço IP do atacante.</p>
-                            </div>
-                            <div class="bg-black p-3 rounded border-start border-info border-4 mb-3">
-                                <h6 class="text-info">VIRTUAL PATCHING</h6>
-                                <p class="small text-white-50">Aplicação de uma regra de segurança imediata para mitigar uma falha conhecida sem precisar alterar o código fonte original.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    renderToModule('glossary', glossaryHTML);
+            </div>`;
+    } catch (e) {
+        console.error("Glossary preload failed", e);
+    } finally {
+        isGlossaryCaching = false;
+    }
 }
+
+async function showGlossary() {
+    if (cachedGlossaryHTML) {
+        renderToModule('glossary', cachedGlossaryHTML);
+        return;
+    }
+
+    renderToModule('glossary', '<div class="p-5 text-center"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i><p class="mt-3 text-muted">Construindo índice enciclopédico...</p></div>');
+    
+    if (!isGlossaryCaching) {
+        await initGlossaryCache();
+    } else {
+        // Wait until it finishes caching
+        while (isGlossaryCaching && !cachedGlossaryHTML) {
+            await new Promise(r => setTimeout(r, 100));
+        }
+    }
+    
+    if (cachedGlossaryHTML) {
+        renderToModule('glossary', cachedGlossaryHTML);
+    } else {
+        renderToModule('glossary', '<div class="p-5 text-center text-danger"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><p>Erro ao carregar o banco de dados.</p></div>');
+    }
+}
+
 
 // ================= CORE HELPERS =================
 function getCurrentUser() {
@@ -297,8 +327,10 @@ function loadGameInterface() {
             </div>
 
             <div class="premium-glass p-4 mb-4 border-primary">
-                <p class="text-white-50 mb-3"><i class="fas fa-info-circle me-2"></i>${currentChallengeData.description || 'Analise o código abaixo e identifique a vulnerabilidade.'}</p>
-                <div class="bg-black p-3 rounded position-relative">
+                <p class="text-white-50 mb-2"><i class="fas fa-info-circle me-2"></i>${currentChallengeData.description || 'Analise o código abaixo e identifique a vulnerabilidade.'}</p>
+                ${currentChallengeData.cve ? `<span class="badge bg-danger me-2 mb-2"><i class="fas fa-bug me-1"></i>${currentChallengeData.cve}</span>` : ''}
+                ${currentChallengeData.mitre ? `<span class="badge bg-warning text-dark mb-2"><i class="fas fa-crosshairs me-1"></i>MITRE: ${currentChallengeData.mitre}</span>` : ''}
+                <div class="bg-black p-3 rounded position-relative mt-2">
                     <pre class="mb-0"><code class="text-success">${currentChallengeData.code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
                 </div>
             </div>
@@ -673,19 +705,25 @@ function showMissionBriefing() {
 }
 
 // ================= AUTH =================
+window.triggerLoginFlow = function() {
+    const user = getCurrentUser();
+    if (!user) return;
+    document.getElementById('desktop-layer').classList.remove('d-none');
+    showDashboard();
+    if (!user.briefingShown) {
+        showMissionBriefing();
+        user.briefingShown = true;
+        saveUserData();
+    }
+};
+
 window.addEventListener('load', () => {
     sfx.init();
-    const user = getCurrentUser();
-    if (user) {
-        if (window.os) os.hideSplash();
-        document.getElementById('desktop-layer').classList.remove('d-none');
-        showDashboard();
-        if (!user.briefingShown) {
-            showMissionBriefing();
-            user.briefingShown = true;
-            saveUserData();
-        }
-    }
+    // Do NOT hide splash immediately here. Let index.html initIntro handle the transition.
+    // The splash screen will call triggerLoginFlow() when it finishes.
+    
+    // Pre-cache the glossary in the background to ensure instant load
+    initGlossaryCache();
 
     document.getElementById('loginForm')?.addEventListener('submit', (e) => {
         e.preventDefault();
