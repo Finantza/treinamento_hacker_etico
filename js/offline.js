@@ -413,22 +413,34 @@ const arenaHandlers = {
     over: (e) => {
         const body = document.getElementById('body-botwar');
         if (!body) return;
-        const isWin = e.detail.result === 'red_win';
+        const redWin = e.detail.result === 'red_win';
+        const icon  = redWin ? 'fa-skull' : 'fa-trophy';
+        const color = redWin ? 'danger'   : 'success';
+        const glow  = redWin ? '#f00'     : '#0f0';
+        const title = redWin ? 'SISTEMA COMPROMETIDO' : 'BLUE TEAM VITORIOSO!';
+        const xpGain  = redWin ? 20  : 80;
+        const repGain = redWin ? 5   : 30;
+        const user = getCurrentUser();
+        if (user) {
+            user.xp += xpGain; user.reputation += repGain;
+            user.level = Math.floor(user.xp / 100) + 1;
+            saveUserData();
+        }
         body.innerHTML = `
             <div class="d-flex flex-column align-items-center justify-content-center h-100 p-5 animate__animated animate__zoomIn">
-                <div class="mx-auto mb-4 bg-${isWin ? 'danger' : 'info'} rounded-circle d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; box-shadow: 0 0 30px ${isWin ? '#f00' : '#0ff'};">
-                    <i class="fas ${isWin ? 'fa-skull' : 'fa-shield-alt'} fa-3x text-dark"></i>
+                <div class="mx-auto mb-4 bg-${color} rounded-circle d-flex align-items-center justify-content-center" style="width:100px;height:100px;box-shadow:0 0 30px ${glow};">
+                    <i class="fas ${icon} fa-3x text-dark"></i>
                 </div>
-                <h1 class="text-${isWin ? 'danger' : 'info'} glitch-text mb-2">${isWin ? 'SISTEMA COMPROMETIDO' : 'SISTEMA PROTEGIDO'}</h1>
-                <p class="text-white-50 mb-4 text-center">O duelo IA chegou ao fim. Resultados processados pelo CyberOS.</p>
-                <div class="row g-3 w-100 mb-5" style="max-width: 400px;">
-                    <div class="col-6"><div class="bg-black p-3 rounded border border-primary text-center small">+50 XP</div></div>
-                    <div class="col-6"><div class="bg-black p-3 rounded border border-primary text-center small">+20 REP</div></div>
+                <h1 class="text-${color} glitch-text mb-2">${title}</h1>
+                <p class="text-white-50 mb-4 text-center">${redWin ? 'Red Bot venceu. Analise os logs e melhore a defesa.' : '20 ataques neutralizados. Excelente resposta a incidentes!'}</p>
+                <div class="row g-3 w-100 mb-4" style="max-width:400px;">
+                    <div class="col-6"><div class="bg-black p-3 rounded border border-${color} text-center small text-${color} fw-bold">+${xpGain} XP</div></div>
+                    <div class="col-6"><div class="bg-black p-3 rounded border border-${color} text-center small text-${color} fw-bold">+${repGain} REP</div></div>
                 </div>
-                <button class="btn btn-outline-primary btn-lg px-5 py-3 fw-bold" onclick="startBotWar()">REINICIAR PROTOCOLO</button>
+                <button class="btn btn-outline-${color} btn-lg px-5 py-3 fw-bold" onclick="startBotWar()">REINICIAR PROTOCOLO</button>
             </div>
         `;
-        if (window.os) os.showNotification(isWin ? 'Alerta: Sistema Derrubado!' : 'Sucesso: Defesa Concluída!', isWin ? 'danger' : 'success');
+        if (window.os) os.showNotification(redWin ? '💀 Sistema derrubado pelo Red Bot!' : '🏆 Blue Team venceu a Arena!', redWin ? 'danger' : 'success');
     }
 };
 
@@ -547,21 +559,27 @@ function startBotWar(missionType = 'duel') {
             <div class="row g-4 mb-4">
                 <div class="col-md-6">
                     <div class="premium-glass p-3 border-danger ${isDefenseOnly ? 'd-none' : ''}">
-                        <h6 class="text-danger small mb-2">COMANDOS DE ATAQUE ${isAttackOnly ? '(MISSÃO)' : ''}</h6>
-                        <div class="d-flex gap-2 flex-wrap">
+                        <h6 class="text-danger small mb-2"><i class="fas fa-skull me-1"></i>ATAQUES RED ${isAttackOnly ? '(MISSÃO)' : ''}</h6>
+                        <div class="d-flex gap-1 flex-wrap">
                             <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('sqli')">SQLi</button>
                             <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('bof')">BoF</button>
                             <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('xss')">XSS</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('ransomware')">Ransom</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('phishing')">Phish</button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('zeroday')">0-Day</button>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="premium-glass p-3 border-info ${isAttackOnly ? 'd-none' : ''}">
-                        <h6 class="text-info small mb-2">COMANDOS DE DEFESA ${isDefenseOnly ? '(MISSÃO)' : ''}</h6>
-                        <div class="d-flex gap-2 flex-wrap">
+                        <h6 class="text-info small mb-2"><i class="fas fa-shield-alt me-1"></i>DEFESAS BLUE ${isDefenseOnly ? '(MISSÃO)' : ''}</h6>
+                        <div class="d-flex gap-1 flex-wrap">
                             <button class="btn btn-sm btn-outline-info" onclick="botWar.manualDefend('WAF')">WAF</button>
                             <button class="btn btn-sm btn-outline-info" onclick="botWar.manualDefend('IPS')">IPS</button>
-                            <button class="btn btn-sm btn-outline-info" onclick="botWar.manualDefend('PATCH')">PATCH</button>
+                            <button class="btn btn-sm btn-outline-info" onclick="botWar.manualDefend('PATCH')">Patch</button>
+                            <button class="btn btn-sm btn-outline-success" onclick="botWar.manualDefend('EDR')">EDR</button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="botWar.manualDefend('ZT')">ZeroTrust</button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="botWar.manualDefend('MFA')">MFA</button>
                         </div>
                     </div>
                 </div>
