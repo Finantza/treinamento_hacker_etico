@@ -446,7 +446,7 @@ function checkPentestAnswer(idx) {
         user.playerStats = user.playerStats || { solved: 0, failed: 0 };
         user.playerStats.solved += 1;
         
-        saveUserData();
+        saveUserData(user);
         
         const pentestBody = document.getElementById('body-pentest');
         if (pentestBody) {
@@ -467,7 +467,7 @@ function checkPentestAnswer(idx) {
         user.combo = 1; // Reset combo
         user.playerStats = user.playerStats || { solved: 0, failed: 0 };
         user.playerStats.failed += 1;
-        saveUserData();
+        saveUserData(user);
         
         const pentestBody = document.getElementById('body-pentest');
         if (pentestBody) {
@@ -837,7 +837,7 @@ window.triggerLoginFlow = function() {
     if (!user.briefingShown) {
         showMissionBriefing();
         user.briefingShown = true;
-        saveUserData();
+        saveUserData(user);
     }
 };
 
@@ -957,7 +957,7 @@ window.buyMarketItem = function(item, price) {
     if (item === 'hint') user.inventory.hints++;
     if (item === 'skip') user.inventory.skips++;
     
-    saveUserData();
+    saveUserData(user);
     sfx.correct();
     if (window.os) os.showNotification('Compra efetuada com sucesso! Entrega anônima realizada.', 'success');
     
@@ -1057,7 +1057,7 @@ window.simulatePixSuccess = function(amount) {
     if (!user) return;
     
     user.coins = (user.coins || 0) + amount;
-    saveUserData();
+    saveUserData(user);
     
     document.getElementById('pixModal')?.remove();
     sfx.correct();
