@@ -51,18 +51,16 @@ class ProceduralAI {
 
     async loadExternalArsenal() {
         try {
-            const response = await fetch('data/arsenal.json');
-            if (!response.ok) return;
-            const data = await response.json();
-            if (data.challenges) {
-                console.log(`[ProceduralAI] Loading ${data.challenges.length} external challenges from Python Factory.`);
+            const data = window.ARSENAL_DATA;
+            if (data && data.challenges) {
+                console.log(`[ProceduralAI] Loading ${data.challenges.length} external challenges from static Arsenal.`);
                 data.challenges.forEach(ch => {
                     if (!this.templates[ch.category]) this.templates[ch.category] = [];
                     this.templates[ch.category].push(ch);
                 });
             }
         } catch (e) {
-            console.warn('[ProceduralAI] External arsenal not found or load failed. Using built-in templates.');
+            console.warn('[ProceduralAI] Static arsenal load failed.');
         }
     }
 
@@ -81,6 +79,28 @@ class ProceduralAI {
         
         this.usedChallenges.add(challenge.id);
         return challenge;
+    }
+
+    // Bridge for offline.js
+    gerar(config, diff) {
+        const ch = this.generateChallenge(diff);
+        // Map to offline.js structure
+        const distractors = this.generateDistractors(ch.category, ch.solution);
+        const allOptions = [ch.solution, ...distractors].sort(() => Math.random() - 0.5);
+        
+        return {
+            category: ch.category,
+            description: ch.description,
+            code: ch.vulnerableCode || ch.code,
+            options: allOptions,
+            correct: allOptions.indexOf(ch.solution),
+            explain: ch.description,
+            xp: diff === 'massiva' ? 100 : (diff === 'logica' ? 50 : 25),
+            rep: 10,
+            cve: ch.cveReference,
+            mitre: this.categories[ch.category]?.mitre,
+            difficulty: diff
+        };
     }
 
     weightedCategory() {
@@ -482,10 +502,30 @@ class ProceduralAI {
         };
     }
 
-    generateWrongAnswer(category, correctAnswer) {
-        const wrongAnswers = {
+    generateDistractors(category, correctAnswer) {
+        const distractors = [];
+        const pool = this.getWrongPool(category);
+        const shuffled = pool.filter(o => o !== correctAnswer).sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, 3);
+    }
+
+    getWrongPool(category) {
+        const pools = {
             injection: ["' OR 'a'='b'", "admin'-- -", "1; SLEEP(5)", "' AND 1=0--", "') OR ('1'='1", "UNION SELECT 1,2,3--"],
             xss: ["<img src=x>", "javascript:void(0)", "<svg onload=alert(2)>", "'; alert(1); //", "<iframe src='javascript:alert(1)'>"],
+            auth: ["admin:admin", "123456", "password", "root:root", "guest:guest"],
+            rce: ["/etc/passwd", "; id", "system('ls')", "eval('1+1')", "exec('/bin/bash')"],
+            idor: ["?id=0", "?user=admin", "?uid=1337", "/profile/test", "/api/v1/debug"],
+            api_security: ["Bearer token123", "Authorization: Basic Og==", "X-Admin: true", "api_key=test"],
+            network_hacking: ["nmap -sS", "ping -f", "hping3 --flood", "netdiscover -r 192.168.1.0/24"],
+            ssrf: ["http://localhost:80", "file:///etc/hosts", "gopher://localhost:70", "http://127.0.0.1:22"],
+            lfi_rfi: ["/var/log/apache2/access.log", "C:\\Windows\\win.ini", "../../../.env", "/proc/self/environ"]
+        };
+        return pools[category] || ["Exploit Genérico #1", "Exploit Genérico #2", "Exploit Genérico #3", "Exploit Genérico #4"];
+    }
+
+    generateWrongAnswer(category, correctAnswer) {
+        const pool = this.getWrongPool(category);
             rce: ["&& ls", "| whoami", "`id`", "$(test)", "; cat /etc/shadow"],
             buffer_overflow: ["A".repeat(32), "B".repeat(64), "\\x90".repeat(10), "0xdeadbeef", "BBBB".repeat(10)],
             idor: ["?id=0", "?user=guest", "?profile=null", "/api/v1/debug"],

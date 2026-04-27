@@ -131,12 +131,16 @@ function logout() {
     window.location.reload();
 }
 
-function saveUserData() {
+function saveUserData(userToSave = null) {
     const username = localStorage.getItem('currentUser');
     if (!username) return;
-    const user = getCurrentUser();
     const users = JSON.parse(localStorage.getItem('users') || '{}');
-    users[username] = user;
+    if (userToSave) {
+        users[username] = userToSave;
+    } else {
+        // Fallback for safety, but usually you should pass the object
+        console.warn("saveUserData called without user object.");
+    }
     localStorage.setItem('users', JSON.stringify(users));
 }
 
@@ -179,51 +183,111 @@ function showDashboard() {
     const user = getCurrentUser();
     if (!user) return;
 
-    const getReputationStatus = (rep) => {
-        if (rep >= 1000) return 'Cyber Legend';
-        if (rep >= 500) return 'Elite White Hat';
-        return 'Aspirante';
+    if (user.coins === undefined) user.coins = 0;
+    if (user.combo === undefined) user.combo = 1;
+
+    const getReputationStatus = (xp) => {
+        if (xp >= 10000) return { rank: 'Zero-Day Architect', color: 'danger' };
+        if (xp >= 5000) return { rank: 'Elite White Hat', color: 'warning' };
+        if (xp >= 2500) return { rank: 'SysAdmin Hacker', color: 'info' };
+        if (xp >= 1000) return { rank: 'Bug Bounty Hunter', color: 'success' };
+        if (xp >= 500) return { rank: 'Network Explorer', color: 'primary' };
+        return { rank: 'Script Kiddie', color: 'secondary' };
     };
 
+    const getNextRankXP = (xp) => {
+        if (xp < 500) return 500;
+        if (xp < 1000) return 1000;
+        if (xp < 2500) return 2500;
+        if (xp < 5000) return 5000;
+        if (xp < 10000) return 10000;
+        return xp;
+    };
+
+    const currentRank = getReputationStatus(user.xp);
+    const nextXp = getNextRankXP(user.xp);
+    const progress = nextXp === user.xp ? 100 : Math.floor((user.xp / nextXp) * 100);
+
     const dashboardHTML = `
-        <div class="p-4">
+        <div class="p-4 animate__animated animate__fadeIn">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <h3 class="text-white mb-0">CENTRAL DE COMANDO</h3>
-                <button class="btn btn-outline-danger btn-sm" onclick="logout()">
-                    <i class="fas fa-power-off me-2"></i> SAIR DO SISTEMA
-                </button>
+                <h3 class="text-white mb-0"><i class="fas fa-terminal me-2 text-primary"></i>CENTRAL DE COMANDO</h3>
+                <div class="d-flex gap-3 align-items-center">
+                    <div class="bg-dark rounded px-3 py-1 border border-warning">
+                        <i class="fas fa-coins text-warning me-1"></i> <span class="fw-bold text-warning">${user.coins} CC</span>
+                    </div>
+                    <button class="btn btn-outline-danger btn-sm" onclick="logout()">
+                        <i class="fas fa-power-off me-1"></i> SAIR
+                    </button>
+                </div>
             </div>
             <div class="row g-4">
+                <!-- COLUNA DO JOGADOR -->
                 <div class="col-lg-4">
-                    <div class="premium-glass p-4 text-center">
-                        <div class="mx-auto bg-primary rounded-circle mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
-                            <i class="fas fa-user-secret fa-2x"></i>
+                    <div class="premium-glass p-4 text-center border-start border-4 border-${currentRank.color} h-100 position-relative">
+                        ${user.combo > 1 ? `<div class="position-absolute top-0 end-0 m-3 combo-text">x${user.combo} COMBO</div>` : ''}
+                        
+                        <div class="mx-auto bg-${currentRank.color} rounded-circle mb-3 d-flex align-items-center justify-content-center shadow-glow" style="width: 80px; height: 80px;">
+                            <i class="fas fa-user-ninja fa-2x text-dark"></i>
                         </div>
                         <h3 class="text-white mb-0">${user.name}</h3>
-                        <p class="text-primary small mb-3">@${user.username}</p>
-                        <div class="badge bg-dark border border-primary px-3 py-2 mb-3">
-                            ${getReputationStatus(user.reputation)}
+                        <p class="text-muted small mb-3">@${user.username}</p>
+                        
+                        <div class="badge bg-dark border border-${currentRank.color} text-${currentRank.color} px-3 py-2 mb-3 fs-6">
+                            ${currentRank.rank}
                         </div>
-                        <div class="row g-2 mt-2">
-                            <div class="col-6"><div class="bg-black p-2 rounded small">Lvl ${user.level}</div></div>
-                            <div class="col-6"><div class="bg-black p-2 rounded small">${user.xp} XP</div></div>
+                        
+                        <div class="mt-4 text-start">
+                            <div class="d-flex justify-content-between small text-muted mb-1">
+                                <span>XP Total: <span class="text-white fw-bold">${user.xp}</span></span>
+                                <span>Próximo Rank: ${nextXp}</span>
+                            </div>
+                            <div class="progress bg-black" style="height: 10px;">
+                                <div class="progress-bar bg-${currentRank.color} progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mt-4">
+                            <div class="col-6"><div class="bg-black p-2 rounded small border border-secondary"><i class="fas fa-check text-success me-1"></i> ${user.playerStats?.solved || 0} Resolvidos</div></div>
+                            <div class="col-6"><div class="bg-black p-2 rounded small border border-secondary"><i class="fas fa-times text-danger me-1"></i> ${user.playerStats?.failed || 0} Falhas</div></div>
                         </div>
                     </div>
                 </div>
+
+                <!-- COLUNA DE APPS -->
                 <div class="col-lg-8">
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <div class="glass-card p-4 h-100 cursor-pointer border-primary" onclick="showAcademy()">
+                            <div class="glass-card p-4 h-100 cursor-pointer border-primary shadow-hover transition-all" onclick="showAcademy()">
                                 <h5 class="text-primary"><i class="fas fa-university me-2"></i>CYBER ACADEMY</h5>
-                                <p class="small text-muted">Trilhas de aprendizado guiado para iniciantes.</p>
-                                <button class="btn btn-sm btn-primary">ACESSAR AULAS</button>
+                                <p class="small text-muted">Aprenda táticas ofensivas e defensivas de forma guiada.</p>
+                                <button class="btn btn-sm btn-outline-primary mt-2">TREINAR</button>
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="glass-card p-4 h-100 cursor-pointer border-warning" onclick="startUrgentMission()">
-                                <h5 class="text-warning"><i class="fas fa-bolt me-2"></i>MISSÃO URGENTE</h5>
-                                <p class="small text-muted">Desafios de alta pressão com tempo limitado.</p>
-                                <button class="btn btn-sm btn-outline-warning">SOLICITAR AGORA</button>
+                            <div class="glass-card p-4 h-100 cursor-pointer border-warning shadow-hover transition-all" onclick="startUrgentMission()">
+                                <h5 class="text-warning"><i class="fas fa-bolt me-2 pulse"></i>MISSÃO URGENTE</h5>
+                                <p class="small text-muted">Contratos cronometrados de alto risco para ganhar XP extra.</p>
+                                <button class="btn btn-sm btn-warning text-dark fw-bold mt-2">ACEITAR CONTRATO</button>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="glass-card p-4 cursor-pointer border-danger" style="background: linear-gradient(45deg, rgba(20,0,0,0.8), rgba(0,0,0,0.9));" onclick="showBlackMarket()">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="text-danger mb-1"><i class="fas fa-shopping-cart me-2"></i>BLACK MARKET</h5>
+                                        <p class="small text-muted mb-0">Use seus CyberCoins para comprar ferramentas exclusivas e dicas.</p>
+                                    </div>
+                                    <button class="btn btn-danger btn-sm"><i class="fas fa-lock-open me-1"></i> ACESSAR LOJA</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <h6 class="text-white-50 mb-3"><i class="fas fa-trophy text-warning me-2"></i>RANKING LOCAL (DARKNET)</h6>
+                            <div class="glass-card p-0 overflow-hidden border-secondary" style="max-height: 200px; overflow-y: auto;">
+                                <ul class="list-group list-group-flush bg-transparent">
+                                    ${generateLeaderboard(user.xp, user.username)}
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -369,16 +433,55 @@ function checkPentestAnswer(idx) {
     if (isWin) {
         sfx.correct();
         const user = getCurrentUser();
-        user.xp += currentChallengeData.xp;
+        
+        user.combo = (user.combo || 0) + 1;
+        const multiplier = user.combo > 1 ? parseFloat((1 + (user.combo * 0.1)).toFixed(1)) : 1;
+        
+        const earnedXp = Math.floor(currentChallengeData.xp * multiplier);
+        const earnedCoins = Math.floor((currentChallengeData.xp / 10) * multiplier) + 5;
+        
+        user.xp += earnedXp;
+        user.coins = (user.coins || 0) + earnedCoins;
         user.reputation += currentChallengeData.rep;
-        user.level = Math.floor(user.xp / 100) + 1;
+        user.playerStats = user.playerStats || { solved: 0, failed: 0 };
+        user.playerStats.solved += 1;
+        
         saveUserData();
-        if (window.os) os.showNotification('Missão Concluída! +' + currentChallengeData.xp + ' XP', 'success');
-        feedback.innerHTML = `<div class="alert alert-success">🔥 SUCESSO! Acesso concedido. <button class="btn btn-success ms-3" onclick="loadGameInterface()">PRÓXIMO</button></div>`;
+        
+        const pentestBody = document.getElementById('body-pentest');
+        if (pentestBody) {
+            pentestBody.classList.add('flash-success');
+            setTimeout(() => pentestBody.classList.remove('flash-success'), 500);
+        }
+
+        if (window.os) os.showNotification(`Acesso Concedido! +${earnedXp} XP | +${earnedCoins} CC`, 'success');
+        feedback.innerHTML = `
+            <div class="alert alert-success border-success bg-dark shadow-glow animate__animated animate__headShake">
+                <h4 class="text-success mb-2">🔥 ACESSO CONCEDIDO!</h4>
+                <p class="mb-0 text-white-50">XP Ganho: <b class="text-white">${earnedXp}</b> <span class="text-success">(x${multiplier} Combo)</span> | <i class="fas fa-coins text-warning"></i> <b class="text-warning">+${earnedCoins} CC</b></p>
+                <button class="btn btn-success mt-3 pulse w-100 fw-bold" onclick="loadGameInterface()">PULAR PARA PRÓXIMO ALVO <i class="fas fa-arrow-right"></i></button>
+            </div>`;
     } else {
         sfx.wrong();
-        if (window.os) os.showNotification('ALERTA: IDS Detectou sua assinatura!', 'danger');
-        feedback.innerHTML = `<div class="alert alert-danger">❌ FALHA! Conexão encerrada pelo Firewall. <button class="btn btn-danger ms-3" onclick="loadGameInterface()">RECOBRAR</button></div>`;
+        const user = getCurrentUser();
+        user.combo = 1; // Reset combo
+        user.playerStats = user.playerStats || { solved: 0, failed: 0 };
+        user.playerStats.failed += 1;
+        saveUserData();
+        
+        const pentestBody = document.getElementById('body-pentest');
+        if (pentestBody) {
+            pentestBody.classList.add('shake');
+            setTimeout(() => pentestBody.classList.remove('shake'), 300);
+        }
+
+        if (window.os) os.showNotification('ALERTA: IDS Detectou sua assinatura! Combo Perdido.', 'danger');
+        feedback.innerHTML = `
+            <div class="alert alert-danger bg-dark border-danger animate__animated animate__shakeX">
+                <h4 class="text-danger">❌ CONEXÃO BLOQUEADA PELO FIREWALL</h4>
+                <p class="mb-0 text-white-50">O alvo rastreou sua requisição. Posição comprometida.</p>
+                <button class="btn btn-danger mt-3 w-100 fw-bold" onclick="loadGameInterface()">ABORTAR E ESCONDER RASTROS</button>
+            </div>`;
     }
 }
 
@@ -450,28 +553,49 @@ const arenaHandlers = {
         const color = redWin ? 'danger'   : 'success';
         const glow  = redWin ? '#f00'     : '#0f0';
         const title = redWin ? 'SISTEMA COMPROMETIDO' : 'BLUE TEAM VITORIOSO!';
-        const xpGain  = redWin ? 20  : 80;
-        const repGain = redWin ? 5   : 30;
+        const xpGain  = redWin ? 20  : 150;
+        const repGain = redWin ? 5   : 50;
+        const coinsGain = redWin ? 0 : 25;
         const user = getCurrentUser();
+        
         if (user) {
-            user.xp += xpGain; user.reputation += repGain;
-            user.level = Math.floor(user.xp / 100) + 1;
+            if (!redWin) {
+                user.combo = (user.combo || 0) + 1;
+                sfx.correct();
+                body.classList.add('flash-success');
+                setTimeout(() => body.classList.remove('flash-success'), 500);
+            } else {
+                user.combo = 1;
+                sfx.wrong();
+                body.classList.add('shake');
+                setTimeout(() => body.classList.remove('shake'), 500);
+            }
+            
+            const multiplier = user.combo > 1 ? parseFloat((1 + (user.combo * 0.1)).toFixed(1)) : 1;
+            const finalXp = Math.floor(xpGain * multiplier);
+            const finalCoins = Math.floor(coinsGain * multiplier);
+            
+            user.xp += finalXp; 
+            user.reputation += repGain;
+            user.coins = (user.coins || 0) + finalCoins;
             saveUserData();
+            
+            body.innerHTML = `
+                <div class="d-flex flex-column align-items-center justify-content-center h-100 p-5 animate__animated animate__zoomIn">
+                    <div class="mx-auto mb-4 bg-${color} rounded-circle d-flex align-items-center justify-content-center shadow-glow" style="width:100px;height:100px;">
+                        <i class="fas ${icon} fa-3x text-dark"></i>
+                    </div>
+                    <h1 class="text-${color} glitch-text mb-2">${title}</h1>
+                    <p class="text-white-50 mb-4 text-center">${redWin ? 'Red Bot venceu. Combo zerado.' : 'Onda neutralizada! Adrenalina ativada.'}</p>
+                    <div class="row g-3 w-100 mb-4" style="max-width:500px;">
+                        <div class="col-4"><div class="bg-black p-3 rounded border border-${color} text-center small text-${color} fw-bold">+${finalXp} XP ${!redWin ? `<span class="opacity-50">(x${multiplier})</span>` : ''}</div></div>
+                        <div class="col-4"><div class="bg-black p-3 rounded border border-warning text-center small text-warning fw-bold">+${finalCoins} CC</div></div>
+                        <div class="col-4"><div class="bg-black p-3 rounded border border-${color} text-center small text-${color} fw-bold">+${repGain} REP</div></div>
+                    </div>
+                    <button class="btn btn-outline-${color} btn-lg px-5 py-3 fw-bold pulse" onclick="startBotWar()">REINICIAR PROTOCOLO</button>
+                </div>
+            `;
         }
-        body.innerHTML = `
-            <div class="d-flex flex-column align-items-center justify-content-center h-100 p-5 animate__animated animate__zoomIn">
-                <div class="mx-auto mb-4 bg-${color} rounded-circle d-flex align-items-center justify-content-center" style="width:100px;height:100px;box-shadow:0 0 30px ${glow};">
-                    <i class="fas ${icon} fa-3x text-dark"></i>
-                </div>
-                <h1 class="text-${color} glitch-text mb-2">${title}</h1>
-                <p class="text-white-50 mb-4 text-center">${redWin ? 'Red Bot venceu. Analise os logs e melhore a defesa.' : '20 ataques neutralizados. Excelente resposta a incidentes!'}</p>
-                <div class="row g-3 w-100 mb-4" style="max-width:400px;">
-                    <div class="col-6"><div class="bg-black p-3 rounded border border-${color} text-center small text-${color} fw-bold">+${xpGain} XP</div></div>
-                    <div class="col-6"><div class="bg-black p-3 rounded border border-${color} text-center small text-${color} fw-bold">+${repGain} REP</div></div>
-                </div>
-                <button class="btn btn-outline-${color} btn-lg px-5 py-3 fw-bold" onclick="startBotWar()">REINICIAR PROTOCOLO</button>
-            </div>
-        `;
         if (window.os) os.showNotification(redWin ? '💀 Sistema derrubado pelo Red Bot!' : '🏆 Blue Team venceu a Arena!', redWin ? 'danger' : 'success');
     }
 };
@@ -760,3 +884,187 @@ window.addEventListener('load', () => {
         window.location.reload();
     });
 });
+
+// ================= BLACK MARKET =================
+function showBlackMarket() {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    const marketHTML = `
+        <div class="p-4 animate__animated animate__fadeIn">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="text-danger mb-0"><i class="fas fa-shopping-cart me-2"></i>BLACK MARKET</h3>
+                <div class="bg-dark rounded px-3 py-1 border border-warning">
+                    <i class="fas fa-coins text-warning me-1"></i> <span class="fw-bold text-warning" id="bm-coins">${user.coins || 0} CC</span>
+                </div>
+            </div>
+            <p class="text-white-50 mb-5">Compre exploits customizados, dicas e decodificadores de rede na Dark Web.</p>
+            
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="glass-card p-4 border-secondary shadow-hover h-100">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="text-info"><i class="fas fa-lightbulb me-2"></i>Dica Avançada (Hint)</h5>
+                            <span class="badge bg-warning text-dark fs-6">100 CC</span>
+                        </div>
+                        <p class="small text-muted mt-2">Dá acesso a um módulo de dica extra que revela partes do código vulnerável ou payload exato durante o Pentest.</p>
+                        <p class="small text-white">No inventário: <b class="text-info" id="inv-hints">${user.inventory?.hints || 0}</b></p>
+                        <button class="btn btn-outline-info w-100 mt-2" onclick="buyMarketItem('hint', 100)"><i class="fas fa-download me-1"></i> ADQUIRIR EXPLOIT</button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="glass-card p-4 border-secondary shadow-hover h-100">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="text-danger"><i class="fas fa-fast-forward me-2"></i>Script de Pulo (Skip)</h5>
+                            <span class="badge bg-warning text-dark fs-6">250 CC</span>
+                        </div>
+                        <p class="small text-muted mt-2">Um script de automação massiva que força a passagem da missão atual sem precisar resolvê-la. Uso único.</p>
+                        <p class="small text-white">No inventário: <b class="text-danger" id="inv-skips">${user.inventory?.skips || 0}</b></p>
+                        <button class="btn btn-outline-danger w-100 mt-2" onclick="buyMarketItem('skip', 250)"><i class="fas fa-download me-1"></i> ADQUIRIR AUTOMATIZADOR</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-4 border-success mt-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="text-success mb-1"><i class="fas fa-university me-2"></i>RECARGA DE CRÉDITOS (PIX)</h5>
+                        <p class="small text-muted mb-0">Adquira CyberCoins instantaneamente via transferência criptografada.</p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-success btn-sm" onclick="showPixPayment(500, 10)">500 CC (R$ 10)</button>
+                        <button class="btn btn-success btn-sm" onclick="showPixPayment(1500, 25)">1500 CC (R$ 25)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    renderToModule('blackmarket', marketHTML);
+}
+
+window.buyMarketItem = function(item, price) {
+    const user = getCurrentUser();
+    if (!user) return;
+    if ((user.coins || 0) < price) {
+        if (window.os) os.showNotification('Saldo insuficiente. Complete mais missões para ganhar CC.', 'danger');
+        sfx.wrong();
+        return;
+    }
+    
+    user.coins -= price;
+    if (!user.inventory) user.inventory = { hints: 0, skips: 0 };
+    
+    if (item === 'hint') user.inventory.hints++;
+    if (item === 'skip') user.inventory.skips++;
+    
+    saveUserData();
+    sfx.correct();
+    if (window.os) os.showNotification('Compra efetuada com sucesso! Entrega anônima realizada.', 'success');
+    
+    const coinsEl = document.getElementById('bm-coins');
+    const hintsEl = document.getElementById('inv-hints');
+    const skipsEl = document.getElementById('inv-skips');
+    
+    if (coinsEl) coinsEl.innerHTML = `${user.coins} CC`;
+    if (hintsEl && item === 'hint') {
+        hintsEl.textContent = user.inventory.hints;
+        hintsEl.parentElement.parentElement.classList.add('flash-success');
+        setTimeout(() => hintsEl.parentElement.parentElement.classList.remove('flash-success'), 500);
+    }
+    if (skipsEl && item === 'skip') {
+        skipsEl.textContent = user.inventory.skips;
+        skipsEl.parentElement.parentElement.classList.add('flash-success');
+        setTimeout(() => skipsEl.parentElement.parentElement.classList.remove('flash-success'), 500);
+    }
+};
+
+// ================= RIVALS & LEADERBOARD =================
+const npcRivals = [
+    { name: 'PhantomByte', xp: 12500 },
+    { name: '0xG3n', xp: 8200 },
+    { name: 'NullSec', xp: 5100 },
+    { name: 'DarkNet_44', xp: 2400 },
+    { name: 'ScriptRunner', xp: 800 }
+];
+
+function generateLeaderboard(userXp, username) {
+    const allPlayers = [...npcRivals, { name: username + ' (Você)', xp: userXp, isUser: true }];
+    allPlayers.sort((a, b) => b.xp - a.xp);
+    
+    return allPlayers.map((p, index) => {
+        const bg = p.isUser ? 'bg-primary text-white' : 'bg-transparent text-white-50';
+        const rankColor = index === 0 ? 'text-warning' : (index === 1 ? 'text-secondary' : (index === 2 ? 'text-danger' : 'text-muted'));
+        
+        return `
+            <li class="list-group-item ${bg} border-secondary d-flex justify-content-between align-items-center py-3">
+                <div><span class="${rankColor} fw-bold me-3">#${index + 1}</span> ${p.name}</div>
+                <span class="badge ${p.isUser ? 'bg-dark text-primary' : 'bg-secondary'}">${p.xp} XP</span>
+            </li>
+        `;
+    }).join('');
+}
+
+// Rival notifications ticker
+setInterval(() => {
+    if (!window.os || !getCurrentUser()) return;
+    if (Math.random() > 0.8) {
+        const randomRival = npcRivals[Math.floor(Math.random() * npcRivals.length)];
+        const events = [
+            `${randomRival.name} resolveu um contrato da DarkWeb e ganhou XP!`,
+            `${randomRival.name} invadiu um mainframe corporativo.`,
+            `${randomRival.name} comprou um novo Exploit no Black Market.`
+        ];
+        os.showNotification(events[Math.floor(Math.random() * events.length)], 'secondary');
+    }
+}, 45000);
+
+// ================= PIX PAYMENT SYSTEM =================
+window.showPixPayment = function(ccAmount, brlPrice) {
+    const pixHTML = `
+        <div id="pixModal" class="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-4" style="z-index: 40000; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);">
+            <div class="glass-card p-4 border-success text-center animate__animated animate__zoomIn" style="max-width: 450px;">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <h4 class="text-success mb-0"><i class="fas fa-qrcode me-2"></i>PAGAMENTO VIA PIX</h4>
+                    <button class="btn-close btn-close-white" onclick="document.getElementById('pixModal').remove()"></button>
+                </div>
+                <p class="text-white-50 small mb-4">Escaneie o código abaixo para carregar <b>${ccAmount} CyberCoins</b> em sua conta.</p>
+                
+                <div class="bg-white p-3 rounded mb-4 mx-auto" style="width: 250px; height: 250px;">
+                    <img src="pix_qr.png" class="img-fluid" alt="PIX QR Code">
+                </div>
+                
+                <div class="bg-dark p-3 rounded border border-success mb-4 text-start">
+                    <div class="small text-muted">VALOR A PAGAR:</div>
+                    <div class="fs-4 text-success fw-bold">R$ ${brlPrice.toFixed(2)}</div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button class="btn btn-success py-3 fw-bold" onclick="simulatePixSuccess(${ccAmount})">
+                        <i class="fas fa-check-circle me-2"></i> JÁ PAGUEI (SIMULAR SUCESSO)
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="document.getElementById('pixModal').remove()">CANCELAR OPERAÇÃO</button>
+                </div>
+                <p class="text-muted mt-3 small" style="font-size: 0.7rem;">Operação criptografada ponta-a-ponta via CyberBank.</p>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', pixHTML);
+    sfx.recon();
+};
+
+window.simulatePixSuccess = function(amount) {
+    const user = getCurrentUser();
+    if (!user) return;
+    
+    user.coins = (user.coins || 0) + amount;
+    saveUserData();
+    
+    document.getElementById('pixModal')?.remove();
+    sfx.correct();
+    
+    if (window.os) {
+        os.showNotification(`Pagamento Confirmado! +${amount} CC creditados.`, 'success');
+        // Refresh Black Market if open
+        showBlackMarket();
+    }
+};

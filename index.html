@@ -308,6 +308,7 @@
                     else if (id === 'soc') startDefenseMode();
                     else if (id === 'botwar') startBotWar();
                     else if (id === 'glossary') showGlossary();
+                    else if (id === 'blackmarket') { if (typeof showBlackMarket === 'function') showBlackMarket(); }
                     return;
                 }
                 if (win.style.display === 'none') { this.minimizeWindow(id); this.focusWindow(id); }
@@ -346,6 +347,7 @@
 
     <!-- Dependencies -->
     <script src="js/i18n.js"></script>
+    <script src="data/arsenal.js"></script>
     <script src="js/ai_generator.js"></script>
     <script src="js/gemma_optimizer.js"></script>
     <script src="js/defense_engine.js"></script>
