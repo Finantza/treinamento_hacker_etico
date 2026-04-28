@@ -124,7 +124,11 @@ class BotWarEngine {
 
     manualDefend(type) {
         if (!this.isActive) return;
-        const labels = { WAF: 'WAF/CSP rules', IPS: 'IPS block', PATCH: 'Virtual Patch', EDR: 'EDR containment', ZT: 'Zero Trust' };
+        const labels = { 
+            WAF: 'WAF/CSP rules', IPS: 'IPS block', PATCH: 'Virtual Patch', 
+            EDR: 'EDR containment', ZT: 'Zero Trust', MFA: 'MFA Enabled',
+            RATE_LIMIT: 'Rate Limiting', IMDSV2: 'IMDSv2 Migration', SCA: 'SCA Supply Chain'
+        };
         this.log(`[USER-BLUE] ${labels[type] || type} aplicado manualmente!`, 'success');
         this.systemIntegrity = Math.min(100, this.systemIntegrity + 10);
         this.exploitProgress = Math.max(0, this.exploitProgress - 15);
@@ -140,7 +144,11 @@ class BotWarEngine {
             xss:        { type: 'XSS',               damage: 10, mitre: 'T1059.007' },
             ransomware: { type: 'Ransomware',         damage: 40, mitre: 'T1486' },
             phishing:   { type: 'Phishing',          damage: 15, mitre: 'T1566.001' },
-            zeroday:    { type: 'Zero-Day',           damage: 45, mitre: 'T1203' }
+            zeroday:    { type: 'Zero-Day',           damage: 45, mitre: 'T1203' },
+            ssrf:       { type: 'SSRF Cloud',         damage: 20, mitre: 'T1552.005' },
+            dos:        { type: 'DDoS Flood',         damage: 30, mitre: 'T1498' },
+            supply:     { type: 'Supply Chain',       damage: 35, mitre: 'T1195.002' },
+            advanced_sqli:{ type: 'Blind SQLi',       damage: 20, mitre: 'T1190' }
         };
         return attacks[type] || attacks['sqli'];
     }

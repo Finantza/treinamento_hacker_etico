@@ -25,6 +25,7 @@ const MARKET_ITEMS = [
     { id: 'skip', name: 'Automation Script', desc: 'Força a conclusão da missão atual.', price: 250, icon: 'fa-fast-forward', color: 'danger', minXP: 500 },
     { id: 'vpn', name: 'Premium VPN', desc: 'Protege seu combo em caso de falha.', price: 400, icon: 'fa-user-shield', color: 'warning', minXP: 1500 },
     { id: 'zeroday', name: 'Zero-Day Access', desc: 'Dobra o ganho de XP na próxima missão.', price: 750, icon: 'fa-virus', color: 'primary', minXP: 4000 },
+    { id: 'soc_ai', name: 'SOC AI Assistant', desc: 'A IA automatiza uma contra-medida extra no modo Defesa.', price: 1200, icon: 'fa-robot', color: 'info', minXP: 7500 },
     { id: 'botnet', name: 'Botnet Rental', desc: 'Poder massivo: Pula 3 missões seguidas.', price: 1500, icon: 'fa-network-wired', color: 'success', minXP: 10000 }
 ];
 
@@ -730,7 +731,16 @@ function startDefenseMode() {
     window.addEventListener('defense_log', socHandlers.log);
     window.addEventListener('threat_update', socHandlers.threat);
 
-    if (window.defense) window.defense.startSimulation();
+    if (window.defense) {
+        const user = getCurrentUser();
+        if (user && user.inventory && user.inventory.soc_ai > 0) {
+            window.defense.autoDefense = true;
+            if (window.os) os.showNotification('SOC AI Assistant Ativado! Mitigação automática ligada.', 'info');
+        } else {
+            window.defense.autoDefense = false;
+        }
+        window.defense.startSimulation();
+    }
 }
 
 function getDifficultyByXP(xp) {
@@ -757,6 +767,7 @@ function showUrgentMissionInvitation() {
     container.id = 'urgent-invitation-overlay';
     container.className = 'position-fixed inset-0 d-flex align-items-center justify-content-center z-index-30000';
     container.style.background = 'rgba(0,0,0,0.85)';
+    container.style.webkitBackdropFilter = 'blur(10px)';
     container.style.backdropFilter = 'blur(10px)';
     
     const diffColor = difficulty === 'massiva' ? 'danger' : (difficulty === 'logica' ? 'warning' : 'primary');
@@ -850,6 +861,10 @@ function startBotWar(missionType = 'duel', diff = 'logica') {
                             <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('ransomware')">Ransom</button>
                             <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('phishing')">Phish</button>
                             <button class="btn btn-sm btn-outline-danger" onclick="botWar.manualAttack('zeroday')">0-Day</button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="botWar.manualAttack('ssrf')">SSRF</button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="botWar.manualAttack('dos')">DDoS</button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="botWar.manualAttack('supply')">SCA</button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="botWar.manualAttack('advanced_sqli')">BlindSQLi</button>
                         </div>
                     </div>
                 </div>
@@ -863,6 +878,9 @@ function startBotWar(missionType = 'duel', diff = 'logica') {
                             <button class="btn btn-sm btn-outline-success" onclick="botWar.manualDefend('EDR')">EDR</button>
                             <button class="btn btn-sm btn-outline-primary" onclick="botWar.manualDefend('ZT')">ZeroTrust</button>
                             <button class="btn btn-sm btn-outline-warning" onclick="botWar.manualDefend('MFA')">MFA</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="botWar.manualDefend('RATE_LIMIT')">RateLimit</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="botWar.manualDefend('IMDSV2')">IMDSv2</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="botWar.manualDefend('SCA')">SCA</button>
                         </div>
                     </div>
                 </div>
@@ -939,7 +957,7 @@ function showToolkit() {
 // ================= BRIEFING =================
 function showMissionBriefing() {
     const briefingHTML = `
-        <div id="briefingOverlay" class="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-4" style="z-index: 30000; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);">
+        <div id="briefingOverlay" class="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-4" style="z-index: 30000; background: rgba(0,0,0,0.9); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);">
             <div class="glass-card p-5 border-primary animate__animated animate__zoomIn" style="max-width: 600px;">
                 <h1 class="text-primary text-center mb-4">MODO TUTORIAL</h1>
                 <p class="text-white-50">Bem-vindo, Agente. O CyberOS é sua plataforma de treinamento.</p>
@@ -1172,7 +1190,7 @@ window.showPixPayment = function(ccAmount, brlPrice) {
     const transactionId = "TXN_" + Math.random().toString(36).substr(2, 9).toUpperCase();
     
     const pixHTML = `
-        <div id="pixModal" class="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-4" style="z-index: 40000; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);">
+        <div id="pixModal" class="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-4" style="z-index: 40000; background: rgba(0,0,0,0.9); -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);">
             <div class="glass-card p-4 border-success text-center animate__animated animate__zoomIn" style="max-width: 450px;">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <h4 class="text-success mb-0"><i class="fas fa-qrcode me-2"></i>SINCRO. BANCÁRIA PIX</h4>

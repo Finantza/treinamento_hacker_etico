@@ -58,6 +58,11 @@ class DefenseEngine {
         if (!this.isActive) return;
 
         const attacks = [
+            // === FALSOS POSITIVOS (Tráfego Legítimo) ===
+            { type: 'LEGIT_TRAFFIC',      pattern: "Acesso legítimo: CEO acessando o ERP via VPN", risk: 0, mitre: 'N/A', isFalsePositive: true },
+            { type: 'LEGIT_TRAFFIC',      pattern: "Scanner de vulnerabilidade interno (Nessus Autorizado)", risk: 0, mitre: 'N/A', isFalsePositive: true },
+            { type: 'LEGIT_TRAFFIC',      pattern: "Backup agendado para S3", risk: 0, mitre: 'N/A', isFalsePositive: true },
+            
             // === RECONNAISSANCE (TA0043) ===
             { type: 'ACTIVE_SCANNING',    pattern: "TCP SYN Scan - 192.168.1.0/24 [Nmap -sS]",                    risk: 5,  mitre: 'T1595' },
             { type: 'VULN_SCANNING',       pattern: "Vulnerability Scan - Nessus detected CVE-2024-1234",            risk: 10, mitre: 'T1595.002' },
@@ -129,6 +134,12 @@ class DefenseEngine {
         ];
 
         const attack = attacks[Math.floor(Math.random() * attacks.length)];
+        
+        if (attack.isFalsePositive) {
+            this.log(`[INFO] Tráfego normal: ${attack.pattern}`, 'info');
+            return;
+        }
+
         this.detectedCount++;
         
         if (this.isMitigated(attack)) {
@@ -166,16 +177,15 @@ class DefenseEngine {
 
     isMitigated(attack) {
         const type = attack.type;
-        if ((type === 'INJECTION' || type === 'XSS') && this.activeCountermeasures.has('WAF_SQLI')) return true;
+        if ((type === 'INJECTION' || type === 'SSRF') && this.activeCountermeasures.has('WAF_SQLI')) return true;
         if (type === 'XSS' && this.activeCountermeasures.has('WAF_XSS')) return true;
-        if ((type === 'BRUTEFORCE' || type === 'SCAN') && this.activeCountermeasures.has('IP_BLOCK')) return true;
-        if ((type === 'RCE' || type === 'ZERO_DAY') && this.activeCountermeasures.has('VIRTUAL_PATCH')) return true;
-        if (type === 'RANSOMWARE' && this.activeCountermeasures.has('EDR')) return true;
-        if (type === 'LATERAL_MOVE' && this.activeCountermeasures.has('ZERO_TRUST')) return true;
+        if ((type === 'BRUTEFORCE' || type === 'SCAN' || type === 'ACTIVE_SCANNING' || type === 'VULN_SCANNING' || type === 'EXTERNAL_REMOTE' || type === 'DOS_ATTACK') && this.activeCountermeasures.has('IP_BLOCK')) return true;
+        if ((type === 'RCE' || type === 'ZERO_DAY' || type === 'WEB_SHELL' || type === 'SUID_EXPLOIT') && this.activeCountermeasures.has('VIRTUAL_PATCH')) return true;
+        if ((type === 'RANSOMWARE' || type === 'DESTRUCTION' || type === 'POWERSHELL_MALICIOUS' || type === 'PROCESS_INJECTION' || type === 'OBFUSCATED_FILES' || type === 'DISABLE_AV' || type === 'KEYLOGGING') && this.activeCountermeasures.has('EDR')) return true;
+        if ((type === 'LATERAL_MOVE' || type === 'PASS_THE_HASH' || type === 'REMOTE_SSH' || type === 'WMI_EXECUTION' || type === 'VALID_ACCOUNTS' || type === 'DATA_EXFILTRATION') && this.activeCountermeasures.has('ZERO_TRUST')) return true;
         if (type === 'PHISHING' && this.activeCountermeasures.has('EMAIL_FILTER')) return true;
         if (type === 'SUPPLY_CHAIN' && this.activeCountermeasures.has('SCA_SCAN')) return true;
-        if (type === 'CREDENTIAL_DUMP' && this.activeCountermeasures.has('MFA')) return true;
-        if (type === 'SSRF' && this.activeCountermeasures.has('WAF_SQLI')) return true;
+        if ((type === 'CREDENTIAL_DUMP' || type === 'LSASS_DUMP' || type === 'KERBEROS_ATTACK' || type === 'GOLDEN_TICKET' || type === 'CREDENTIALS_BROWSER' || type === 'ACCOUNT_ENUM') && this.activeCountermeasures.has('MFA')) return true;
 
         for (const rule of this.customRules) {
             if (rule.pattern.test(attack.pattern)) {
@@ -208,9 +218,16 @@ class DefenseEngine {
         this.log('🤖 Gemma AI: Iniciando mitigação automatizada (SOAR)...', 'info');
         const mapping = {
             INJECTION: 'WAF_SQLI', BRUTEFORCE: 'IP_BLOCK', XSS: 'WAF_XSS',
-            RCE: 'VIRTUAL_PATCH', RANSOMWARE: 'EDR', LATERAL_MOVE: 'ZERO_TRUST',
-            PHISHING: 'EMAIL_FILTER', SUPPLY_CHAIN: 'SCA_SCAN', CREDENTIAL_DUMP: 'MFA',
-            SSRF: 'WAF_SQLI', ZERO_DAY: 'VIRTUAL_PATCH', SCAN: 'IP_BLOCK'
+            RCE: 'VIRTUAL_PATCH', RANSOMWARE: 'EDR', PASS_THE_HASH: 'ZERO_TRUST',
+            REMOTE_SSH: 'ZERO_TRUST', WMI_EXECUTION: 'ZERO_TRUST',
+            PHISHING: 'EMAIL_FILTER', SUPPLY_CHAIN: 'SCA_SCAN', 
+            LSASS_DUMP: 'MFA', KERBEROS_ATTACK: 'MFA', GOLDEN_TICKET: 'MFA',
+            CREDENTIALS_BROWSER: 'MFA', ACCOUNT_ENUM: 'MFA',
+            SSRF: 'WAF_SQLI', ZERO_DAY: 'VIRTUAL_PATCH', SCAN: 'IP_BLOCK',
+            ACTIVE_SCANNING: 'IP_BLOCK', VULN_SCANNING: 'IP_BLOCK', EXTERNAL_REMOTE: 'IP_BLOCK', DOS_ATTACK: 'IP_BLOCK',
+            WEB_SHELL: 'VIRTUAL_PATCH', SUID_EXPLOIT: 'VIRTUAL_PATCH',
+            DESTRUCTION: 'EDR', POWERSHELL_MALICIOUS: 'EDR', PROCESS_INJECTION: 'EDR', OBFUSCATED_FILES: 'EDR', DISABLE_AV: 'EDR', KEYLOGGING: 'EDR',
+            VALID_ACCOUNTS: 'ZERO_TRUST', DATA_EXFILTRATION: 'ZERO_TRUST'
         };
         const rule = mapping[type];
         if (rule && !this.activeCountermeasures.has(rule)) this.deployCountermeasure(rule);
