@@ -2,10 +2,10 @@
     "organisation": "",
     "contact": "",
     "gitConfig": {
-        "owner": "",
-        "repo": "",
+        "owner": "Finantza",
+        "repo": "treinamento_hacker_etico",
         "branch": "master",
-        "publishUrl": ""
+        "publishUrl": "https://Finantza.github.io/treinamento_hacker_etico/"
     },
     "repoConfig": {
         "assetFolderName": "δ steps",
@@ -15,6 +15,6 @@
         "mapsFolderName": "tsmaps"
     },
     "devConfig": {
-        "forceJsDelivr": true
+        "forceJsDelivr": false
     }
 }

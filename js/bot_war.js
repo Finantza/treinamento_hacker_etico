@@ -11,15 +11,17 @@ class BotWarEngine {
         this.history = [];
         this.blueWinTicks = 0;
         this.blueWinThreshold = 20;
+        this.difficulty = 'logica'; // Default
     }
 
-    startDuel() {
+    startDuel(diff = 'logica') {
+        this.difficulty = diff;
         this.isActive = true;
         this.systemIntegrity = 100;
         this.exploitProgress = 0;
         this.history = [];
         this.blueWinTicks = 0;
-        this.log('ARENA: Protocolo de duelo iniciado. Red Bot vs Blue Bot (Gemma AI).', 'info');
+        this.log(`ARENA: Protocolo iniciado em nível ${this.difficulty.toUpperCase()}.`, 'info');
         this.log('INTEL: MITRE ATT&CK framework carregado. Modo realístico ativado.', 'info');
         this.interval = setInterval(() => this.tick(), 2000);
     }
@@ -36,15 +38,27 @@ class BotWarEngine {
         this.log(`[RED | ${attack.mitre}] ${attack.type}: ${attack.payload}`, 'danger');
 
         setTimeout(() => {
-            const success = Math.random() > 0.35; // 65% taxa de defesa
+            let defenseChance = 0.65; // 'logica'
+            let damageMult = 1.0;
+
+            if (this.difficulty === 'iniciante') {
+                defenseChance = 0.8;
+                damageMult = 0.7;
+            } else if (this.difficulty === 'massiva') {
+                defenseChance = 0.45;
+                damageMult = 1.4;
+            }
+
+            const success = Math.random() < defenseChance;
             if (success) {
                 this.log(`[BLUE] Gemma detectou ${attack.type}. Aplicando ${attack.mitigation}...`, 'info');
                 this.log(`[BLUE] Bloqueio efetuado. Integridade preservada.`, 'success');
                 this.exploitProgress = Math.max(0, this.exploitProgress - 5);
                 this.blueWinTicks++;
             } else {
-                this.log(`[RED] ${attack.type} penetrou as defesas! Dano: -${attack.damage}%`, 'warning');
-                this.systemIntegrity = Math.max(0, this.systemIntegrity - attack.damage);
+                const actualDamage = Math.floor(attack.damage * damageMult);
+                this.log(`[RED] ${attack.type} penetrou as defesas! Dano: -${actualDamage}%`, 'warning');
+                this.systemIntegrity = Math.max(0, this.systemIntegrity - actualDamage);
                 this.exploitProgress = Math.min(100, this.exploitProgress + 10);
                 this.blueWinTicks = 0;
             }

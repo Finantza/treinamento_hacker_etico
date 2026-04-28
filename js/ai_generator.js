@@ -81,25 +81,46 @@ class ProceduralAI {
         return challenge;
     }
 
-    // Bridge for offline.js
-    gerar(config, diff) {
-        const ch = this.generateChallenge(diff);
-        // Map to offline.js structure
-        const distractors = this.generateDistractors(ch.category, ch.solution);
-        const allOptions = [ch.solution, ...distractors].sort(() => Math.random() - 0.5);
+    // Bridge for offline.js (Refactored for efficiency)
+    gerar(config, difficulty = 'logica') {
+        const challenge = this.generateChallenge(difficulty);
+        const options = new Set();
+        options.add(challenge.solution);
         
+        const distractors = this.generateDistractors(challenge.category, challenge.solution);
+        distractors.forEach(d => options.add(d));
+        
+        // If we still don't have 4, add generic ones
+        const fallbacks = ["' OR 1=1--", "<script>alert(1)</script>", "../../../etc/passwd", "admin'--"];
+        let fIdx = 0;
+        while (options.size < 4) {
+            options.add(fallbacks[fIdx % fallbacks.length]);
+            fIdx++;
+        }
+        
+        const generatedOptions = Array.from(options).sort(() => Math.random() - 0.5);
+        
+        // Reward Scaling based on difficulty
+        const rewards = {
+            iniciante: { xp: 30, rep: 10 },
+            logica: { xp: 75, rep: 25 },
+            massiva: { xp: 150, rep: 50 }
+        };
+        const reward = rewards[difficulty] || rewards.logica;
+
         return {
-            category: ch.category,
-            description: ch.description,
-            code: ch.vulnerableCode || ch.code,
-            options: allOptions,
-            correct: allOptions.indexOf(ch.solution),
-            explain: ch.description,
-            xp: diff === 'massiva' ? 100 : (diff === 'logica' ? 50 : 25),
-            rep: 10,
-            cve: ch.cveReference,
-            mitre: this.categories[ch.category]?.mitre,
-            difficulty: diff
+            id: challenge.id,
+            category: challenge.category,
+            difficulty: challenge.difficulty,
+            code: challenge.vulnerableCode || challenge.code,
+            description: challenge.description,
+            options: generatedOptions,
+            correct: generatedOptions.indexOf(challenge.solution),
+            explain: challenge.payloadHint || `A vulnerabilidade de ${challenge.category.toUpperCase()} permite este exploit: ${challenge.solution}.`,
+            cve: challenge.cveReference || null,
+            mitre: this.categories[challenge.category]?.mitre || null,
+            xp: reward.xp,
+            rep: reward.rep
         };
     }
 
@@ -452,55 +473,7 @@ class ProceduralAI {
         if (used) this.usedChallenges = new Set(JSON.parse(used));
     }
 
-    // Modalidade Múltipla Escolha para Integração HTML
-    gerar(config, difficulty = 'logica') {
-        const challenge = this.generateChallenge(difficulty);
-        const options = new Set();
-        options.add(challenge.solution);
-        
-        let attempts = 0;
-        while (options.size < 4 && attempts < 20) {
-            const wrong = this.generateWrongAnswer(challenge.category, challenge.solution);
-            if (wrong !== challenge.solution) {
-                options.add(wrong);
-            }
-            attempts++;
-        }
-        
-        // If we still don't have 4, add generic ones
-        const fallbacks = ["' OR 1=1--", "<script>alert(1)</script>", "../../../etc/passwd", "admin'--"];
-        let fIdx = 0;
-        while (options.size < 4) {
-            options.add(fallbacks[fIdx % fallbacks.length]);
-            fIdx++;
-        }
-        
-        const generatedOptions = Array.from(options).sort(() => Math.random() - 0.5);
-        const correctIndex = generatedOptions.indexOf(challenge.solution);
-        
-        // Reward Scaling based on difficulty
-        const rewards = {
-            iniciante: { xp: 20, rep: 5 },
-            logica: { xp: 50, rep: 15 },
-            massiva: { xp: 100, rep: 30 }
-        };
-        const reward = rewards[difficulty] || rewards.logica;
-
-        return {
-            id: challenge.id,
-            category: challenge.category,
-            difficulty: challenge.difficulty,
-            code: challenge.vulnerableCode,
-            description: challenge.description,
-            options: generatedOptions,
-            correct: correctIndex,
-            explain: challenge.payloadHint || `A vulnerabilidade de ${challenge.category.toUpperCase()} permite este exploit: ${challenge.solution}.`,
-            cve: challenge.cveReference || null,
-            mitre: challenge.mitre || null,
-            xp: reward.xp,
-            rep: reward.rep
-        };
-    }
+    // Removed duplicate gerar method
 
     generateDistractors(category, correctAnswer) {
         const distractors = [];
@@ -525,7 +498,9 @@ class ProceduralAI {
     }
 
     generateWrongAnswer(category, correctAnswer) {
-        const pool = this.getWrongPool(category);
+        const wrongAnswers = {
+            injection: ["' OR 'a'='b'", "admin'-- -", "1; SLEEP(5)", "' AND 1=0--", "') OR ('1'='1"],
+            xss: ["<img src=x>", "javascript:void(0)", "<svg onload=alert(2)>", "'; alert(1); //"],
             rce: ["&& ls", "| whoami", "`id`", "$(test)", "; cat /etc/shadow"],
             buffer_overflow: ["A".repeat(32), "B".repeat(64), "\\x90".repeat(10), "0xdeadbeef", "BBBB".repeat(10)],
             idor: ["?id=0", "?user=guest", "?profile=null", "/api/v1/debug"],

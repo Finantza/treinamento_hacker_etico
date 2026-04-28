@@ -6,14 +6,27 @@ const PENTEST_CACHE = 'pentest-v5.0';
 // ASSETS_CRITICAL - TODOS os recursos expandidos (150+ templates ProceduralAI, i18n completa, game engine, cyberpunk UI)
 // ASSETS_CRITICAL - Recursos fundamentais para funcionamento offline
 const ASSETS_CRITICAL = [
-  '/', 
-  '/index.html', 
-  '/manifest.json',
-  '/css/style.css', 
-  '/js/ai_generator.js', 
-  '/js/i18n.js', 
-  '/js/offline.js',
-  '/icon.png'
+  './', 
+  './index.html', 
+  './manifest.json',
+  './css/style.css', 
+  './css/bootstrap.min.css',
+  './css/all.min.css',
+  './css/animate.min.css',
+  './js/bootstrap.bundle.min.js',
+  './js/security.js',
+  './js/ai_generator.js', 
+  './js/i18n.js', 
+  './js/offline.js',
+  './icon.png',
+  './webfonts/fa-brands-400.woff2',
+  './webfonts/fa-brands-400.ttf',
+  './webfonts/fa-regular-400.woff2',
+  './webfonts/fa-regular-400.ttf',
+  './webfonts/fa-solid-900.woff2',
+  './webfonts/fa-solid-900.ttf',
+  './webfonts/fa-v4compatibility.woff2',
+  './webfonts/fa-v4compatibility.ttf'
 ];
 
 // Recursos dinâmicos (CVEs recentes, leaderboards - network-first com cache fallback)
@@ -33,7 +46,7 @@ self.addEventListener('install', (event) => {
       // Precaching pentest payloads (alta prioridade)
       caches.open(PENTEST_CACHE).then(cache => 
         cache.addAll([
-          '/data/arsenal.json'
+          './data/arsenal.json'
         ])
       )
     ])
@@ -147,9 +160,9 @@ self.addEventListener('push', (event) => {
   const data = event.data.json();
   const options = {
     body: `🌀 Nova CVE: ${data.title} (CVSS ${data.score})`,
-    icon: '/icons/icon-192.png',
-    badge: '/icons/maskable-icon.png',
-    data: {url: `/challenge?cve=${data.id}`}
+    icon: './icon.png',
+    badge: './icon.png',
+    data: {url: `./index.html#challenge?cve=${data.id}`}
   };
   event.waitUntil(
     self.registration.showNotification('Ethical Hacker Premium', options)

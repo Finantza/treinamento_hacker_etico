@@ -10,6 +10,37 @@ let gameStartTime = 0;
 let cachedGlossaryHTML = null;
 let isGlossaryCaching = false;
 
+const RANKS = [
+    { xp: 0, rank: 'Script Kiddie', color: 'secondary', reward: 0 },
+    { xp: 500, rank: 'Network Explorer', color: 'primary', reward: 100 },
+    { xp: 1500, rank: 'Bug Bounty Hunter', color: 'success', reward: 250 },
+    { xp: 4000, rank: 'SysAdmin Hacker', color: 'info', reward: 500 },
+    { xp: 10000, rank: 'Elite White Hat', color: 'warning', reward: 1000 },
+    { xp: 25000, rank: 'Zero-Day Architect', color: 'danger', reward: 2500 },
+    { xp: 50000, rank: 'Cyber Overlord', color: 'light', reward: 5000 }
+];
+
+const MARKET_ITEMS = [
+    { id: 'hint', name: 'Exploit Hint', desc: 'Revela detalhes da vulnerabilidade.', price: 100, icon: 'fa-lightbulb', color: 'info', minXP: 0 },
+    { id: 'skip', name: 'Automation Script', desc: 'Força a conclusão da missão atual.', price: 250, icon: 'fa-fast-forward', color: 'danger', minXP: 500 },
+    { id: 'vpn', name: 'Premium VPN', desc: 'Protege seu combo em caso de falha.', price: 400, icon: 'fa-user-shield', color: 'warning', minXP: 1500 },
+    { id: 'zeroday', name: 'Zero-Day Access', desc: 'Dobra o ganho de XP na próxima missão.', price: 750, icon: 'fa-virus', color: 'primary', minXP: 4000 },
+    { id: 'botnet', name: 'Botnet Rental', desc: 'Poder massivo: Pula 3 missões seguidas.', price: 1500, icon: 'fa-network-wired', color: 'success', minXP: 10000 }
+];
+
+const getReputationStatus = (xp) => {
+    let current = RANKS[0];
+    for (const r of RANKS) {
+        if (xp >= r.xp) current = r;
+        else break;
+    }
+    return current;
+};
+
+const getNextRank = (xp) => {
+    return RANKS.find(r => r.xp > xp) || null;
+};
+
 async function initGlossaryCache() {
     if (cachedGlossaryHTML || isGlossaryCaching) return;
     isGlossaryCaching = true;
@@ -182,31 +213,16 @@ function renderToModule(moduleId, html) {
 function showDashboard() {
     const user = getCurrentUser();
     if (!user) return;
-
-    if (user.coins === undefined) user.coins = 0;
-    if (user.combo === undefined) user.combo = 1;
-
-    const getReputationStatus = (xp) => {
-        if (xp >= 10000) return { rank: 'Zero-Day Architect', color: 'danger' };
-        if (xp >= 5000) return { rank: 'Elite White Hat', color: 'warning' };
-        if (xp >= 2500) return { rank: 'SysAdmin Hacker', color: 'info' };
-        if (xp >= 1000) return { rank: 'Bug Bounty Hunter', color: 'success' };
-        if (xp >= 500) return { rank: 'Network Explorer', color: 'primary' };
-        return { rank: 'Script Kiddie', color: 'secondary' };
-    };
-
-    const getNextRankXP = (xp) => {
-        if (xp < 500) return 500;
-        if (xp < 1000) return 1000;
-        if (xp < 2500) return 2500;
-        if (xp < 5000) return 5000;
-        if (xp < 10000) return 10000;
-        return xp;
-    };
+    
+    // Check for urgent mission on login
+    if (!window.initialMissionChecked) {
+        window.initialMissionChecked = true;
+        checkUrgentMissionChance();
+    }
 
     const currentRank = getReputationStatus(user.xp);
-    const nextXp = getNextRankXP(user.xp);
-    const progress = nextXp === user.xp ? 100 : Math.floor((user.xp / nextXp) * 100);
+    const nextRank = getNextRank(user.xp);
+    const progress = !nextRank ? 100 : Math.floor(((user.xp - currentRank.xp) / (nextRank.xp - currentRank.xp)) * 100);
 
     const dashboardHTML = `
         <div class="p-4 animate__animated animate__fadeIn">
@@ -239,8 +255,8 @@ function showDashboard() {
                         
                         <div class="mt-4 text-start">
                             <div class="d-flex justify-content-between small text-muted mb-1">
-                                <span>XP Total: <span class="text-white fw-bold">${user.xp}</span></span>
-                                <span>Próximo Rank: ${nextXp}</span>
+                                <span>XP: <span class="text-white fw-bold">${user.xp}</span></span>
+                                <span>${nextRank ? `Faltam ${nextRank.xp - user.xp} XP para ${nextRank.rank}` : 'RANK MÁXIMO'}</span>
                             </div>
                             <div class="progress bg-black" style="height: 10px;">
                                 <div class="progress-bar bg-${currentRank.color} progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${progress}%"></div>
@@ -257,18 +273,11 @@ function showDashboard() {
                 <!-- COLUNA DE APPS -->
                 <div class="col-lg-8">
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="glass-card p-4 h-100 cursor-pointer border-primary shadow-hover transition-all" onclick="showAcademy()">
                                 <h5 class="text-primary"><i class="fas fa-university me-2"></i>CYBER ACADEMY</h5>
-                                <p class="small text-muted">Aprenda táticas ofensivas e defensivas de forma guiada.</p>
-                                <button class="btn btn-sm btn-outline-primary mt-2">TREINAR</button>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="glass-card p-4 h-100 cursor-pointer border-warning shadow-hover transition-all" onclick="startUrgentMission()">
-                                <h5 class="text-warning"><i class="fas fa-bolt me-2 pulse"></i>MISSÃO URGENTE</h5>
-                                <p class="small text-muted">Contratos cronometrados de alto risco para ganhar XP extra.</p>
-                                <button class="btn btn-sm btn-warning text-dark fw-bold mt-2">ACEITAR CONTRATO</button>
+                                <p class="small text-muted">Aprenda táticas ofensivas e defensivas de forma guiada com módulos interativos.</p>
+                                <button class="btn btn-sm btn-outline-primary mt-2">ACESSAR ACADEMIA</button>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -391,9 +400,9 @@ function loadGameInterface() {
             </div>
 
             <div class="premium-glass p-4 mb-4 border-primary">
-                <p class="text-white-50 mb-2"><i class="fas fa-info-circle me-2"></i>${currentChallengeData.description || 'Analise o código abaixo e identifique a vulnerabilidade.'}</p>
-                ${currentChallengeData.cve ? `<span class="badge bg-danger me-2 mb-2"><i class="fas fa-bug me-1"></i>${currentChallengeData.cve}</span>` : ''}
-                ${currentChallengeData.mitre ? `<span class="badge bg-warning text-dark mb-2"><i class="fas fa-crosshairs me-1"></i>MITRE: ${currentChallengeData.mitre}</span>` : ''}
+                <p class="text-white-50 mb-2"><i class="fas fa-info-circle me-2"></i>${security.escapeHTML(currentChallengeData.description) || 'Analise o código abaixo e identifique a vulnerabilidade.'}</p>
+                ${currentChallengeData.cve ? `<span class="badge bg-danger me-2 mb-2"><i class="fas fa-bug me-1"></i>${security.escapeHTML(currentChallengeData.cve)}</span>` : ''}
+                ${currentChallengeData.mitre ? `<span class="badge bg-warning text-dark mb-2"><i class="fas fa-crosshairs me-1"></i>MITRE: ${security.escapeHTML(currentChallengeData.mitre)}</span>` : ''}
                 <div class="bg-black p-3 rounded position-relative mt-2">
                     <pre class="mb-0"><code class="text-success">${currentChallengeData.code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
                 </div>
@@ -403,7 +412,7 @@ function loadGameInterface() {
                 ${currentChallengeData.options.map((opt, i) => `
                     <div class="col-md-6">
                         <button class="btn btn-outline-primary w-100 py-3 text-start px-4 position-relative overflow-hidden" onclick="checkPentestAnswer(${i})">
-                            <span class="opacity-25 me-2">${String.fromCharCode(65 + i)}|</span> ${opt}
+                            <span class="opacity-25 me-2">${String.fromCharCode(65 + i)}|</span> ${security.escapeHTML(opt)}
                         </button>
                     </div>
                 `).join('')}
@@ -433,12 +442,29 @@ function checkPentestAnswer(idx) {
     if (isWin) {
         sfx.correct();
         const user = getCurrentUser();
+        const oldRank = getReputationStatus(user.xp).rank;
         
+        // Speed Bonus calculation
+        const timeTaken = (Date.now() - gameStartTime) / 1000;
+        let speedMultiplier = 1;
+        let speedLabel = "";
+        if (timeTaken < 10) { speedMultiplier = 1.5; speedLabel = "⚡ SPEED DEMON! (+50%)"; }
+        else if (timeTaken < 20) { speedMultiplier = 1.25; speedLabel = "🚀 RÁPIDO! (+25%)"; }
+
+        // Zero-Day Exploit Check
+        let zeroDayMultiplier = 1;
+        if (user.inventory?.zeroday > 0) {
+            user.inventory.zeroday--;
+            zeroDayMultiplier = 2.0;
+            speedLabel = "☣️ ZERO-DAY EXPLOIT ATIVO! (XP x2) " + speedLabel;
+        }
+
         user.combo = (user.combo || 0) + 1;
-        const multiplier = user.combo > 1 ? parseFloat((1 + (user.combo * 0.1)).toFixed(1)) : 1;
+        const comboMultiplier = user.combo > 1 ? parseFloat((1 + (user.combo * 0.1)).toFixed(1)) : 1;
         
-        const earnedXp = Math.floor(currentChallengeData.xp * multiplier);
-        const earnedCoins = Math.floor((currentChallengeData.xp / 10) * multiplier) + 5;
+        const finalMultiplier = speedMultiplier * comboMultiplier * zeroDayMultiplier;
+        const earnedXp = Math.floor(currentChallengeData.xp * finalMultiplier);
+        const earnedCoins = Math.floor((currentChallengeData.xp / 10) * finalMultiplier) + 5;
         
         user.xp += earnedXp;
         user.coins = (user.coins || 0) + earnedCoins;
@@ -446,6 +472,18 @@ function checkPentestAnswer(idx) {
         user.playerStats = user.playerStats || { solved: 0, failed: 0 };
         user.playerStats.solved += 1;
         
+        // Rank-Up Detection
+        const newRank = getReputationStatus(user.xp);
+        let rankUpMsg = "";
+        if (newRank.rank !== oldRank) {
+            user.coins += newRank.reward;
+            rankUpMsg = `<div class="mt-3 p-3 border border-${newRank.color} rounded bg-black animate__animated animate__bounceIn">
+                <h5 class="text-${newRank.color} mb-1"><i class="fas fa-arrow-up me-2"></i>NOVO RANK: ${newRank.rank.toUpperCase()}</h5>
+                <p class="small text-white-50 mb-0">Bônus de Promoção: <b class="text-warning">+${newRank.reward} CC</b></p>
+            </div>`;
+            if (window.os) os.showNotification(`PROMOÇÃO: Você agora é ${newRank.rank}!`, 'success');
+        }
+
         saveUserData(user);
         
         const pentestBody = document.getElementById('body-pentest');
@@ -458,12 +496,29 @@ function checkPentestAnswer(idx) {
         feedback.innerHTML = `
             <div class="alert alert-success border-success bg-dark shadow-glow animate__animated animate__headShake">
                 <h4 class="text-success mb-2">🔥 ACESSO CONCEDIDO!</h4>
-                <p class="mb-0 text-white-50">XP Ganho: <b class="text-white">${earnedXp}</b> <span class="text-success">(x${multiplier} Combo)</span> | <i class="fas fa-coins text-warning"></i> <b class="text-warning">+${earnedCoins} CC</b></p>
-                <button class="btn btn-success mt-3 pulse w-100 fw-bold" onclick="loadGameInterface()">PULAR PARA PRÓXIMO ALVO <i class="fas fa-arrow-right"></i></button>
+                <div class="small text-white-50 mb-2">${speedLabel ? `<span class="text-info fw-bold me-2">${speedLabel}</span>` : ''} <span class="text-success">Combo x${comboMultiplier}</span></div>
+                <p class="mb-0 text-white-50">XP Ganho: <b class="text-white">${earnedXp}</b> | <i class="fas fa-coins text-warning"></i> <b class="text-warning">+${earnedCoins} CC</b></p>
+                ${rankUpMsg}
+                <button class="btn btn-success mt-3 pulse w-100 fw-bold" onclick="loadGameInterface(); checkUrgentMissionChance();">PULAR PARA PRÓXIMO ALVO <i class="fas fa-arrow-right"></i></button>
             </div>`;
     } else {
         sfx.wrong();
         const user = getCurrentUser();
+        
+        // VPN Check
+        if (user.inventory?.vpn > 0) {
+            user.inventory.vpn--;
+            saveUserData(user);
+            if (window.os) os.showNotification('🛡️ VPN PROTEGEU SEU COMBO!', 'warning');
+            feedback.innerHTML = `
+                <div class="alert alert-warning bg-dark border-warning animate__animated animate__tada">
+                    <h4 class="text-warning mb-2"><i class="fas fa-user-shield me-2"></i>FALHA DETECTADA!</h4>
+                    <p class="mb-0 text-white-50">Sua VPN Premium redirecionou o tráfego. <b>O combo foi preservado!</b></p>
+                    <button class="btn btn-warning mt-3 w-100 fw-bold" onclick="window.answered=false; this.parentElement.innerHTML='';">TENTAR NOVAMENTE (SIGILO MANTIDO)</button>
+                </div>`;
+            return;
+        }
+
         user.combo = 1; // Reset combo
         user.playerStats = user.playerStats || { solved: 0, failed: 0 };
         user.playerStats.failed += 1;
@@ -553,9 +608,14 @@ const arenaHandlers = {
         const color = redWin ? 'danger'   : 'success';
         const glow  = redWin ? '#f00'     : '#0f0';
         const title = redWin ? 'SISTEMA COMPROMETIDO' : 'BLUE TEAM VITORIOSO!';
-        const xpGain  = redWin ? 20  : 150;
-        const repGain = redWin ? 5   : 50;
-        const coinsGain = redWin ? 0 : 25;
+        const isUrgent = window.urgentMissionActive;
+        const xpGain  = redWin ? 20  : (isUrgent ? 300 : 150);
+        const repGain = redWin ? 5   : (isUrgent ? 100 : 50);
+        const coinsGain = redWin ? 0 : (isUrgent ? 50 : 25);
+        
+        // Reset flag
+        window.urgentMissionActive = false;
+        
         const user = getCurrentUser();
         
         if (user) {
@@ -578,7 +638,7 @@ const arenaHandlers = {
             user.xp += finalXp; 
             user.reputation += repGain;
             user.coins = (user.coins || 0) + finalCoins;
-            saveUserData();
+            saveUserData(user);
             
             body.innerHTML = `
                 <div class="d-flex flex-column align-items-center justify-content-center h-100 p-5 animate__animated animate__zoomIn">
@@ -673,22 +733,89 @@ function startDefenseMode() {
     if (window.defense) window.defense.startSimulation();
 }
 
-function startUrgentMission(type = null) {
+function getDifficultyByXP(xp) {
+    if (xp >= 10000) return 'massiva';
+    if (xp >= 1500) return 'logica';
+    return 'iniciante';
+}
+
+function checkUrgentMissionChance() {
+    // Avoid multiple invitations or triggers during active missions
+    if (document.getElementById('urgent-invitation-overlay')) return;
+    if (window.botWar && window.botWar.isActive) return;
+
+    if (Math.random() < 0.15) {
+        setTimeout(showUrgentMissionInvitation, 800);
+    }
+}
+
+function showUrgentMissionInvitation() {
+    const user = getCurrentUser();
+    const missionType = Math.random() > 0.5 ? 'attack' : 'defense';
+    const difficulty = getDifficultyByXP(user ? user.xp : 0);
+    const container = document.createElement('div');
+    container.id = 'urgent-invitation-overlay';
+    container.className = 'position-fixed inset-0 d-flex align-items-center justify-content-center z-index-30000';
+    container.style.background = 'rgba(0,0,0,0.85)';
+    container.style.backdropFilter = 'blur(10px)';
+    
+    const diffColor = difficulty === 'massiva' ? 'danger' : (difficulty === 'logica' ? 'warning' : 'primary');
+    
+    container.innerHTML = `
+        <div class="premium-glass p-5 border-warning text-center animate__animated animate__zoomIn" style="max-width: 500px; border-width: 2px !important;">
+            <div class="mb-4">
+                <i class="fas fa-satellite-dish fa-3x text-warning animate__animated animate__pulse animate__infinite"></i>
+            </div>
+            <h2 class="text-warning fw-bold mb-3">CONTRATO URGENTE DETECTADO</h2>
+            <p class="text-white-50 mb-4">Interceptei uma transmissão da Darknet. Há uma operação de alto risco compatível com seu nível.</p>
+            
+            <div class="bg-black p-3 rounded border border-secondary mb-4 text-start">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">TIPO:</span>
+                    <span class="text-white fw-bold">${missionType === 'attack' ? 'OFENSIVA (RED)' : 'DEFENSIVA (BLUE)'}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted small">DIFICULDADE:</span>
+                    <span class="text-${diffColor} fw-bold">${difficulty.toUpperCase()}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted small">RECOMPENSA:</span>
+                    <span class="text-success fw-bold">+250 XP | +100 CC</span>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-3">
+                <button class="btn btn-warning py-3 fw-bold" onclick="startUrgentMission('${missionType}', '${difficulty}')">ACEITAR CONTRATO</button>
+                <button class="btn btn-outline-secondary py-2 small" onclick="document.getElementById('urgent-invitation-overlay').remove()">IGNORAR TRANSMISSÃO</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(container);
+    sfx.recon();
+    if (window.os) os.showNotification('CONTRATO URGENTE RECEBIDO', 'warning');
+}
+
+function startUrgentMission(type = null, diff = 'logica') {
+    const overlay = document.getElementById('urgent-invitation-overlay');
+    if (overlay) overlay.remove();
+
+    window.urgentMissionActive = true;
     const missionType = type || (Math.random() > 0.5 ? 'attack' : 'defense');
-    startBotWar(missionType);
+    startBotWar(missionType, diff);
     
     setTimeout(() => {
         const title = document.querySelector(`#win-botwar .fw-bold`);
-        if (title) title.innerHTML = `<i class="fas fa-exclamation-triangle text-warning me-2"></i> MISSÃO URGENTE: ${missionType === 'attack' ? 'OFENSIVA' : 'DEFENSIVA'}`;
-        
+        if (title) title.innerHTML = `<i class="fas fa-exclamation-triangle text-warning me-2"></i> MISSÃO URGENTE: ${missionType === 'attack' ? 'OFENSIVA' : 'DEFENSIVA'} (${diff.toUpperCase()})`;
         if (window.os) os.showNotification(`ALERTA: Missão Urgente Iniciada! Objetivo: ${missionType.toUpperCase()}`, 'warning');
     }, 200);
 }
 
-function startBotWar(missionType = 'duel') {
+function startBotWar(missionType = 'duel', diff = 'logica') {
     const isAttackOnly = missionType === 'attack';
     const isDefenseOnly = missionType === 'defense';
 
+    if (window.botWar) window.botWar.startDuel(diff);
     const arenaHTML = `
         <div class="p-4 animate__animated animate__fadeIn">
             <div class="row g-4 mb-4">
@@ -849,18 +976,25 @@ window.addEventListener('load', () => {
     // Pre-cache the glossary in the background to ensure instant load
     initGlossaryCache();
 
-    document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const u = document.getElementById('loginUsername').value.trim();
         const p = document.getElementById('loginPassword').value;
         const users = JSON.parse(localStorage.getItem('users') || '{}');
-        if (users[u] && users[u].password === p) {
+        const hp = await security.hash(p);
+        
+        // Suporte a login legado (migração automática) ou hash correto
+        if (users[u] && (users[u].password === hp || users[u].password === p)) {
+            if (users[u].password !== hp) {
+                users[u].password = hp; // Migrar para hash
+                localStorage.setItem('users', JSON.stringify(users));
+            }
             localStorage.setItem('currentUser', u);
             window.location.reload();
         } else if (u === 'admin' && p === 'admin123') {
             localStorage.setItem('currentUser', 'admin');
             if (!users['admin']) {
-                users['admin'] = { name:'Admin', username:'admin', password:'admin123', reputation:500, xp:1000, level:10, briefingShown:false, performance:{}, inventory:{hints:5,skips:3}, coins:500 };
+                users['admin'] = { name:'Admin', username:'admin', password:hp, reputation:500, xp:1000, level:10, briefingShown:false, performance:{}, inventory:{hints:5,skips:3}, coins:500 };
                 localStorage.setItem('users', JSON.stringify(users));
             }
             window.location.reload();
@@ -870,7 +1004,7 @@ window.addEventListener('load', () => {
         }
     });
 
-    document.getElementById('registerForm')?.addEventListener('submit', (e) => {
+    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('registerName').value.trim();
         const username = document.getElementById('registerUsername').value.trim().toLowerCase();
@@ -878,7 +1012,8 @@ window.addEventListener('load', () => {
         if (!name || !username || !password) return;
         const users = JSON.parse(localStorage.getItem('users') || '{}');
         if (users[username]) { alert('Codinome já em uso. Escolha outro.'); return; }
-        users[username] = { name, username, password, reputation:0, xp:0, level:1, coins:100, briefingShown:false, performance:{}, inventory:{hints:5, skips:3} };
+        const hp = await security.hash(password);
+        users[username] = { name, username, password: hp, reputation:0, xp:0, level:1, coins:100, briefingShown:false, performance:{}, inventory:{hints:5, skips:3} };
         localStorage.setItem('users', JSON.stringify(users));
         localStorage.setItem('currentUser', username);
         window.location.reload();
@@ -890,6 +1025,33 @@ function showBlackMarket() {
     const user = getCurrentUser();
     if (!user) return;
 
+    const availableItems = MARKET_ITEMS.map(item => {
+        const isLocked = user.xp < item.minXP;
+        const requiredRank = getReputationStatus(item.minXP).rank;
+        
+        return `
+            <div class="col-md-6">
+                <div class="glass-card p-4 border-secondary shadow-hover h-100 position-relative ${isLocked ? 'opacity-50' : ''}">
+                    ${isLocked ? `<div class="position-absolute inset-0 d-flex flex-column align-items-center justify-content-center bg-black bg-opacity-75 rounded z-index-1">
+                        <i class="fas fa-lock fa-2x mb-2 text-muted"></i>
+                        <span class="small text-muted text-center px-3">Requer Rank: <br><b class="text-white">${requiredRank}</b></span>
+                    </div>` : ''}
+                    <div class="d-flex justify-content-between">
+                        <h5 class="text-${item.color}"><i class="fas ${item.icon} me-2"></i>${item.name}</h5>
+                        <span class="badge bg-warning text-dark fs-6">${item.price} CC</span>
+                    </div>
+                    <p class="small text-white-50 mt-2">${item.desc}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span class="small text-white">Inventário: <b class="text-${item.color}">${user.inventory?.[item.id] || 0}</b></span>
+                        <button class="btn btn-sm btn-outline-${item.color}" onclick="buyMarketItem('${item.id}', ${item.price})" ${isLocked ? 'disabled' : ''}>
+                            <i class="fas fa-shopping-cart me-1"></i> COMPRAR
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
     const marketHTML = `
         <div class="p-4 animate__animated animate__fadeIn">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -898,35 +1060,14 @@ function showBlackMarket() {
                     <i class="fas fa-coins text-warning me-1"></i> <span class="fw-bold text-warning" id="bm-coins">${user.coins || 0} CC</span>
                 </div>
             </div>
-            <p class="text-white-50 mb-5">Compre exploits customizados, dicas e decodificadores de rede na Dark Web.</p>
+            <p class="text-white-50 mb-4 small"><i class="fas fa-shield-alt me-2"></i>Nível de Anonimato: <span class="text-success">HIGH (Encrypted Tunnel)</span></p>
             
             <div class="row g-4 mb-4">
-                <div class="col-md-6">
-                    <div class="glass-card p-4 border-secondary shadow-hover h-100">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="text-info"><i class="fas fa-lightbulb me-2"></i>Dica Avançada (Hint)</h5>
-                            <span class="badge bg-warning text-dark fs-6">100 CC</span>
-                        </div>
-                        <p class="small text-muted mt-2">Dá acesso a um módulo de dica extra que revela partes do código vulnerável ou payload exato durante o Pentest.</p>
-                        <p class="small text-white">No inventário: <b class="text-info" id="inv-hints">${user.inventory?.hints || 0}</b></p>
-                        <button class="btn btn-outline-info w-100 mt-2" onclick="buyMarketItem('hint', 100)"><i class="fas fa-download me-1"></i> ADQUIRIR EXPLOIT</button>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="glass-card p-4 border-secondary shadow-hover h-100">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="text-danger"><i class="fas fa-fast-forward me-2"></i>Script de Pulo (Skip)</h5>
-                            <span class="badge bg-warning text-dark fs-6">250 CC</span>
-                        </div>
-                        <p class="small text-muted mt-2">Um script de automação massiva que força a passagem da missão atual sem precisar resolvê-la. Uso único.</p>
-                        <p class="small text-white">No inventário: <b class="text-danger" id="inv-skips">${user.inventory?.skips || 0}</b></p>
-                        <button class="btn btn-outline-danger w-100 mt-2" onclick="buyMarketItem('skip', 250)"><i class="fas fa-download me-1"></i> ADQUIRIR AUTOMATIZADOR</button>
-                    </div>
-                </div>
+                ${availableItems}
             </div>
 
             <div class="glass-card p-4 border-success mt-4">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div>
                         <h5 class="text-success mb-1"><i class="fas fa-university me-2"></i>RECARGA DE CRÉDITOS (PIX)</h5>
                         <p class="small text-muted mb-0">Adquira CyberCoins instantaneamente via transferência criptografada.</p>
@@ -934,6 +1075,7 @@ function showBlackMarket() {
                     <div class="d-flex gap-2">
                         <button class="btn btn-success btn-sm" onclick="showPixPayment(500, 10)">500 CC (R$ 10)</button>
                         <button class="btn btn-success btn-sm" onclick="showPixPayment(1500, 25)">1500 CC (R$ 25)</button>
+                        <button class="btn btn-success btn-sm" onclick="showPixPayment(5000, 75)">5000 CC (R$ 75)</button>
                     </div>
                 </div>
             </div>
@@ -952,10 +1094,9 @@ window.buyMarketItem = function(item, price) {
     }
     
     user.coins -= price;
-    if (!user.inventory) user.inventory = { hints: 0, skips: 0 };
+    if (!user.inventory) user.inventory = { hints: 0, skips: 0, vpn: 0, zeroday: 0, botnet: 0 };
     
-    if (item === 'hint') user.inventory.hints++;
-    if (item === 'skip') user.inventory.skips++;
+    user.inventory[item] = (user.inventory[item] || 0) + 1;
     
     saveUserData(user);
     sfx.correct();
@@ -1014,42 +1155,118 @@ setInterval(() => {
             `${randomRival.name} invadiu um mainframe corporativo.`,
             `${randomRival.name} comprou um novo Exploit no Black Market.`
         ];
-        os.showNotification(events[Math.floor(Math.random() * events.length)], 'secondary');
+        if (window.os) os.showNotification(events[Math.floor(Math.random() * events.length)], 'secondary');
     }
 }, 45000);
 
+// Urgent Mission Periodic Check (Every 2 Minutes)
+setInterval(() => {
+    if (getCurrentUser()) {
+        checkUrgentMissionChance();
+    }
+}, 120000);
+
 // ================= PIX PAYMENT SYSTEM =================
 window.showPixPayment = function(ccAmount, brlPrice) {
+    const pixKey = "31984359511";
+    const transactionId = "TXN_" + Math.random().toString(36).substr(2, 9).toUpperCase();
+    
     const pixHTML = `
         <div id="pixModal" class="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-4" style="z-index: 40000; background: rgba(0,0,0,0.9); backdrop-filter: blur(15px);">
             <div class="glass-card p-4 border-success text-center animate__animated animate__zoomIn" style="max-width: 450px;">
                 <div class="d-flex justify-content-between align-items-start mb-3">
-                    <h4 class="text-success mb-0"><i class="fas fa-qrcode me-2"></i>PAGAMENTO VIA PIX</h4>
-                    <button class="btn-close btn-close-white" onclick="document.getElementById('pixModal').remove()"></button>
+                    <h4 class="text-success mb-0"><i class="fas fa-qrcode me-2"></i>SINCRO. BANCÁRIA PIX</h4>
+                    <button class="btn-close btn-close-white" onclick="stopPixPolling(); document.getElementById('pixModal').remove()"></button>
                 </div>
-                <p class="text-white-50 small mb-4">Escaneie o código abaixo para carregar <b>${ccAmount} CyberCoins</b> em sua conta.</p>
                 
-                <div class="bg-white p-3 rounded mb-4 mx-auto" style="width: 250px; height: 250px;">
+                <p class="text-white-50 small mb-3">Após o pagamento, o sistema detectará o crédito automaticamente via rede bancária.</p>
+                
+                <div class="bg-white p-2 rounded mb-3 mx-auto" style="width: 200px; height: 200px;">
                     <img src="pix_qr.png" class="img-fluid" alt="PIX QR Code">
                 </div>
+
+                <div class="input-group mb-2">
+                    <span class="input-group-text bg-dark border-success text-success small">CHAVE:</span>
+                    <input type="text" class="form-control bg-black border-success text-white small text-center" value="${pixKey}" readonly id="pixKeyInput">
+                    <button class="btn btn-outline-success" onclick="copyPixKey()"><i class="fas fa-copy"></i></button>
+                </div>
+                <div class="text-muted mb-3" style="font-size: 0.6rem;">ID TRANSAÇÃO: <span class="text-success fw-bold">${transactionId}</span></div>
                 
-                <div class="bg-dark p-3 rounded border border-success mb-4 text-start">
-                    <div class="small text-muted">VALOR A PAGAR:</div>
-                    <div class="fs-4 text-success fw-bold">R$ ${brlPrice.toFixed(2)}</div>
+                <div id="pixStatus" class="p-3 bg-black rounded border border-secondary mb-3">
+                    <div class="d-flex align-items-center justify-content-center text-info">
+                        <div class="spinner-grow spinner-grow-sm me-2" role="status"></div>
+                        <span class="small fw-bold">AGUARDANDO RECEBIMENTO...</span>
+                    </div>
                 </div>
 
                 <div class="d-grid gap-2">
-                    <button class="btn btn-success py-3 fw-bold" onclick="simulatePixSuccess(${ccAmount})">
-                        <i class="fas fa-check-circle me-2"></i> JÁ PAGUEI (SIMULAR SUCESSO)
-                    </button>
-                    <button class="btn btn-outline-secondary" onclick="document.getElementById('pixModal').remove()">CANCELAR OPERAÇÃO</button>
+                    <button class="btn btn-outline-secondary" onclick="stopPixPolling(); document.getElementById('pixModal').remove()">CANCELAR E VOLTAR</button>
                 </div>
-                <p class="text-muted mt-3 small" style="font-size: 0.7rem;">Operação criptografada ponta-a-ponta via CyberBank.</p>
+                <p class="text-muted mt-3 mb-0" style="font-size: 0.6rem;">Segurança CyberOS: Verificação criptografada de ponta-a-ponta.</p>
             </div>
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', pixHTML);
     sfx.recon();
+
+    startPixPolling(transactionId, ccAmount);
+};
+
+let pixPollingInterval = null;
+
+window.startPixPolling = function(txId, amount) {
+    stopPixPolling();
+    const startTime = Date.now();
+    const timeoutLimit = 120000; // 2 minutos para pagar
+    
+    console.log(`[CyberBank] Monitorando transação: ${txId}`);
+    
+    pixPollingInterval = setInterval(() => {
+        const statusEl = document.getElementById('pixStatus');
+        if (!statusEl) { stopPixPolling(); return; }
+
+        const elapsed = Date.now() - startTime;
+        
+        // Verificação de Timeout
+        if (elapsed > timeoutLimit) {
+            stopPixPolling();
+            statusEl.innerHTML = `
+                <div class="d-flex align-items-center justify-content-center text-danger">
+                    <i class="fas fa-times-circle me-2"></i>
+                    <span class="small fw-bold">TRANSAÇÃO CANCELADA (TIMEOUT)</span>
+                </div>
+            `;
+            sfx.wrong();
+            if (window.os) os.showNotification('O tempo limite para o pagamento PIX expirou.', 'danger');
+            setTimeout(() => document.getElementById('pixModal')?.remove(), 3000);
+            return;
+        }
+
+        // Simulação de detecção
+        if (window.FORCE_PIX_SUCCESS) {
+            clearInterval(pixPollingInterval);
+            statusEl.innerHTML = `
+                <div class="d-flex align-items-center justify-content-center text-success animate__animated animate__pulse">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span class="small fw-bold">PAGAMENTO CONFIRMADO!</span>
+                </div>
+            `;
+            sfx.correct();
+            setTimeout(() => simulatePixSuccess(amount), 2000);
+        }
+    }, 3000);
+};
+
+window.stopPixPolling = function() {
+    if (pixPollingInterval) clearInterval(pixPollingInterval);
+    window.FORCE_PIX_SUCCESS = false;
+};
+
+window.copyPixKey = function() {
+    const input = document.getElementById('pixKeyInput');
+    input.select();
+    document.execCommand('copy');
+    if (window.os) os.showNotification('Chave PIX copiada!', 'success');
 };
 
 window.simulatePixSuccess = function(amount) {
@@ -1063,8 +1280,7 @@ window.simulatePixSuccess = function(amount) {
     sfx.correct();
     
     if (window.os) {
-        os.showNotification(`Pagamento Confirmado! +${amount} CC creditados.`, 'success');
-        // Refresh Black Market if open
+        os.showNotification(`+${amount} CyberCoins adicionados à sua conta!`, 'success');
         showBlackMarket();
     }
 };
