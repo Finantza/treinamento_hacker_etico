@@ -216,6 +216,11 @@
                         menu.classList.add('d-none');
                     }
                 });
+
+                // Initialize Hardening
+                if (window.security && window.security.hardening) {
+                    window.security.hardening.init();
+                }
             },
 
             updateClock() {
@@ -266,12 +271,23 @@
             initIntro() {
                 const term = document.getElementById('splash-terminal');
                 const progress = document.getElementById('splash-progress');
-                const logs = ["> INITIALIZING KERNEL...", "> LOADING NEURAL MODULES...", "> ESTABLISHING TUNNEL...", "> SYSTEM READY."];
+                const logs = ["> INITIALIZING KERNEL...", "> LOADING NEURAL MODULES...", "> ESTABLISHING TUNNEL...", "> VERIFYING SYSTEM INTEGRITY...", "> SYSTEM READY."];
                 let i = 0;
                 this.introInterval = setInterval(() => {
                     if (i < logs.length) {
                         const div = document.createElement('div');
                         div.textContent = logs[i];
+                        
+                        // Verification Check
+                        if (logs[i].includes("VERIFYING")) {
+                            if (!window.TECNICAS_DATA || !window.ARSENAL_DATA) {
+                                div.textContent = "> ERROR: DATABASE CORRUPT OR MISSING.";
+                                div.classList.add('text-danger');
+                                clearInterval(this.introInterval);
+                                return;
+                            }
+                        }
+
                         if (term) term.appendChild(div);
                         if (progress) progress.style.width = ((i+1)/logs.length)*100 + '%';
                         i++;

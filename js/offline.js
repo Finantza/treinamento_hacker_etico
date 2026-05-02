@@ -248,10 +248,16 @@ async function showGlossary() {
 
 // ================= CORE HELPERS =================
 function getCurrentUser() {
-    const username = localStorage.getItem('currentUser');
-    if (!username) return null;
-    const users = JSON.parse(localStorage.getItem('users') || '{}');
-    return users[username] || null;
+    try {
+        const username = localStorage.getItem('currentUser');
+        if (!username) return null;
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        return users[username] || null;
+    } catch (e) {
+        console.error("Critical: LocalStorage corrupted.", e);
+        if (window.os) os.showNotification("Erro crítico de dados. Tente recarregar a página.", "danger");
+        return null;
+    }
 }
 
 function loginGuest() {
@@ -314,13 +320,22 @@ const sfx = {
 
 // ================= RENDER ENGINE =================
 function renderToModule(moduleId, html) {
+    let attempts = 0;
+    const maxAttempts = 10;
+    
     const tryRender = () => {
         const body = document.getElementById(`body-${moduleId}`);
         if (body) {
             body.innerHTML = html;
         } else if (window.os) {
-            os.openWindow(moduleId);
-            setTimeout(tryRender, 100);
+            if (attempts === 0) os.openWindow(moduleId);
+            attempts++;
+            if (attempts < maxAttempts) {
+                setTimeout(tryRender, 100);
+            } else {
+                console.error(`Failed to render module: ${moduleId}`);
+                os.showNotification(`Erro ao carregar módulo: ${moduleId}`, 'danger');
+            }
         }
     };
     tryRender();
