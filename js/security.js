@@ -51,7 +51,9 @@ const security = {
             this.disableShortcuts();
             this.preventSelection();
             this.antiDebug();
-            console.log("%c[CyberOS Security] Hardening Active", "color: #00ffff; font-weight: bold;");
+            this.detectConsoleOpen();
+            this.blockDragAndDrop();
+            console.log("%c[CyberOS Security] Advanced Hardening Active", "color: #ff0000; font-weight: bold;");
         },
 
         disableContextMenu() {
@@ -64,16 +66,37 @@ const security = {
 
         disableShortcuts() {
             document.addEventListener('keydown', (e) => {
-                // F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+Shift+C
-                if (
-                    e.keyCode === 123 || 
-                    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || 
-                    (e.ctrlKey && e.keyCode === 85)
-                ) {
+                const forbiddenKeys = [
+                    e.keyCode === 123, // F12
+                    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)), // I, J, C
+                    (e.ctrlKey && e.keyCode === 85), // Ctrl+U (View Source)
+                    (e.ctrlKey && e.keyCode === 83), // Ctrl+S (Save)
+                    (e.ctrlKey && e.keyCode === 80), // Ctrl+P (Print)
+                    (e.metaKey && e.altKey && e.keyCode === 73) // Cmd+Option+I (Mac)
+                ];
+
+                if (forbiddenKeys.some(k => k)) {
                     e.preventDefault();
-                    this.triggerTrace(`TENTATIVA DE ACESSO VIA ATALHO (${e.key.toUpperCase()})`);
+                    this.triggerTrace(`VIOLAÇÃO DE ATALHO BLOQUEADO: ${e.key.toUpperCase()}`);
                     return false;
                 }
+            });
+        },
+
+        detectConsoleOpen() {
+            // Check if window was resized in a way that suggests console opened
+            let threshold = 160;
+            window.addEventListener('resize', () => {
+                if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
+                    this.triggerTrace('TERMINAL DE DESENVOLVEDOR DETECTADO (RESIDE)');
+                }
+            });
+        },
+
+        blockDragAndDrop() {
+            document.addEventListener('dragstart', (e) => {
+                e.preventDefault();
+                return false;
             });
         },
 
@@ -82,8 +105,56 @@ const security = {
                 os.showNotification('ALERTA: VIOLAÇÃO DE SEGURANÇA DETECTADA!', 'danger');
             }
             this.fetchTraceData().then(data => {
+                this.logCriminalActivity(data, reason);
                 this.showInvasionAlert(data, reason);
             });
+        },
+
+        logCriminalActivity(data, reason) {
+            const logs = JSON.parse(localStorage.getItem('cyberos_security_logs') || '[]');
+            const entry = {
+                timestamp: new Date().toISOString(),
+                reason: reason,
+                ip: data.ip,
+                location: `${data.city}, ${data.country}`,
+                userAgent: navigator.userAgent
+            };
+            logs.push(entry);
+            localStorage.setItem('cyberos_security_logs', JSON.stringify(logs.slice(-50))); // Keep last 50
+            
+            // Automatic Report Generation (Thematic Download)
+            if (logs.length % 3 === 0) { // Every 3 attempts, "leak" their own report
+                this.downloadEvidenceFile(entry);
+            }
+        },
+
+        downloadEvidenceFile(entry) {
+            const content = `
+[CYBER-OS CRIMINAL REPORT]
+-------------------------------------------
+ID DE RASTREAMENTO: ${btoa(entry.timestamp)}
+DATA/HORA: ${entry.timestamp}
+VIOLAÇÃO: ${entry.reason}
+
+DADOS DO INVASOR:
+-------------------------------------------
+ENDEREÇO IP: ${entry.ip}
+GEOLOCALIZAÇÃO: ${entry.location}
+BROWSER: ${entry.userAgent}
+
+ESTADO: POSIÇÃO COMPROMETIDA.
+-------------------------------------------
+RELATÓRIO GERADO AUTOMATICAMENTE PELO KERNEL CYBER-OS.
+`;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `EVIDENCE_${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            a.remove();
         },
 
         async fetchTraceData() {
