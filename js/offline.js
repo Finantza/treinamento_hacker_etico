@@ -298,6 +298,52 @@ function saveUserData(userToSave = null) {
     localStorage.setItem('users', JSON.stringify(users));
 }
 
+function showInvasionLogs() {
+    const vfs = JSON.parse(localStorage.getItem('cyberos_virtual_fs') || '{"/var/log/invasions": []}');
+    const logs = vfs["/var/log/invasions"] || [];
+    
+    let logsHTML = `
+        <div class="p-4 animate__animated animate__fadeIn">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="text-danger mb-0"><i class="fas fa-user-secret me-2"></i>INTRUSION LOGS</h3>
+                <div class="badge bg-danger text-black shadow-glow">${logs.length} INCIDENTES</div>
+            </div>
+            
+            <div class="bg-black rounded p-3 border border-danger shadow-hover mb-4" style="font-family: monospace; font-size: 0.8rem; max-height: 400px; overflow-y: auto;">
+                <table class="table table-dark table-hover mb-0">
+                    <thead>
+                        <tr class="text-danger border-bottom border-danger">
+                            <th>ID</th>
+                            <th>TIMESTAMP</th>
+                            <th>EVENTO</th>
+                            <th>IP / LOCALIZAÇÃO</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${logs.reverse().map(l => `
+                            <tr>
+                                <td class="text-info">${l.id}</td>
+                                <td class="text-muted small">${l.timestamp}</td>
+                                <td><span class="badge bg-danger-subtle text-danger">${l.event}</span></td>
+                                <td class="small">${l.intruder.ip}<br><span class="text-muted">${l.intruder.geo}</span></td>
+                                <td><span class="badge bg-dark border border-warning text-warning">${l.status}</span></td>
+                            </tr>
+                        `).join('')}
+                        ${logs.length === 0 ? '<tr><td colspan="5" class="text-center p-5 text-muted">Nenhum incidente registrado. Sistema operando em segurança.</td></tr>' : ''}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="alert bg-dark border border-info text-info small">
+                <i class="fas fa-info-circle me-2"></i><b>ADMIN NOTE:</b> Estes logs são coletados silenciosamente em <code>/var/log/invasions</code>. O invasor não recebe notificações deste registro.
+            </div>
+        </div>
+    `;
+    
+    renderToModule('security_logs', logsHTML);
+}
+
 // ================= SFX =================
 const sfx = {
     ctx: null,
@@ -327,6 +373,8 @@ function renderToModule(moduleId, html) {
         const body = document.getElementById(`body-${moduleId}`);
         if (body) {
             body.innerHTML = html;
+            // Ensure window is visible if we just rendered to it
+            if (window.os && os.windows[moduleId]) os.focusWindow(moduleId);
         } else if (window.os) {
             if (attempts === 0) os.openWindow(moduleId);
             attempts++;
@@ -334,36 +382,75 @@ function renderToModule(moduleId, html) {
                 setTimeout(tryRender, 100);
             } else {
                 console.error(`Failed to render module: ${moduleId}`);
-                os.showNotification(`Erro ao carregar módulo: ${moduleId}`, 'danger');
+                if (os.showNotification) os.showNotification(`Erro ao carregar módulo: ${moduleId}`, 'danger');
             }
         }
     };
     tryRender();
 }
 
+function generateLeaderboard(userXP, currentUsername) {
+    const bots = [
+        { name: 'ZeroCool', xp: 48500, rank: 'Archon' },
+        { name: 'AcidBurn', xp: 32000, rank: 'Elite' },
+        { name: 'CerealKiller', xp: 12500, rank: 'SysAdmin' },
+        { name: 'LordNikon', xp: 8400, rank: 'Bounty Hunter' },
+        { name: 'PhantomPhreak', xp: 5200, rank: 'Bounty Hunter' }
+    ];
+
+    // Add current user to bots for comparison
+    const currentUser = { name: currentUsername, xp: userXP, rank: getReputationStatus(userXP).rank, isUser: true };
+    const all = [...bots, currentUser].sort((a, b) => b.xp - a.xp);
+
+    return all.map((p, i) => `
+        <li class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center py-2 ${p.isUser ? 'bg-primary-subtle border-start border-3 border-primary' : ''}">
+            <div class="d-flex align-items-center">
+                <span class="badge ${i < 3 ? 'bg-warning text-dark' : 'bg-dark'} me-3" style="width: 25px;">${i + 1}</span>
+                <div>
+                    <div class="fw-bold ${p.isUser ? 'text-primary' : 'text-white'} small">${p.name} ${p.isUser ? '(VOCÊ)' : ''}</div>
+                    <div class="text-muted" style="font-size: 0.6rem;">${p.rank.toUpperCase()}</div>
+                </div>
+            </div>
+            <div class="text-end">
+                <div class="fw-bold text-white small">${p.xp}</div>
+                <div class="text-muted" style="font-size: 0.6rem;">XP</div>
+            </div>
+        </li>
+    `).join('');
+}
+
 // ================= DASHBOARD =================
 function showDashboard() {
-    const user = getCurrentUser();
-    if (!user) return;
+    try {
+        // Force open window if it doesn't exist to ensure container is ready
+        if (window.os && !os.windows['dashboard']) {
+            os.openWindow('dashboard');
+        } else if (window.os) {
+            os.focusWindow('dashboard');
+        }
 
-    // If window already open, just focus it
-    if (window.os && window.os.windows['dashboard']) {
-        window.os.focusWindow('dashboard');
-        return;
-    }
-    
-    // Check for urgent mission on login
-    if (!window.initialMissionChecked) {
-        window.initialMissionChecked = true;
-        try { checkUrgentMissionChance(); } catch(e) { console.warn('urgentMission:', e); }
-    }
+        const user = getCurrentUser();
+        if (!user) {
+            console.error("Dashboard: No user logged in.");
+            if (window.os) os.showNotification("Erro: Sessão não encontrada. Por favor, entre novamente.", "warning");
+            return;
+        }
 
-    const currentRank = getReputationStatus(user.xp || 0);
-    const nextRank = getNextRank(user.xp || 0);
-    const progress = !nextRank ? 100 : Math.floor((((user.xp||0) - currentRank.xp) / (nextRank.xp - currentRank.xp)) * 100);
+        // Default stats if missing
+        if (!user.playerStats) user.playerStats = { solved: 0, failed: 0 };
+        
+        // Check for urgent mission on login
+        if (!window.initialMissionChecked) {
+            window.initialMissionChecked = true;
+            try { checkUrgentMissionChance(); } catch(e) { console.warn('urgentMission:', e); }
+        }
 
-    let leaderboardHTML = '';
-    try { leaderboardHTML = generateLeaderboard(user.xp || 0, user.username); } catch(e) { leaderboardHTML = ''; }
+        const currentRank = getReputationStatus(user.xp || 0);
+        const nextRank = getNextRank(user.xp || 0);
+        const progress = !nextRank ? 100 : Math.floor((((user.xp||0) - currentRank.xp) / (nextRank.xp - currentRank.xp)) * 100);
+
+        let leaderboardHTML = '';
+        try { leaderboardHTML = generateLeaderboard(user.xp || 0, user.username); } catch(e) { console.warn("Leaderboard error:", e); leaderboardHTML = ''; }
 
     const dashboardHTML = `
         <div class="p-4 animate__animated animate__fadeIn">
@@ -458,6 +545,10 @@ function showDashboard() {
         </div>
     `;
     renderToModule('dashboard', dashboardHTML);
+    } catch (err) {
+        console.error("CRITICAL: showDashboard failed", err);
+        if (window.os) os.showNotification("Erro ao renderizar perfil. Verifique o console.", "danger");
+    }
 }
 
 
@@ -1175,7 +1266,6 @@ window.triggerLoginFlow = function() {
     }
 
     document.getElementById('desktop-layer').classList.remove('d-none');
-    showDashboard();
     if (window.gemma) window.gemma.initBuddy();
     if (!user.briefingShown) {
         showMissionBriefing();

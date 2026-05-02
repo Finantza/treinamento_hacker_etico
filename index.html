@@ -76,7 +76,6 @@
 
     <!-- DESKTOP LAYER -->
     <div id="desktop-layer" class="d-none animate__animated animate__fadeIn">
-        <!-- Desktop icons removed to keep workspace clean (Available in Start Menu) -->
         
         <!-- HERO GAME HUB -->
         <div id="hero-hub" class="hero-hub">
@@ -158,6 +157,7 @@
             <div id="start-menu" class="premium-glass p-3 d-none">
                 <div class="small text-muted mb-2 border-bottom border-secondary pb-1">SISTEMA</div>
                 <div class="start-menu-item" onclick="showDashboard(); os.toggleStartMenu()"><i class="fas fa-id-card me-2 text-primary"></i> PERFIL</div>
+                <div class="start-menu-item" onclick="showInvasionLogs(); os.toggleStartMenu()"><i class="fas fa-user-secret me-2 text-danger"></i> LOGS DE INVASÃO</div>
                 <div class="start-menu-item" onclick="startGame('logica'); os.toggleStartMenu()"><i class="fas fa-bug me-2 text-danger"></i> PENTEST</div>
                 <div class="start-menu-item" onclick="startDefenseMode(); os.toggleStartMenu()"><i class="fas fa-shield-alt me-2 text-info"></i> SOC</div>
                 <div class="start-menu-item" onclick="startBotWar(); os.toggleStartMenu()"><i class="fas fa-bolt me-2 text-warning"></i> ARENA</div>

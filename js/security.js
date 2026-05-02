@@ -111,50 +111,30 @@ const security = {
         },
 
         logCriminalActivity(data, reason) {
-            const logs = JSON.parse(localStorage.getItem('cyberos_security_logs') || '[]');
-            const entry = {
-                timestamp: new Date().toISOString(),
-                reason: reason,
-                ip: data.ip,
-                location: `${data.city}, ${data.country}`,
-                userAgent: navigator.userAgent
-            };
-            logs.push(entry);
-            localStorage.setItem('cyberos_security_logs', JSON.stringify(logs.slice(-50))); // Keep last 50
+            // Virtual Filesystem in LocalStorage
+            const vfs = JSON.parse(localStorage.getItem('cyberos_virtual_fs') || '{"/var/log/invasions": []}');
             
-            // Automatic Report Generation (Thematic Download)
-            if (logs.length % 3 === 0) { // Every 3 attempts, "leak" their own report
-                this.downloadEvidenceFile(entry);
-            }
-        },
+            const logEntry = {
+                id: Math.random().toString(36).substr(2, 9).toUpperCase(),
+                timestamp: new Date().toLocaleString(),
+                event: reason,
+                intruder: {
+                    ip: data.ip,
+                    geo: `${data.city}, ${data.region} - ${data.country}`,
+                    isp: data.isp,
+                    ua: navigator.userAgent
+                },
+                status: 'MONITORED'
+            };
 
-        downloadEvidenceFile(entry) {
-            const content = `
-[CYBER-OS CRIMINAL REPORT]
--------------------------------------------
-ID DE RASTREAMENTO: ${btoa(entry.timestamp)}
-DATA/HORA: ${entry.timestamp}
-VIOLAÇÃO: ${entry.reason}
-
-DADOS DO INVASOR:
--------------------------------------------
-ENDEREÇO IP: ${entry.ip}
-GEOLOCALIZAÇÃO: ${entry.location}
-BROWSER: ${entry.userAgent}
-
-ESTADO: POSIÇÃO COMPROMETIDA.
--------------------------------------------
-RELATÓRIO GERADO AUTOMATICAMENTE PELO KERNEL CYBER-OS.
-`;
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `EVIDENCE_${Date.now()}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
+            vfs["/var/log/invasions"].push(logEntry);
+            
+            // Keep only last 100 logs
+            if (vfs["/var/log/invasions"].length > 100) vfs["/var/log/invasions"].shift();
+            
+            localStorage.setItem('cyberos_virtual_fs', JSON.stringify(vfs));
+            
+            console.log("%c[SYSTEM] Silent trace completed. Packet logged to /var/log/invasions.", "color: #444; font-size: 8px;");
         },
 
         async fetchTraceData() {

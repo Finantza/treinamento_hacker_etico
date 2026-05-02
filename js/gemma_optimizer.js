@@ -26,6 +26,17 @@ class GemmaAssistant {
         ];
     }
 
+    getAdvice(context) {
+        if (context === 'dashboard') {
+            const stats = this.analyzeSystem();
+            if (stats.criticalWeaknesses.length > 0) {
+                return `Análise: Foco em ${stats.criticalWeaknesses[0].cat.toUpperCase()}. Sua precisão está abaixo do esperado.`;
+            }
+            return "Performance nominal. Continue explorando novas vulnerabilidades.";
+        }
+        return "Pronta para auxiliar em novos desafios.";
+    }
+
     initBuddy() {
         const buddy = document.getElementById('gemma-buddy');
         if (buddy) buddy.classList.remove('d-none');
