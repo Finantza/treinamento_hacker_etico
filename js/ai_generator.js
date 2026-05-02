@@ -47,6 +47,7 @@ class ProceduralAI {
         this.payloads = this.loadPayloadDatabase();
         this.realismFactor = 0.9; // 90% realistic payloads
         this.loadExternalArsenal();
+        this.loadProgress();
     }
 
     async loadExternalArsenal() {

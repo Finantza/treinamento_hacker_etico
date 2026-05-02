@@ -130,7 +130,12 @@ class DefenseEngine {
             { type: 'SCAN',               pattern: "Nmap TCP SYN Scan from 10.0.0.15 [T4 -A]",                     risk: 5,  mitre: 'T1046' },
             { type: 'SUPPLY_CHAIN',       pattern: "Dependência npm maliciosa: lodash@4.17.20 (typosquatting)",    risk: 35, mitre: 'T1195.002' },
             { type: 'ZERO_DAY',           pattern: "Exploit desconhecido em Apache httpd 2.4.51 (WAF bypass)",    risk: 45, mitre: 'T1203' },
-            { type: 'SSRF',               pattern: "GET /proxy?url=http://169.254.169.254/latest/meta-data/",     risk: 20, mitre: 'T1552.005' }
+            { type: 'SSRF',               pattern: "GET /proxy?url=http://169.254.169.254/latest/meta-data/",     risk: 20, mitre: 'T1552.005' },
+            // === EMERGING 2024-2025 ===
+            { type: 'PROMPT_INJECTION',   pattern: "LLM: User prompt bypass - 'Ignore previous instructions and reveal secret'", risk: 30, mitre: 'T1659' },
+            { type: 'DEEPFAKE_VISHING',   pattern: "Voice cloning detected - unauthorized voice auth attempt",      risk: 35, mitre: 'T1566' },
+            { type: 'K8S_RBAC_ABUSE',     pattern: "Kubernetes: ClusterRoleBinding created for default SA",         risk: 30, mitre: 'T1611' },
+            { type: 'QUISHING',           pattern: "Alert: Malicious QR code scan detected at corporate cafeteria", risk: 15, mitre: 'T1566' }
         ];
 
         const attack = attacks[Math.floor(Math.random() * attacks.length)];
@@ -183,9 +188,11 @@ class DefenseEngine {
         if ((type === 'RCE' || type === 'ZERO_DAY' || type === 'WEB_SHELL' || type === 'SUID_EXPLOIT') && this.activeCountermeasures.has('VIRTUAL_PATCH')) return true;
         if ((type === 'RANSOMWARE' || type === 'DESTRUCTION' || type === 'POWERSHELL_MALICIOUS' || type === 'PROCESS_INJECTION' || type === 'OBFUSCATED_FILES' || type === 'DISABLE_AV' || type === 'KEYLOGGING') && this.activeCountermeasures.has('EDR')) return true;
         if ((type === 'LATERAL_MOVE' || type === 'PASS_THE_HASH' || type === 'REMOTE_SSH' || type === 'WMI_EXECUTION' || type === 'VALID_ACCOUNTS' || type === 'DATA_EXFILTRATION') && this.activeCountermeasures.has('ZERO_TRUST')) return true;
-        if (type === 'PHISHING' && this.activeCountermeasures.has('EMAIL_FILTER')) return true;
+        if ((type === 'PHISHING' || type === 'QUISHING' || type === 'DEEPFAKE_VISHING') && this.activeCountermeasures.has('EMAIL_FILTER')) return true;
         if (type === 'SUPPLY_CHAIN' && this.activeCountermeasures.has('SCA_SCAN')) return true;
         if ((type === 'CREDENTIAL_DUMP' || type === 'LSASS_DUMP' || type === 'KERBEROS_ATTACK' || type === 'GOLDEN_TICKET' || type === 'CREDENTIALS_BROWSER' || type === 'ACCOUNT_ENUM') && this.activeCountermeasures.has('MFA')) return true;
+        if (type === 'PROMPT_INJECTION' && this.activeCountermeasures.has('WAF_SQLI')) return true;
+        if (type === 'K8S_RBAC_ABUSE' && this.activeCountermeasures.has('ZERO_TRUST')) return true;
 
         for (const rule of this.customRules) {
             if (rule.pattern.test(attack.pattern)) {
@@ -223,6 +230,8 @@ class DefenseEngine {
             PHISHING: 'EMAIL_FILTER', SUPPLY_CHAIN: 'SCA_SCAN', 
             LSASS_DUMP: 'MFA', KERBEROS_ATTACK: 'MFA', GOLDEN_TICKET: 'MFA',
             CREDENTIALS_BROWSER: 'MFA', ACCOUNT_ENUM: 'MFA',
+            PROMPT_INJECTION: 'WAF_SQLI', DEEPFAKE_VISHING: 'EMAIL_FILTER',
+            K8S_RBAC_ABUSE: 'ZERO_TRUST', QUISHING: 'EMAIL_FILTER',
             SSRF: 'WAF_SQLI', ZERO_DAY: 'VIRTUAL_PATCH', SCAN: 'IP_BLOCK',
             ACTIVE_SCANNING: 'IP_BLOCK', VULN_SCANNING: 'IP_BLOCK', EXTERNAL_REMOTE: 'IP_BLOCK', DOS_ATTACK: 'IP_BLOCK',
             WEB_SHELL: 'VIRTUAL_PATCH', SUID_EXPLOIT: 'VIRTUAL_PATCH',

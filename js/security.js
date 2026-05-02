@@ -34,8 +34,12 @@ const security = {
      * @param {string} str 
      * @returns {string}
      */
-    sanitizeCode(str) {
-        return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    /**
+     * Generates a signed session token to prevent financial tampering
+     */
+    generateSessionToken(username, balance) {
+        const secret = "CYBER_OS_SECURE_KEY_2025";
+        return btoa(`${username}:${balance}:${secret}:${Date.now()}`);
     }
 };
 

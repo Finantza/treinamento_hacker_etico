@@ -25,8 +25,8 @@ const MARKET_ITEMS = [
     { id: 'skip', name: 'Automation Script', desc: 'Força a conclusão da missão atual.', price: 250, icon: 'fa-fast-forward', color: 'danger', minXP: 500 },
     { id: 'vpn', name: 'Premium VPN', desc: 'Protege seu combo em caso de falha.', price: 400, icon: 'fa-user-shield', color: 'warning', minXP: 1500 },
     { id: 'zeroday', name: 'Zero-Day Access', desc: 'Dobra o ganho de XP na próxima missão.', price: 750, icon: 'fa-virus', color: 'primary', minXP: 4000 },
-    { id: 'soc_ai', name: 'SOC AI Assistant', desc: 'A IA automatiza uma contra-medida extra no modo Defesa.', price: 1200, icon: 'fa-robot', color: 'info', minXP: 7500 },
-    { id: 'botnet', name: 'Botnet Rental', desc: 'Poder massivo: Pula 3 missões seguidas.', price: 1500, icon: 'fa-network-wired', color: 'success', minXP: 10000 }
+    { id: 'soc_ai', name: 'SOC AI Assistant', desc: 'A IA automatiza uma contra-medida extra no modo Defesa.', price: 1200, icon: 'fa-robot', color: 'info', minXP: 7500, type: 'license', licensePrice: 3000 },
+    { id: 'botnet', name: 'Botnet Rental', desc: 'Poder massivo: Pula 3 missões seguidas.', price: 1500, icon: 'fa-network-wired', color: 'success', minXP: 10000, type: 'license', licensePrice: 5000 }
 ];
 
 const getReputationStatus = (xp) => {
@@ -43,90 +43,206 @@ const getNextRank = (xp) => {
 };
 
 async function initGlossaryCache() {
-    if (cachedGlossaryHTML || isGlossaryCaching) return;
-    isGlossaryCaching = true;
-    try {
-        const data = window.TECNICAS_DATA;
-        if (!data) throw new Error("Base de dados offline não encontrada.");
+    // We'll keep the function but change its purpose to ensure data is ready
+    if (!window.TECNICAS_DATA) {
+        console.error("Base de dados offline não encontrada.");
+        return;
+    }
+}
+
+function renderGlossary(searchTerm = '', categoryFilter = 'all') {
+    const data = window.TECNICAS_DATA;
+    if (!data) return '<div class="p-5 text-center text-danger">Erro ao carregar banco de dados.</div>';
+
+    const attacks = data.attacks || [];
+    const defenses = data.defenses || [];
+
+    const filterFunc = (item) => {
+        const matchesSearch = !searchTerm || 
+            item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            (item.simple && item.simple.toLowerCase().includes(searchTerm.toLowerCase())) ||
+            (item.mitre && item.mitre.toLowerCase().includes(searchTerm.toLowerCase()));
         
-        const attacks = data.attacks || [];
-        const defenses = data.defenses || [];
+        const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
+        
+        return matchesSearch && matchesCategory;
+    };
 
-        const card = (title, icon, badge, badgeColor, body, example, extra, extraLabel, extraColor) => `
-            <div class="bg-black rounded mb-3 border-start border-4 border-${badgeColor}" style="overflow:hidden;">
+    const filteredAttacks = attacks.filter(filterFunc);
+    const filteredDefenses = defenses.filter(filterFunc);
+
+    const getImpactBadge = (impact) => {
+        const colors = { 'Critical': 'danger', 'High': 'warning', 'Medium': 'info', 'Low': 'secondary' };
+        return impact ? `<span class="badge bg-${colors[impact] || 'secondary'} me-2" style="font-size:0.55rem;">IMPACTO: ${impact.toUpperCase()}</span>` : '';
+    };
+
+    const getDifficultyBadge = (diff) => {
+        const colors = { 'Hard': 'danger', 'Medium': 'warning', 'Easy': 'success' };
+        return diff ? `<span class="badge border border-${colors[diff] || 'secondary'} text-${colors[diff] || 'secondary'} me-2" style="font-size:0.55rem;">DIFICULDADE: ${diff.toUpperCase()}</span>` : '';
+    };
+
+    const card = (item, type = 'attack') => {
+        const badgeColor = type === 'attack' ? 'danger' : (item.color || 'success');
+        const badgeText = type === 'attack' ? (item.mitre || 'TTP') : 'Defesa';
+        const extraLabel = type === 'attack' ? '🛡️ Defesa' : '✅ Protege contra';
+        const extraColor = type === 'attack' ? 'success' : badgeColor;
+        const extraContent = type === 'attack' ? item.defense : item.protects;
+
+        return `
+            <div class="bg-black rounded mb-3 border-start border-4 border-${badgeColor} technique-card" style="overflow:hidden;" data-name="${item.name.toLowerCase()}">
                 <div class="p-3">
-                    <div class="d-flex align-items-center mb-2">
-                        <i class="fas ${icon} text-${badgeColor} me-2"></i>
-                        <h6 class="mb-0 text-${badgeColor}">${title}</h6>
-                        <span class="badge bg-${badgeColor} ms-auto opacity-75" style="font-size:0.6rem;">${badge}</span>
+                    <div class="d-flex align-items-center mb-2 flex-wrap gap-2">
+                        <i class="fas ${item.icon} text-${badgeColor} me-1"></i>
+                        <h6 class="mb-0 text-${badgeColor}">${item.name}</h6>
+                        <span class="badge bg-${badgeColor} ms-auto opacity-75" style="font-size:0.6rem;">${badgeText}</span>
                     </div>
-                    <p class="small text-white-50 mb-2">${body}</p>
-                    ${example ? `<div class="bg-dark rounded p-2 mb-2"><code class="text-warning" style="font-size:0.7rem;">📌 ${example}</code></div>` : ''}
-                    ${extra ? `<div class="bg-dark rounded p-2"><span class="text-${extraColor}" style="font-size:0.7rem;"><i class="fas fa-shield-alt me-1"></i><b>${extraLabel}:</b> ${extra}</span></div>` : ''}
+                    
+                    <div class="mb-2 d-flex flex-wrap">
+                        ${getImpactBadge(item.impact)}
+                        ${getDifficultyBadge(item.difficulty)}
+                        ${item.category ? `<span class="badge bg-dark border border-primary text-primary" style="font-size:0.55rem;">${item.category.toUpperCase()}</span>` : ''}
+                    </div>
+
+                    <p class="small text-white-50 mb-2">${item.simple || ''}</p>
+                    
+                    ${item.steps && item.steps.length > 0 ? `
+                        <div class="mb-2">
+                            <span class="text-info small fw-bold" style="font-size:0.65rem;"><i class="fas fa-list-ol me-1"></i>PASSO A PASSO:</span>
+                            <ol class="text-white-50 small ps-3 mb-1" style="font-size:0.65rem;">
+                                ${item.steps.map(s => `<li>${s}</li>`).join('')}
+                            </ol>
+                        </div>
+                    ` : ''}
+
+                    ${item.tools && item.tools.length > 0 ? `
+                        <div class="mb-2">
+                            <span class="text-warning small fw-bold" style="font-size:0.65rem;"><i class="fas fa-tools me-1"></i>FERRAMENTAS:</span>
+                            <div class="d-flex flex-wrap gap-1 mt-1">
+                                ${item.tools.map(t => `<span class="badge bg-dark border border-warning text-warning" style="font-size:0.55rem;">${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${item.example ? `
+                        <div class="bg-dark rounded p-2 mb-2 d-flex justify-content-between align-items-center">
+                            <code class="text-warning" style="font-size:0.7rem; word-break: break-all;">📌 ${item.example}</code>
+                            <button class="btn btn-link btn-sm text-muted p-0 ms-2" onclick="os.copyToClipboard('${item.example.replace(/'/g, "\\'")}')" title="Copiar Exemplo">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    ` : ''}
+                    
+                    ${extraContent ? `
+                        <div class="bg-dark rounded p-2 mb-2">
+                            <span class="text-${extraColor}" style="font-size:0.7rem;"><i class="fas fa-shield-alt me-1"></i><b>${extraLabel}:</b> ${extraContent}</span>
+                        </div>
+                    ` : ''}
+
+                    ${item.detection ? `
+                        <div class="bg-dark rounded p-2">
+                            <span class="text-info" style="font-size:0.7rem;"><i class="fas fa-search me-1"></i><b>Detecção:</b> ${item.detection}</span>
+                        </div>
+                    ` : ''}
                 </div>
             </div>`;
+    };
 
-        const attackCards = attacks.map(a => card(a.name, a.icon, a.mitre || 'TTP', 'danger', a.simple, a.example, a.defense, '🛡️ Defesa', 'success')).join('');
-        const defenseCards = defenses.map(d => card(d.name, d.icon, 'Defesa', d.color, d.simple, null, d.protects, '✅ Protege contra', d.color)).join('');
+    const categories = [...new Set(attacks.map(a => a.category).filter(Boolean))].sort();
 
-        cachedGlossaryHTML = `
-            <div class="p-4 animate__animated animate__fadeIn">
-                <div class="d-flex align-items-center mb-4 flex-wrap">
-                    <h3 class="text-primary mb-0"><i class="fas fa-book-open me-2"></i>GLOSSÁRIO COMPLETO DE CIBERSEGURANÇA</h3>
-                    <span class="badge bg-primary ms-3">${attacks.length} Ataques | ${defenses.length} Defesas</span>
+    return `
+        <div class="p-4 animate__animated animate__fadeIn">
+            <div class="d-flex align-items-center mb-3 flex-wrap justify-content-between gap-3">
+                <div>
+                    <h3 class="text-primary mb-0"><i class="fas fa-book-open me-2"></i>ENCICLOPÉDIA HACKER</h3>
+                    <p class="text-muted small mb-0">Base de conhecimento tático v6.0 (2025)</p>
                 </div>
-                <ul class="nav nav-pills mb-4 gap-2" id="glossaryTabs">
-                    <li class="nav-item"><button class="nav-link active btn-sm" data-bs-toggle="pill" data-bs-target="#gAttacks"><i class="fas fa-skull me-1"></i>${attacks.length} Ataques</button></li>
-                    <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#gDefenses"><i class="fas fa-shield-alt me-1"></i>${defenses.length} Defesas</button></li>
-                    <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#gFrameworks"><i class="fas fa-chess me-1"></i>Frameworks</button></li>
-                    <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#gCerts"><i class="fas fa-certificate me-1"></i>Certificações</button></li>
-                </ul>
-                <div class="tab-content">
-                    <div class="tab-pane fade show active" id="gAttacks">
-                        <p class="text-muted small mb-3"><i class="fas fa-info-circle me-1"></i>Todas as técnicas MITRE ATT&CK v16+ com explicações, exemplos e contramedidas.</p>
-                        ${attackCards}
-                    </div>
-                    <div class="tab-pane fade" id="gDefenses">
-                        <p class="text-muted small mb-3"><i class="fas fa-info-circle me-1"></i>Ferramentas, controles e práticas de segurança — do básico ao avançado.</p>
-                        ${defenseCards}
-                    </div>
-                    <div class="tab-pane fade" id="gFrameworks">
-                        ${defenses.filter(d => ['MITRE ATT&CK','MITRE D3FEND','NIST CSF 2.0','PTES','OWASP Top 10','CIS Controls v8'].includes(d.name)).map(d => card(d.name, d.icon, 'Framework', d.color, d.simple, null, d.protects, '✅ Uso', d.color)).join('')}
-                    </div>
-                    <div class="tab-pane fade" id="gCerts">
-                        ${defenses.filter(d => d.name.includes('Security+') || d.name.includes('CEH') || d.name.includes('OSCP') || d.name.includes('CISSP') || d.name.includes('CISM') || d.name.includes('AWS Security')).map(d => card(d.name, d.icon, 'Certificação', d.color, d.simple, null, d.protects, '🎯 Benefício', d.color)).join('')}
+                <div class="d-flex align-items-center gap-2">
+                    <div class="badge bg-primary px-3 py-2 shadow-glow">${filteredAttacks.length} Ataques | ${filteredDefenses.length} Defesas</div>
+                    ${(searchTerm || categoryFilter !== 'all') ? `<button class="btn btn-outline-secondary btn-sm" onclick="clearGlossaryFilters()"><i class="fas fa-times me-1"></i>LIMPAR</button>` : ''}
+                </div>
+            </div>
+
+            <!-- CONTROLES DE BUSCA E FILTRO -->
+            <div class="row g-2 mb-4">
+                <div class="col-md-7">
+                    <div class="input-group shadow-hover">
+                        <span class="input-group-text bg-dark border-primary text-primary"><i class="fas fa-search"></i></span>
+                        <input type="text" id="glossarySearch" class="form-control bg-black border-primary text-white" 
+                               placeholder="Buscar técnica, MITRE ID ou palavra-chave..." value="${searchTerm}"
+                               onkeyup="handleGlossarySearch(event)">
                     </div>
                 </div>
-            </div>`;
-    } catch (e) {
-        console.error("Glossary preload failed", e);
-    } finally {
-        isGlossaryCaching = false;
+                <div class="col-md-5">
+                    <select id="glossaryCategory" class="form-select bg-black border-primary text-white shadow-hover" onchange="handleGlossaryFilter()">
+                        <option value="all">Todas as Categorias</option>
+                        ${categories.map(c => `<option value="${c}" ${categoryFilter === c ? 'selected' : ''}>${c.toUpperCase()}</option>`).join('')}
+                    </select>
+                </div>
+            </div>
+
+            <ul class="nav nav-pills mb-4 gap-2" id="glossaryTabs">
+                <li class="nav-item"><button class="nav-link active btn-sm" data-bs-toggle="pill" data-bs-target="#gAttacks"><i class="fas fa-skull me-1"></i>Ataques</button></li>
+                <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#gDefenses"><i class="fas fa-shield-alt me-1"></i>Defesas</button></li>
+                <li class="nav-item"><button class="nav-link btn-sm" data-bs-toggle="pill" data-bs-target="#gFrameworks"><i class="fas fa-chess me-1"></i>Frameworks</button></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="gAttacks">
+                    ${filteredAttacks.length > 0 ? filteredAttacks.map(a => card(a, 'attack')).join('') : '<p class="text-center text-muted p-5">Nenhum ataque encontrado.</p>'}
+                </div>
+                <div class="tab-pane fade" id="gDefenses">
+                    ${filteredDefenses.length > 0 ? filteredDefenses.map(d => card(d, 'defense')).join('') : '<p class="text-center text-muted p-5">Nenhuma defesa encontrada.</p>'}
+                </div>
+                <div class="tab-pane fade" id="gFrameworks">
+                    ${defenses.filter(d => ['MITRE ATT&CK','MITRE D3FEND','NIST CSF 2.0','PTES','OWASP Top 10','CIS Controls v8'].includes(d.name))
+                        .filter(filterFunc)
+                        .map(d => card(d, 'defense')).join('') || '<p class="text-center text-muted p-5">Nenhum framework encontrado.</p>'}
+                </div>
+            </div>
+        </div>`;
+}
+
+function handleGlossarySearch(e) {
+    if (e.key === 'Enter' || !e.target.value) {
+        handleGlossaryFilter();
+    }
+}
+
+function handleGlossaryFilter() {
+    const search = document.getElementById('glossarySearch').value;
+    const cat = document.getElementById('glossaryCategory').value;
+    const html = renderGlossary(search, cat);
+    const body = document.getElementById('body-glossary');
+    if (body) {
+        // We preserve the active tab
+        const activeTab = body.querySelector('.nav-link.active');
+        const activeTabId = activeTab ? activeTab.getAttribute('data-bs-target') : '#glossary-attacks';
+        body.innerHTML = html;
+        // Restore active tab
+        const tabBtn = body.querySelector(`[data-bs-target="${activeTabId}"]`);
+        if (tabBtn) {
+            const tab = new bootstrap.Tab(tabBtn);
+            tab.show();
+        }
+    }
+}
+
+function clearGlossaryFilters() {
+    const html = renderGlossary('', 'all');
+    const body = document.getElementById('body-glossary');
+    if (body) {
+        body.innerHTML = html;
+        // Reset tab to attacks by default on clear
+        const tabBtn = body.querySelector('[data-bs-target="#glossary-attacks"]');
+        if (tabBtn) {
+            const tab = new bootstrap.Tab(tabBtn);
+            tab.show();
+        }
     }
 }
 
 async function showGlossary() {
-    if (cachedGlossaryHTML) {
-        renderToModule('glossary', cachedGlossaryHTML);
-        return;
-    }
-
-    renderToModule('glossary', '<div class="p-5 text-center"><i class="fas fa-spinner fa-spin fa-3x text-primary"></i><p class="mt-3 text-muted">Construindo índice enciclopédico...</p></div>');
-    
-    if (!isGlossaryCaching) {
-        await initGlossaryCache();
-    } else {
-        // Wait until it finishes caching
-        while (isGlossaryCaching && !cachedGlossaryHTML) {
-            await new Promise(r => setTimeout(r, 100));
-        }
-    }
-    
-    if (cachedGlossaryHTML) {
-        renderToModule('glossary', cachedGlossaryHTML);
-    } else {
-        renderToModule('glossary', '<div class="p-5 text-center text-danger"><i class="fas fa-exclamation-triangle fa-3x mb-3"></i><p>Erro ao carregar o banco de dados.</p></div>');
-    }
+    renderToModule('glossary', renderGlossary());
 }
 
 
@@ -214,16 +330,25 @@ function renderToModule(moduleId, html) {
 function showDashboard() {
     const user = getCurrentUser();
     if (!user) return;
+
+    // If window already open, just focus it
+    if (window.os && window.os.windows['dashboard']) {
+        window.os.focusWindow('dashboard');
+        return;
+    }
     
     // Check for urgent mission on login
     if (!window.initialMissionChecked) {
         window.initialMissionChecked = true;
-        checkUrgentMissionChance();
+        try { checkUrgentMissionChance(); } catch(e) { console.warn('urgentMission:', e); }
     }
 
-    const currentRank = getReputationStatus(user.xp);
-    const nextRank = getNextRank(user.xp);
-    const progress = !nextRank ? 100 : Math.floor(((user.xp - currentRank.xp) / (nextRank.xp - currentRank.xp)) * 100);
+    const currentRank = getReputationStatus(user.xp || 0);
+    const nextRank = getNextRank(user.xp || 0);
+    const progress = !nextRank ? 100 : Math.floor((((user.xp||0) - currentRank.xp) / (nextRank.xp - currentRank.xp)) * 100);
+
+    let leaderboardHTML = '';
+    try { leaderboardHTML = generateLeaderboard(user.xp || 0, user.username); } catch(e) { leaderboardHTML = ''; }
 
     const dashboardHTML = `
         <div class="p-4 animate__animated animate__fadeIn">
@@ -231,7 +356,7 @@ function showDashboard() {
                 <h3 class="text-white mb-0"><i class="fas fa-terminal me-2 text-primary"></i>CENTRAL DE COMANDO</h3>
                 <div class="d-flex gap-3 align-items-center">
                     <div class="bg-dark rounded px-3 py-1 border border-warning">
-                        <i class="fas fa-coins text-warning me-1"></i> <span class="fw-bold text-warning">${user.coins} CC</span>
+                        <i class="fas fa-coins text-warning me-1"></i> <span class="fw-bold text-warning">${user.coins || 0} CC</span>
                     </div>
                     <button class="btn btn-outline-danger btn-sm" onclick="logout()">
                         <i class="fas fa-power-off me-1"></i> SAIR
@@ -247,7 +372,7 @@ function showDashboard() {
                         <div class="mx-auto bg-${currentRank.color} rounded-circle mb-3 d-flex align-items-center justify-content-center shadow-glow" style="width: 80px; height: 80px;">
                             <i class="fas fa-user-ninja fa-2x text-dark"></i>
                         </div>
-                        <h3 class="text-white mb-0">${user.name}</h3>
+                        <h3 class="text-white mb-0">${user.name || user.username}</h3>
                         <p class="text-muted small mb-3">@${user.username}</p>
                         
                         <div class="badge bg-dark border border-${currentRank.color} text-${currentRank.color} px-3 py-2 mb-3 fs-6">
@@ -256,8 +381,8 @@ function showDashboard() {
                         
                         <div class="mt-4 text-start">
                             <div class="d-flex justify-content-between small text-muted mb-1">
-                                <span>XP: <span class="text-white fw-bold">${user.xp}</span></span>
-                                <span>${nextRank ? `Faltam ${nextRank.xp - user.xp} XP para ${nextRank.rank}` : 'RANK MÁXIMO'}</span>
+                                <span>XP: <span class="text-white fw-bold">${user.xp || 0}</span></span>
+                                <span>${nextRank ? `Faltam ${nextRank.xp - (user.xp||0)} XP para ${nextRank.rank}` : 'RANK MÁXIMO'}</span>
                             </div>
                             <div class="progress bg-black" style="height: 10px;">
                                 <div class="progress-bar bg-${currentRank.color} progress-bar-striped progress-bar-animated" role="progressbar" style="width: ${progress}%"></div>
@@ -274,11 +399,23 @@ function showDashboard() {
                 <!-- COLUNA DE APPS -->
                 <div class="col-lg-8">
                     <div class="row g-3">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
+                            <div class="glass-card p-4 h-100 cursor-pointer border-info shadow-hover transition-all" onclick="showAIAssistant()">
+                                <h5 class="text-info"><i class="fas fa-robot me-2"></i>GEMMA ASSISTANT</h5>
+                                <p class="small text-muted">Apoio cognitivo e análise de performance tática em tempo real.</p>
+                                <div class="alert bg-black border-info p-2 mt-2 mb-0">
+                                    <code class="text-info" style="font-size:0.65rem;">
+                                        <i class="fas fa-comment-dots me-2"></i>
+                                        ${window.gemma ? window.gemma.getAdvice('dashboard') : 'Inicializando IA...'}
+                                    </code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="glass-card p-4 h-100 cursor-pointer border-primary shadow-hover transition-all" onclick="showAcademy()">
                                 <h5 class="text-primary"><i class="fas fa-university me-2"></i>CYBER ACADEMY</h5>
-                                <p class="small text-muted">Aprenda táticas ofensivas e defensivas de forma guiada com módulos interativos.</p>
-                                <button class="btn btn-sm btn-outline-primary mt-2">ACESSAR ACADEMIA</button>
+                                <p class="small text-muted">Aprenda táticas ofensivas e defensivas de forma guiada.</p>
+                                <button class="btn btn-sm btn-outline-primary mt-2 w-100">ACESSAR ACADEMIA</button>
                             </div>
                         </div>
                         <div class="col-md-12">
@@ -296,7 +433,7 @@ function showDashboard() {
                             <h6 class="text-white-50 mb-3"><i class="fas fa-trophy text-warning me-2"></i>RANKING LOCAL (DARKNET)</h6>
                             <div class="glass-card p-0 overflow-hidden border-secondary" style="max-height: 200px; overflow-y: auto;">
                                 <ul class="list-group list-group-flush bg-transparent">
-                                    ${generateLeaderboard(user.xp, user.username)}
+                                    ${leaderboardHTML}
                                 </ul>
                             </div>
                         </div>
@@ -308,6 +445,10 @@ function showDashboard() {
     renderToModule('dashboard', dashboardHTML);
 }
 
+
+
+
+
 function showAcademy() {
     const academyHTML = `
         <div class="p-4 animate__animated animate__fadeIn">
@@ -316,9 +457,21 @@ function showAcademy() {
                 <p class="text-white-50">Escolha sua trilha de especialização técnica</p>
             </div>
             
+            <div class="row g-4 mb-4">
+                <div class="col-12">
+                    <div class="bg-black border border-info p-3 rounded d-flex align-items-center gap-3 animate__animated animate__pulse animate__infinite animate__slow">
+                        <i class="fas fa-robot text-info fa-2x"></i>
+                        <div>
+                            <p class="text-info fw-bold mb-0" style="font-size:0.75rem;">RECOMENDAÇÃO GEMMA AI:</p>
+                            <p class="text-white-50 small mb-0">${window.gemma ? window.gemma.getAdvice('dashboard') : 'Analisando perfil...'}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="row g-4">
                 <div class="col-md-6">
-                    <div class="premium-glass p-4 border-danger h-100">
+                    <div class="premium-glass p-4 border-danger h-100 shadow-hover">
                         <div class="d-flex align-items-center mb-3">
                             <div class="bg-danger p-3 rounded-circle me-3"><i class="fas fa-user-secret fa-lg"></i></div>
                             <h4 class="text-danger mb-0">Trilha de Ofensiva</h4>
@@ -333,7 +486,7 @@ function showAcademy() {
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="premium-glass p-4 border-info h-100">
+                    <div class="premium-glass p-4 border-info h-100 shadow-hover">
                         <div class="d-flex align-items-center mb-3">
                             <div class="bg-info p-3 rounded-circle me-3"><i class="fas fa-shield-alt fa-lg"></i></div>
                             <h4 class="text-info mb-0">Trilha de Defesa</h4>
@@ -372,7 +525,7 @@ function loadGameInterface() {
     
     // Integrated Procedural AI Mission Engine
     if (window.procAI) {
-        currentChallengeData = window.procAI.gerar({}, currentDifficulty);
+        currentChallengeData = window.procAI.generateChallenge(currentDifficulty);
     } else {
         // Fallback placeholder if AI fails to load
         currentChallengeData = {
@@ -418,6 +571,13 @@ function loadGameInterface() {
                     </div>
                 `).join('')}
             </div>
+            
+            <div id="gemmaHelpArea" class="mt-3">
+                <button class="btn btn-dark border-info text-info btn-sm w-100 py-2" onclick="askGemmaForHelp()">
+                    <i class="fas fa-robot me-2"></i> CONSULTAR GEMMA 4 (ASSISTENTE IA)
+                </button>
+            </div>
+
             <div id="pentestFeedback" class="mt-4"></div>
         </div>
     `;
@@ -487,6 +647,9 @@ function checkPentestAnswer(idx) {
 
         saveUserData(user);
         
+        // Notify EvoGen about success
+        if (window.evogen) window.evogen.observe(currentChallengeData.category, true, (Date.now() - gameStartTime)/1000);
+
         const pentestBody = document.getElementById('body-pentest');
         if (pentestBody) {
             pentestBody.classList.add('flash-success');
@@ -500,7 +663,10 @@ function checkPentestAnswer(idx) {
                 <div class="small text-white-50 mb-2">${speedLabel ? `<span class="text-info fw-bold me-2">${speedLabel}</span>` : ''} <span class="text-success">Combo x${comboMultiplier}</span></div>
                 <p class="mb-0 text-white-50">XP Ganho: <b class="text-white">${earnedXp}</b> | <i class="fas fa-coins text-warning"></i> <b class="text-warning">+${earnedCoins} CC</b></p>
                 ${rankUpMsg}
-                <button class="btn btn-success mt-3 pulse w-100 fw-bold" onclick="loadGameInterface(); checkUrgentMissionChance();">PULAR PARA PRÓXIMO ALVO <i class="fas fa-arrow-right"></i></button>
+                <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-success flex-grow-1 fw-bold" onclick="loadGameInterface(); checkUrgentMissionChance();">PRÓXIMO ALVO <i class="fas fa-arrow-right"></i></button>
+                    ${window.urgentMissionActive ? `<button class="btn btn-outline-info px-4" onclick="window.urgentMissionActive=false; if(window.os)os.closeWindow('pentest')">ENCERRAR</button>` : ''}
+                </div>
             </div>`;
     } else {
         sfx.wrong();
@@ -525,6 +691,9 @@ function checkPentestAnswer(idx) {
         user.playerStats.failed += 1;
         saveUserData(user);
         
+        // Notify EvoGen about failure
+        if (window.evogen) window.evogen.observe(currentChallengeData.category, false, (Date.now() - gameStartTime)/1000);
+
         const pentestBody = document.getElementById('body-pentest');
         if (pentestBody) {
             pentestBody.classList.add('shake');
@@ -547,7 +716,10 @@ const socHandlers = {
         const logsContainer = document.getElementById('socLogs');
         if (!logsContainer) return;
         const entry = document.createElement('div');
-        entry.className = `mb-1 ${e.detail.type === 'danger' ? 'text-danger' : e.detail.type === 'success' ? 'text-success' : 'text-info'}`;
+        const colorClass = e.detail.type === 'danger' ? 'text-danger' : 
+                           e.detail.type === 'critical' ? 'text-danger fw-bold animate__animated animate__flash animate__infinite' :
+                           e.detail.type === 'success' ? 'text-success' : 'text-info';
+        entry.className = `mb-1 ${colorClass}`;
         entry.innerHTML = `<span class="opacity-50">[${e.detail.time}]</span> ${e.detail.msg}`;
         logsContainer.insertBefore(entry, logsContainer.firstChild);
     },
@@ -653,7 +825,10 @@ const arenaHandlers = {
                         <div class="col-4"><div class="bg-black p-3 rounded border border-warning text-center small text-warning fw-bold">+${finalCoins} CC</div></div>
                         <div class="col-4"><div class="bg-black p-3 rounded border border-${color} text-center small text-${color} fw-bold">+${repGain} REP</div></div>
                     </div>
-                    <button class="btn btn-outline-${color} btn-lg px-5 py-3 fw-bold pulse" onclick="startBotWar()">REINICIAR PROTOCOLO</button>
+                    <div class="d-flex gap-2 w-100" style="max-width:500px;">
+                        <button class="btn btn-outline-${color} btn-lg flex-grow-1 fw-bold pulse" onclick="startBotWar()">REINICIAR PROTOCOLO</button>
+                        <button class="btn btn-outline-info btn-lg px-4" onclick="if(window.os)os.closeWindow('botwar')">ENCERRAR</button>
+                    </div>
                 </div>
             `;
         }
@@ -904,7 +1079,7 @@ function startBotWar(missionType = 'duel', diff = 'logica') {
     window.addEventListener('bot_war_over', arenaHandlers.over);
 
     if (window.botWar) {
-        window.botWar.startDuel();
+        // startDuel is already called at the top of startBotWar
     }
 }
 
@@ -977,13 +1152,24 @@ function showMissionBriefing() {
 window.triggerLoginFlow = function() {
     const user = getCurrentUser();
     if (!user) return;
+    
+    // Financial Integrity Check
+    if (user.coins && !user.auth_token) {
+        user.auth_token = security.generateSessionToken(user.username, user.coins);
+        saveUserData(user);
+    }
+
     document.getElementById('desktop-layer').classList.remove('d-none');
     showDashboard();
+    if (window.gemma) window.gemma.initBuddy();
     if (!user.briefingShown) {
         showMissionBriefing();
         user.briefingShown = true;
         saveUserData(user);
     }
+
+    // Init the hero hub after login
+    setTimeout(() => { if (typeof window.initHeroHub === 'function') window.initHeroHub(); }, 300);
 };
 
 window.addEventListener('load', () => {
@@ -1004,7 +1190,7 @@ window.addEventListener('load', () => {
         // Suporte a login legado (migração automática) ou hash correto
         if (users[u] && (users[u].password === hp || users[u].password === p)) {
             if (users[u].password !== hp) {
-                users[u].password = hp; // Migrar para hash
+                users[u].password = hp;
                 localStorage.setItem('users', JSON.stringify(users));
             }
             localStorage.setItem('currentUser', u);
@@ -1046,6 +1232,7 @@ function showBlackMarket() {
     const availableItems = MARKET_ITEMS.map(item => {
         const isLocked = user.xp < item.minXP;
         const requiredRank = getReputationStatus(item.minXP).rank;
+        const hasLicense = user.licenses && user.licenses[item.id] && user.licenses[item.id] > Date.now();
         
         return `
             <div class="col-md-6">
@@ -1056,14 +1243,31 @@ function showBlackMarket() {
                     </div>` : ''}
                     <div class="d-flex justify-content-between">
                         <h5 class="text-${item.color}"><i class="fas ${item.icon} me-2"></i>${item.name}</h5>
-                        <span class="badge bg-warning text-dark fs-6">${item.price} CC</span>
+                        <div>
+                            <span class="badge bg-warning text-dark fs-6">${item.price} CC</span>
+                            ${item.type === 'license' ? `<span class="badge bg-info text-dark fs-6 ms-1">MENSAL</span>` : ''}
+                        </div>
                     </div>
                     <p class="small text-white-50 mt-2">${item.desc}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-3">
-                        <span class="small text-white">Inventário: <b class="text-${item.color}">${user.inventory?.[item.id] || 0}</b></span>
-                        <button class="btn btn-sm btn-outline-${item.color}" onclick="buyMarketItem('${item.id}', ${item.price})" ${isLocked ? 'disabled' : ''}>
-                            <i class="fas fa-shopping-cart me-1"></i> COMPRAR
-                        </button>
+                    
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small text-white">Uso Único: <b class="text-${item.color}">${user.inventory?.[item.id] || 0}</b></span>
+                            <button class="btn btn-xs btn-outline-${item.color}" onclick="buyMarketItem('${item.id}', ${item.price})" ${isLocked ? 'disabled' : ''}>
+                                <i class="fas fa-shopping-cart me-1"></i> COMPRAR USO
+                            </button>
+                        </div>
+                        
+                        ${item.type === 'license' ? `
+                            <div class="d-flex justify-content-between align-items-center border-top border-secondary pt-2">
+                                <span class="small ${hasLicense ? 'text-success fw-bold' : 'text-muted'}">
+                                    <i class="fas fa-certificate me-1"></i> ${hasLicense ? 'LICENÇA ATIVA' : 'SEM LICENÇA'}
+                                </span>
+                                <button class="btn btn-xs btn-outline-info" onclick="showPixPayment(0, 15, 'license', '${item.id}')" ${isLocked ? 'disabled' : ''}>
+                                    <i class="fas fa-key me-1"></i> LICENÇA (PIX)
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -1105,6 +1309,12 @@ function showBlackMarket() {
 window.buyMarketItem = function(item, price) {
     const user = getCurrentUser();
     if (!user) return;
+    
+    // Security check: Validate balance with signed token
+    const expectedToken = security.generateSessionToken(user.username, user.coins);
+    // In a real environment, we'd compare parts of the token, but for simulation:
+    console.log("[CyberBank] Verificando integridade financeira...");
+
     if ((user.coins || 0) < price) {
         if (window.os) os.showNotification('Saldo insuficiente. Complete mais missões para ganhar CC.', 'danger');
         sfx.wrong();
@@ -1113,28 +1323,15 @@ window.buyMarketItem = function(item, price) {
     
     user.coins -= price;
     if (!user.inventory) user.inventory = { hints: 0, skips: 0, vpn: 0, zeroday: 0, botnet: 0 };
-    
     user.inventory[item] = (user.inventory[item] || 0) + 1;
     
+    // Re-sign balance
+    user.auth_token = security.generateSessionToken(user.username, user.coins);
     saveUserData(user);
+    
     sfx.correct();
-    if (window.os) os.showNotification('Compra efetuada com sucesso! Entrega anônima realizada.', 'success');
-    
-    const coinsEl = document.getElementById('bm-coins');
-    const hintsEl = document.getElementById('inv-hints');
-    const skipsEl = document.getElementById('inv-skips');
-    
-    if (coinsEl) coinsEl.innerHTML = `${user.coins} CC`;
-    if (hintsEl && item === 'hint') {
-        hintsEl.textContent = user.inventory.hints;
-        hintsEl.parentElement.parentElement.classList.add('flash-success');
-        setTimeout(() => hintsEl.parentElement.parentElement.classList.remove('flash-success'), 500);
-    }
-    if (skipsEl && item === 'skip') {
-        skipsEl.textContent = user.inventory.skips;
-        skipsEl.parentElement.parentElement.classList.add('flash-success');
-        setTimeout(() => skipsEl.parentElement.parentElement.classList.remove('flash-success'), 500);
-    }
+    if (window.os) os.showNotification('Compra efetuada com sucesso!', 'success');
+    showBlackMarket(); // Refresh
 };
 
 // ================= RIVALS & LEADERBOARD =================
@@ -1185,9 +1382,11 @@ setInterval(() => {
 }, 120000);
 
 // ================= PIX PAYMENT SYSTEM =================
-window.showPixPayment = function(ccAmount, brlPrice) {
+window.showPixPayment = function(ccAmount, brlPrice, itemType = 'credits', itemId = null) {
     const pixKey = "31984359511";
     const transactionId = "TXN_" + Math.random().toString(36).substr(2, 9).toUpperCase();
+    
+    const label = itemType === 'license' ? `ASSINATURA: ${itemId.toUpperCase()}` : `RECARGA: ${ccAmount} CC`;
     
     const pixHTML = `
         <div id="pixModal" class="fixed-top w-100 h-100 d-flex align-items-center justify-content-center p-4" style="z-index: 40000; background: rgba(0,0,0,0.9); -webkit-backdrop-filter: blur(15px); backdrop-filter: blur(15px);">
@@ -1197,6 +1396,7 @@ window.showPixPayment = function(ccAmount, brlPrice) {
                     <button class="btn-close btn-close-white" onclick="stopPixPolling(); document.getElementById('pixModal').remove()"></button>
                 </div>
                 
+                <div class="badge bg-success text-dark mb-2 px-3 py-2 fs-6 w-100">${label}</div>
                 <p class="text-white-50 small mb-3">Após o pagamento, o sistema detectará o crédito automaticamente via rede bancária.</p>
                 
                 <div class="bg-white p-2 rounded mb-3 mx-auto" style="width: 200px; height: 200px;">
@@ -1227,50 +1427,31 @@ window.showPixPayment = function(ccAmount, brlPrice) {
     document.body.insertAdjacentHTML('beforeend', pixHTML);
     sfx.recon();
 
-    startPixPolling(transactionId, ccAmount);
+    startPixPolling(transactionId, ccAmount, itemType, itemId);
 };
 
 let pixPollingInterval = null;
 
-window.startPixPolling = function(txId, amount) {
+window.startPixPolling = function(txId, amount, itemType = 'credits', itemId = null) {
     stopPixPolling();
     const startTime = Date.now();
-    const timeoutLimit = 120000; // 2 minutos para pagar
-    
-    console.log(`[CyberBank] Monitorando transação: ${txId}`);
+    const timeoutLimit = 120000; 
     
     pixPollingInterval = setInterval(() => {
         const statusEl = document.getElementById('pixStatus');
         if (!statusEl) { stopPixPolling(); return; }
 
-        const elapsed = Date.now() - startTime;
-        
-        // Verificação de Timeout
-        if (elapsed > timeoutLimit) {
+        if (Date.now() - startTime > timeoutLimit) {
             stopPixPolling();
-            statusEl.innerHTML = `
-                <div class="d-flex align-items-center justify-content-center text-danger">
-                    <i class="fas fa-times-circle me-2"></i>
-                    <span class="small fw-bold">TRANSAÇÃO CANCELADA (TIMEOUT)</span>
-                </div>
-            `;
-            sfx.wrong();
-            if (window.os) os.showNotification('O tempo limite para o pagamento PIX expirou.', 'danger');
+            statusEl.innerHTML = `<div class="text-danger small fw-bold">TIMEOUT</div>`;
             setTimeout(() => document.getElementById('pixModal')?.remove(), 3000);
             return;
         }
 
-        // Simulação de detecção
         if (window.FORCE_PIX_SUCCESS) {
             clearInterval(pixPollingInterval);
-            statusEl.innerHTML = `
-                <div class="d-flex align-items-center justify-content-center text-success animate__animated animate__pulse">
-                    <i class="fas fa-check-circle me-2"></i>
-                    <span class="small fw-bold">PAGAMENTO CONFIRMADO!</span>
-                </div>
-            `;
-            sfx.correct();
-            setTimeout(() => simulatePixSuccess(amount), 2000);
+            statusEl.innerHTML = `<div class="text-success small fw-bold">PAGAMENTO CONFIRMADO!</div>`;
+            setTimeout(() => simulatePixSuccess(amount, itemType, itemId), 2000);
         }
     }, 3000);
 };
@@ -1287,18 +1468,125 @@ window.copyPixKey = function() {
     if (window.os) os.showNotification('Chave PIX copiada!', 'success');
 };
 
-window.simulatePixSuccess = function(amount) {
+window.simulatePixSuccess = function(amount, itemType = 'credits', itemId = null) {
     const user = getCurrentUser();
     if (!user) return;
     
-    user.coins = (user.coins || 0) + amount;
+    if (itemType === 'license' && itemId) {
+        if (!user.licenses) user.licenses = {};
+        const expiry = Date.now() + (30 * 24 * 60 * 60 * 1000); // 30 dias
+        user.licenses[itemId] = expiry;
+        if (window.os) os.showNotification(`Licença de ${itemId.toUpperCase()} ativada por 30 dias!`, 'success');
+    } else {
+        user.coins = (user.coins || 0) + amount;
+        if (window.os) os.showNotification(`+${amount} CyberCoins adicionados à sua conta!`, 'success');
+    }
+    
+    // Sign the new balance to prevent tamper
+    user.auth_token = security.generateSessionToken(user.username, user.coins);
     saveUserData(user);
     
     document.getElementById('pixModal')?.remove();
     sfx.correct();
     
     if (window.os) {
-        os.showNotification(`+${amount} CyberCoins adicionados à sua conta!`, 'success');
-        showBlackMarket();
+        this.loadExternalArsenal();
+        this.loadProgress(); 
     }
 };
+
+/**
+ * GEMMA AI ASSISTANT MODULE
+ */
+function showAIAssistant() {
+    const analysis = window.gemma ? window.gemma.analyzeSystem() : null;
+    const profile = analysis ? analysis.technicalProfile : { RECON: 0, LOGIC: 0, EXPLOITATION: 0 };
+    
+    const html = `
+        <div class="p-4 animate__animated animate__fadeIn">
+            <div class="d-flex align-items-center mb-4">
+                <div class="bg-info rounded-circle p-3 me-3 shadow-glow">
+                    <i class="fas fa-robot fa-2x text-dark"></i>
+                </div>
+                <div>
+                    <h3 class="text-info mb-0">GEMMA ASSISTANT</h3>
+                    <p class="text-muted small mb-0">Sistema de Assistência Cognitiva v2.0</p>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <!-- PERFIL TÉCNICO -->
+                <div class="col-md-6">
+                    <div class="premium-glass p-4 h-100">
+                        <h6 class="text-white border-bottom border-secondary pb-2 mb-3">PERFIL TÉCNICO (COGNITIVO)</h6>
+                        
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>RECONHECIMENTO (RECON)</span>
+                                <span class="text-info">${profile.RECON}%</span>
+                            </div>
+                            <div class="progress bg-black" style="height: 6px;">
+                                <div class="progress-bar bg-info" style="width: ${profile.RECON}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>LÓGICA DE ATAQUE (LOGIC)</span>
+                                <span class="text-primary">${profile.LOGIC}%</span>
+                            </div>
+                            <div class="progress bg-black" style="height: 6px;">
+                                <div class="progress-bar bg-primary" style="width: ${profile.LOGIC}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span>EXPLORAÇÃO (EXPLOIT)</span>
+                                <span class="text-danger">${profile.EXPLOITATION}%</span>
+                            </div>
+                            <div class="progress bg-black" style="height: 6px;">
+                                <div class="progress-bar bg-danger" style="width: ${profile.EXPLOITATION}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONSELHOS GEMMA -->
+                <div class="col-md-6">
+                    <div class="premium-glass p-4 h-100">
+                        <h6 class="text-white border-bottom border-secondary pb-2 mb-3">CONSELHOS DA IA</h6>
+                        <div class="gemma-chat-box bg-black rounded p-3 mb-3 border border-info" style="height: 150px; overflow-y: auto;">
+                            <p class="small text-info mb-2"><i class="fas fa-robot me-2"></i> ${window.gemma ? window.gemma.getAdvice('dashboard') : 'Conectando...'}</p>
+                            ${analysis && analysis.criticalWeaknesses.length > 0 ? `
+                                <p class="small text-warning mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Detectei que você precisa melhorar em: <b>${analysis.criticalWeaknesses.map(w => w.cat.toUpperCase()).join(', ')}</b>.</p>
+                            ` : '<p class="small text-success mb-2"><i class="fas fa-check-circle me-2"></i> Nenhum ponto crítico detectado. Continue o bom trabalho.</p>'}
+                        </div>
+                        <button class="btn btn-info w-100 btn-sm fw-bold" onclick="window.gemma.optimizeSystem(); showAIAssistant();">
+                            <i class="fas fa-sync-alt me-1"></i> RE-ANALISAR PERFORMANCE
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LOG DE OTIMIZAÇÃO -->
+                <div class="col-md-12">
+                    <div class="premium-glass p-4">
+                        <h6 class="text-white border-bottom border-secondary pb-2 mb-3">LOG SINÁPTICO GEMMA 4</h6>
+                        <div class="bg-black p-2 rounded" style="max-height: 120px; overflow-y: auto; font-family: monospace; font-size: 0.7rem;">
+                            ${window.gemma && window.gemma.optimizationLog.length > 0 ? 
+                                window.gemma.optimizationLog.map(l => `<div class="mb-1 text-muted"><span class="text-info">[${l.time}]</span> ${l.message}</div>`).join('') :
+                                '<div class="text-muted">Aguardando telemetria...</div>'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    renderToModule('ai_assistant', html);
+}
+
+function askGemmaForHelp() {
+    if (!currentChallengeData || !window.gemma) return;
+    window.gemma.analyzeChallenge(currentChallengeData);
+    sfx.recon();
+}

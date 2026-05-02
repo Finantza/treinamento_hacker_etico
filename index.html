@@ -9,62 +9,19 @@
     <link rel="stylesheet" href="css/all.min.css">
     <link rel="stylesheet" href="css/animate.min.css">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        :root { --neon-cyan: 180, 100%, 50%; --void-bg: #050505; --border-glass: rgba(0, 255, 255, 0.2); }
-        body { background-color: var(--void-bg); color: white; overflow: hidden; font-family: 'Segoe UI', Roboto, sans-serif; height: 100vh; }
-        .cyber-grid { position: fixed; inset: 0; background: linear-gradient(rgba(0,255,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px); background-size: 50px 50px; z-index: -1; pointer-events: none; }
-        
-        /* Responsive Window System */
-        .window { position: absolute; width: 85vw; height: 80vh; max-width: 1200px; background: rgba(5, 5, 15, 0.9); border: 1px solid rgba(0, 255, 255, 0.15); border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(0,255,255,0.05); display: flex; flex-direction: column; -webkit-backdrop-filter: blur(25px); backdrop-filter: blur(25px); z-index: 100; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s; pointer-events: auto; overflow: hidden; }
-        
-        @media (max-width: 768px) {
-            .window { width: 98vw !important; height: 85vh !important; top: 45% !important; border-radius: 0; }
-            .desktop-icons { grid-template-columns: repeat(2, 1fr); top: 20px; left: 10px; right: 10px; width: auto; }
-            .task-item { padding: 5px 8px; font-size: 0.65rem; margin-right: 5px; }
-            .taskbar-time { display: none; }
-        }
-
-        .window-header { padding: 12px 18px; background: linear-gradient(90deg, rgba(255,255,255,0.08), transparent); border-bottom: 1px solid rgba(255,255,255,0.1); cursor: move; display: flex; justify-content: space-between; align-items: center; }
-        .window-body { flex-grow: 1; overflow: auto; padding: 0; position: relative; }
-        .window-controls span { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-left: 8px; cursor: pointer; }
-        
-        /* Taskbar */
-        .cyber-taskbar { position: fixed; bottom: 0; left: 0; right: 0; height: 50px; background: rgba(0,0,0,0.8); border-top: 1px solid rgba(0,255,255,0.2); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); z-index: 20000; display: flex; align-items: center; padding: 0 15px; }
-        .task-item { padding: 5px 15px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; margin-right: 10px; cursor: pointer; font-size: 0.8rem; font-weight: bold; color: #0ff; transition: 0.2s; }
-        .task-item.active { background: rgba(0,255,255,0.1); border-color: #0ff; box-shadow: 0 0 10px rgba(0,255,255,0.3); }
-        
-        /* Notifications */
-        .notification-container { position: fixed; top: 20px; right: 20px; z-index: 30000; pointer-events: none; }
-        .notification-toast { background: rgba(10,10,10,0.95); border-left: 4px solid var(--neon-cyan); color: white; padding: 15px 25px; margin-bottom: 10px; border-radius: 4px; box-shadow: 0 5px 25px rgba(0,0,0,0.6); pointer-events: auto; min-width: 250px; }
-        
-        /* Desktop */
-        .desktop-icons { position: absolute; top: 30px; left: 30px; display: grid; grid-template-rows: repeat(auto-fill, 100px); gap: 20px; }
-        .desktop-icon { width: 80px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .desktop-icon:hover { transform: scale(1.1); filter: drop-shadow(0 0 10px #0ff); }
-        .icon-box { width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .icon-box.bg-gradient-toolkit { background: linear-gradient(135deg, #6f42c1, #e83e8c); }
-        
-        #window-container { position: absolute; inset: 0; pointer-events: none; }
-        
-        /* Splash Screen */
-        .splash-overlay { position: fixed; inset: 0; background: var(--void-bg); z-index: 99999; display: flex; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .loading-hidden { opacity: 0; pointer-events: none; }
-        .glass { background: rgba(20, 20, 20, 0.8); border: 1px solid rgba(0, 255, 255, 0.2); box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); border-radius: 8px; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
-        .shadow-glow { box-shadow: 0 0 20px rgba(0, 255, 255, 0.15); }
-    </style>
 </head>
 <body>
     <div class="cyber-grid"></div>
 
     <!-- CINEMATIC SPLASH -->
     <div id="splash-intro" class="splash-overlay d-flex flex-column align-items-center justify-content-center">
-        <div class="terminal-loader glass p-4" style="max-width: 600px; width: 90%;">
+        <div class="terminal-loader glass p-4 terminal-loader-container">
             <div id="splash-terminal" class="font-monospace text-primary small"></div>
-            <div class="progress mt-4" style="height: 4px; background: rgba(255,255,255,0.1);">
-                <div id="splash-progress" class="progress-bar bg-info" style="width: 0%"></div>
+            <div class="progress mt-4 splash-progress-track">
+                <div id="splash-progress" class="progress-bar bg-info splash-progress-bar"></div>
             </div>
             <div class="text-center mt-3">
-                <button class="btn btn-link btn-sm text-muted text-decoration-none" onclick="os.hideSplash()" style="font-size: 0.7rem; opacity: 0.5;">[ PULAR INICIALIZAÇÃO ]</button>
+                <button class="btn btn-link btn-sm text-muted text-decoration-none skip-init-btn" onclick="os.hideSplash()">[ PULAR INICIALIZAÇÃO ]</button>
             </div>
         </div>
     </div>
@@ -72,7 +29,7 @@
     <!-- AUTH LAYER -->
     <div id="auth-layer" class="animate__animated animate__fadeIn d-none">
         <div class="container d-flex align-items-center justify-content-center min-vh-100">
-            <div class="glass-card p-5 rounded-4 shadow-glow" style="max-width: 450px; width: 100%;">
+            <div class="glass-card p-5 rounded-4 shadow-glow auth-card-container">
                 <div class="text-center mb-5">
                     <h1 class="cyber-title fs-2 mb-2">ETHICAL HACKER</h1>
                     <div class="badge bg-primary px-3 py-1">PREMIUM OS v5.2</div>
@@ -119,36 +76,99 @@
 
     <!-- DESKTOP LAYER -->
     <div id="desktop-layer" class="d-none animate__animated animate__fadeIn">
-        <div class="desktop-icons">
-            <div class="desktop-icon" onclick="showDashboard()">
-                <div class="icon-box bg-primary"><i class="fas fa-id-card fs-3"></i></div>
-                <span class="small fw-bold">PERFIL</span>
+        <!-- Desktop icons removed to keep workspace clean (Available in Start Menu) -->
+        
+        <!-- HERO GAME HUB -->
+        <div id="hero-hub" class="hero-hub">
+            <!-- Particle canvas -->
+            <canvas id="hero-particles" class="hero-canvas"></canvas>
+
+            <!-- Left column: taglines + stats -->
+            <div class="hero-left">
+                <div class="hero-tag">🎮 SIMULADOR DE HACKING ÉTICO</div>
+                <h1 class="hero-title">
+                    SEJA UM<br>
+                    <span class="hero-accent" id="hero-rotating-word">HACKER.</span>
+                </h1>
+                <p class="hero-desc">
+                    Treine técnicas reais de ataque e defesa num ambiente<br>
+                    gamificado baseado no framework <strong>MITRE ATT&CK</strong>.
+                </p>
+
+                <div class="hero-stats">
+                    <div class="stat-box">
+                        <div class="stat-num" data-target="18">0</div>
+                        <div class="stat-label">Vetores de Ataque</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" data-target="12">0</div>
+                        <div class="stat-label">Defesas Ativas</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-num" data-target="7">0</div>
+                        <div class="stat-label">Níveis de Rank</div>
+                    </div>
+                </div>
+
+                <div class="hero-badges">
+                    <span class="hero-badge b-red">PENTEST</span>
+                    <span class="hero-badge b-cyan">SOC DEFENSE</span>
+                    <span class="hero-badge b-pink">BOT WAR</span>
+                    <span class="hero-badge b-green">CYBER ACADEMY</span>
+                </div>
+
+                <button class="hero-cta" onclick="showDashboard()">
+                    <i class="fas fa-terminal me-2"></i>INICIAR MISSÃO
+                    <div class="cta-ripple"></div>
+                </button>
             </div>
-            <div class="desktop-icon" onclick="startGame('logica')">
-                <div class="icon-box bg-danger"><i class="fas fa-bug fs-3"></i></div>
-                <span class="small fw-bold">PENTEST</span>
-            </div>
-            <div class="desktop-icon" onclick="startDefenseMode()">
-                <div class="icon-box bg-info"><i class="fas fa-shield-alt fs-3"></i></div>
-                <span class="small fw-bold">SOC</span>
-            </div>
-            <div class="desktop-icon" onclick="startBotWar()">
-                <div class="icon-box bg-warning"><i class="fas fa-bolt fs-3"></i></div>
-                <span class="small fw-bold">ARENA</span>
-            </div>
-            <div class="desktop-icon" onclick="showGlossary()">
-                <div class="icon-box bg-success"><i class="fas fa-book fs-3"></i></div>
-                <span class="small fw-bold">GLOSSÁRIO</span>
-            </div>
-            <div class="desktop-icon" onclick="showToolkit()">
-                <div class="icon-box bg-gradient-toolkit"><i class="fas fa-toolbox fs-3"></i></div>
-                <span class="small fw-bold">TOOLKIT</span>
+
+            <!-- Right column: the shield -->
+            <div class="hero-right">
+                <div class="hero-shield-wrap">
+                    <!-- Orbiting tags -->
+                    <div class="orbit-tag ot1"><i class="fas fa-bug"></i> XSS</div>
+                    <div class="orbit-tag ot2"><i class="fas fa-database"></i> SQLi</div>
+                    <div class="orbit-tag ot3"><i class="fas fa-wifi"></i> MITM</div>
+                    <div class="orbit-tag ot4"><i class="fas fa-skull-crossbones"></i> RCE</div>
+                    <div class="orbit-tag ot5"><i class="fas fa-lock"></i> 0DAY</div>
+                    <div class="orbit-tag ot6"><i class="fas fa-robot"></i> AI</div>
+
+                    <!-- Rings -->
+                    <div class="h-ring h-ring-1"></div>
+                    <div class="h-ring h-ring-2"></div>
+                    <div class="h-ring h-ring-3"></div>
+
+                    <!-- Shield icon -->
+                    <div class="hero-shield-icon">
+                        <i class="fas fa-shield-halved"></i>
+                        <div class="shield-scanline"></div>
+                    </div>
+                    <div class="shield-glow-burst"></div>
+                </div>
             </div>
         </div>
 
         <div id="window-container"></div>
 
         <div class="cyber-taskbar">
+            <button class="btn btn-primary btn-sm mx-2" onclick="os.toggleStartMenu()" id="start-btn">
+                <i class="fas fa-th-large me-1"></i> START
+            </button>
+            <div id="start-menu" class="premium-glass p-3 d-none">
+                <div class="small text-muted mb-2 border-bottom border-secondary pb-1">SISTEMA</div>
+                <div class="start-menu-item" onclick="showDashboard(); os.toggleStartMenu()"><i class="fas fa-id-card me-2 text-primary"></i> PERFIL</div>
+                <div class="start-menu-item" onclick="startGame('logica'); os.toggleStartMenu()"><i class="fas fa-bug me-2 text-danger"></i> PENTEST</div>
+                <div class="start-menu-item" onclick="startDefenseMode(); os.toggleStartMenu()"><i class="fas fa-shield-alt me-2 text-info"></i> SOC</div>
+                <div class="start-menu-item" onclick="startBotWar(); os.toggleStartMenu()"><i class="fas fa-bolt me-2 text-warning"></i> ARENA</div>
+                <div class="start-menu-item" onclick="showGlossary(); os.toggleStartMenu()"><i class="fas fa-book me-2 text-success"></i> GLOSSÁRIO</div>
+                <div class="start-menu-item" onclick="showAIAssistant(); os.toggleStartMenu()"><i class="fas fa-robot me-2 text-info"></i> GEMMA AI</div>
+                <div class="start-menu-item" onclick="showToolkit(); os.toggleStartMenu()"><i class="fas fa-toolbox me-2 text-primary"></i> TOOLKIT</div>
+                <div class="start-menu-item" onclick="showBlackMarket(); os.toggleStartMenu()"><i class="fas fa-shopping-cart me-2 text-danger"></i> MERCADO</div>
+                <div class="mt-3 border-top border-secondary pt-2">
+                    <div class="start-menu-item text-danger" onclick="logout()"><i class="fas fa-power-off me-2"></i> SAIR</div>
+                </div>
+            </div>
             <div id="taskbar-items" class="d-flex align-items-center flex-grow-1"></div>
             <div class="taskbar-actions me-3">
                 <button class="btn btn-outline-danger btn-sm px-3" onclick="logout()" title="Encerrar Sessão">
@@ -159,6 +179,18 @@
                 <div id="os-clock" class="fw-bold">00:00</div>
                 <div id="os-date" class="small text-muted">22 APR</div>
             </div>
+        </div>
+    </div>
+    
+    <!-- GEMMA FLOATING ASSISTANT -->
+    <div id="gemma-buddy" class="d-none">
+        <div id="gemma-bubble" class="gemma-bubble">
+            <div id="gemma-bubble-content"></div>
+        </div>
+        <div class="gemma-avatar" onclick="toggleGemmaBubble()">
+            <i class="fas fa-robot"></i>
+            <div class="gemma-pulse"></div>
+            <div class="gemma-status-ring"></div>
         </div>
     </div>
 
@@ -174,7 +206,16 @@
                 this.updateClock(); // Call immediately
                 this.initIntro();
                 this.createNotificationContainer();
-                setInterval(() => this.updateClock(), 1000); // Check every second for better precision, or 60000
+                setInterval(() => this.updateClock(), 1000); 
+                
+                // Close start menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    const menu = document.getElementById('start-menu');
+                    const btn = document.getElementById('start-btn');
+                    if (menu && !menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                        menu.classList.add('d-none');
+                    }
+                });
             },
 
             updateClock() {
@@ -311,6 +352,8 @@
                     else if (id === 'soc') startDefenseMode();
                     else if (id === 'botwar') startBotWar();
                     else if (id === 'glossary') showGlossary();
+                    else if (id === 'ai_assistant') showAIAssistant();
+                    else if (id === 'toolkit') showToolkit();
                     else if (id === 'blackmarket') { if (typeof showBlackMarket === 'function') showBlackMarket(); }
                     return;
                 }
@@ -343,6 +386,19 @@
                         el.style.top = (el.offsetTop - y) + "px"; el.style.left = (el.offsetLeft - x) + "px";
                     };
                 };
+            },
+            
+            copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    this.showNotification('Copiado para a área de transferência!', 'success');
+                }).catch(err => {
+                    console.error('Erro ao copiar: ', err);
+                });
+            },
+
+            toggleStartMenu() {
+                const menu = document.getElementById('start-menu');
+                if (menu) menu.classList.toggle('d-none');
             }
         };
         window.os = os;
@@ -362,6 +418,84 @@
 
     <script>
         window.addEventListener('load', () => os.init());
+
+        // ── HERO HUB ENGINE ──────────────────────────────────────────
+        function initHeroHub() {
+            const hub = document.getElementById('hero-hub');
+            if (!hub) return;
+
+            // Show/hide based on open windows
+            function syncHeroVisibility() {
+                const hasWindows = document.querySelector('#window-container .window');
+                hub.classList.toggle('visible', !hasWindows);
+            }
+            const winObs = new MutationObserver(syncHeroVisibility);
+            const wc = document.getElementById('window-container');
+            if (wc) winObs.observe(wc, { childList: true, subtree: false });
+            syncHeroVisibility();
+
+            // Stat counters
+            document.querySelectorAll('.stat-num').forEach(el => {
+                const target = parseInt(el.dataset.target);
+                let current = 0;
+                const step = Math.max(1, Math.floor(target / 30));
+                const timer = setInterval(() => {
+                    current = Math.min(current + step, target);
+                    el.textContent = current;
+                    if (current >= target) clearInterval(timer);
+                }, 50);
+            });
+
+            // Rotating word
+            const words = ['HACKER.', 'DEFENSOR.', 'ANALISTA.', 'PENTESTER.'];
+            let wi = 0;
+            const wordEl = document.getElementById('hero-rotating-word');
+            if (wordEl) {
+                setInterval(() => {
+                    wi = (wi + 1) % words.length;
+                    wordEl.style.opacity = '0';
+                    setTimeout(() => { wordEl.textContent = words[wi]; wordEl.style.opacity = '1'; }, 300);
+                }, 2200);
+                wordEl.style.transition = 'opacity 0.3s ease';
+            }
+
+            // Particle canvas
+            const canvas = document.getElementById('hero-particles');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const particles = Array.from({ length: 60 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                r: Math.random() * 1.5 + 0.5,
+                a: Math.random()
+            }));
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0,255,255,${p.a * 0.4})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(drawParticles);
+            }
+            drawParticles();
+        }
+
+        // Expose hero hub init — called by offline.js after login completes
+        window.initHeroHub = initHeroHub;
     </script>
 </body>
 </html>
