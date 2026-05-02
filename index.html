@@ -9,6 +9,15 @@
     <link rel="stylesheet" href="css/all.min.css">
     <link rel="stylesheet" href="css/animate.min.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/neon/512/security-shield.png">
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="cyber-grid"></div>
@@ -162,7 +171,7 @@
                 <div class="start-menu-item" onclick="startDefenseMode(); os.toggleStartMenu()"><i class="fas fa-shield-alt me-2 text-info"></i> SOC</div>
                 <div class="start-menu-item" onclick="startBotWar(); os.toggleStartMenu()"><i class="fas fa-bolt me-2 text-warning"></i> ARENA</div>
                 <div class="start-menu-item" onclick="showGlossary(); os.toggleStartMenu()"><i class="fas fa-book me-2 text-success"></i> GLOSSÁRIO</div>
-                <div class="start-menu-item" onclick="showAIAssistant(); os.toggleStartMenu()"><i class="fas fa-robot me-2 text-info"></i> GEMMA AI</div>
+                <div class="start-menu-item" onclick="showAIAssistant(); os.toggleStartMenu()"><i class="fas fa-brain me-2 text-info"></i> ASSISTENTE ONYX</div>
                 <div class="start-menu-item" onclick="showToolkit(); os.toggleStartMenu()"><i class="fas fa-toolbox me-2 text-primary"></i> TOOLKIT</div>
                 <div class="start-menu-item" onclick="showBlackMarket(); os.toggleStartMenu()"><i class="fas fa-shopping-cart me-2 text-danger"></i> MERCADO</div>
                 <div class="mt-3 border-top border-secondary pt-2">
@@ -170,6 +179,10 @@
                 </div>
             </div>
             <div id="taskbar-items" class="d-flex align-items-center flex-grow-1"></div>
+            <div class="taskbar-connectivity me-3 d-flex align-items-center gap-2">
+                <span id="conn-status-dot" class="dot"></span>
+                <span id="conn-status-text" class="small text-muted font-monospace conn-status-text">OFFLINE</span>
+            </div>
             <div class="taskbar-actions me-3">
                 <button class="btn btn-outline-danger btn-sm px-3" onclick="logout()" title="Encerrar Sessão">
                     <i class="fas fa-power-off me-1"></i> SAIR
@@ -182,15 +195,15 @@
         </div>
     </div>
     
-    <!-- GEMMA FLOATING ASSISTANT -->
-    <div id="gemma-buddy" class="d-none">
-        <div id="gemma-bubble" class="gemma-bubble">
-            <div id="gemma-bubble-content"></div>
+    <!-- ONYX FLOATING ASSISTANT -->
+    <div id="onyx-buddy" class="d-none">
+        <div id="onyx-bubble" class="onyx-bubble">
+            <div id="onyx-bubble-content"></div>
         </div>
-        <div class="gemma-avatar" onclick="toggleGemmaBubble()">
+        <div class="onyx-avatar" onclick="window.onyx.toggleBubble()">
             <i class="fas fa-robot"></i>
-            <div class="gemma-pulse"></div>
-            <div class="gemma-status-ring"></div>
+            <div class="onyx-pulse"></div>
+            <div class="onyx-status-ring"></div>
         </div>
     </div>
 

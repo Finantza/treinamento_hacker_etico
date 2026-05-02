@@ -1,6 +1,50 @@
 // Ethical Hacker Premium v5.0 - CYBER-OS EDITION
 // 100% Offline | ProceduralAI v3 | CyberOS Window Manager Integration
 
+// ================= SOC INTEGRATION =================
+window.addEventListener('threat_update', (e) => {
+    const data = e.detail;
+    const threatEl = document.getElementById('threat-level-val');
+    const mttdEl = document.getElementById('mttd-val');
+    const blockedEl = document.getElementById('blocked-val');
+    if (threatEl) {
+        threatEl.innerText = data.level + '%';
+        threatEl.className = data.level > 70 ? 'text-danger fw-bold' : (data.level > 40 ? 'text-warning' : 'text-success');
+        const bar = document.getElementById('threat-bar');
+        if (bar) bar.style.width = data.level + '%';
+    }
+    if (mttdEl) mttdEl.innerText = data.mttd;
+    if (blockedEl) blockedEl.innerText = data.blocked;
+});
+
+window.addEventListener('defense_log', (e) => {
+    const log = e.detail;
+    const container = document.getElementById('soc-logs');
+    if (container) {
+        const div = document.createElement('div');
+        div.className = `small mb-1 animate__animated animate__fadeInLeft text-${log.type === 'danger' ? 'danger' : (log.type === 'success' ? 'success' : 'info')}`;
+        div.innerHTML = `<span class="text-muted">[${log.time}]</span> ${log.msg}`;
+        container.prepend(div);
+        if (container.children.length > 20) container.lastChild.remove();
+    }
+});
+
+window.addEventListener('defense_failed', () => {
+    if (window.os) os.showNotification('SISTEMA COMPROMETIDO: Defesa falhou. Reiniciando protocolos...', 'danger');
+    sfx.wrong();
+});
+
+window.addEventListener('defense_won', (e) => {
+    if (window.os) os.showNotification(`MISSÃO CUMPRIDA: Defesa bem sucedida! MTTD final: ${e.detail.mttd}`, 'success');
+    sfx.correct();
+    const user = getCurrentUser();
+    if (user) {
+        user.xp += 150;
+        user.coins += 50;
+        saveUserData(user);
+    }
+});
+
 let userData = {};
 let currentDifficulty = 'logica';
 let currentChallenge = null;
@@ -460,6 +504,9 @@ function showDashboard() {
                     <div class="bg-dark rounded px-3 py-1 border border-warning">
                         <i class="fas fa-coins text-warning me-1"></i> <span class="fw-bold text-warning">${user.coins || 0} CC</span>
                     </div>
+                    <button class="btn btn-outline-info btn-sm" onclick="window.gemma.scanSystem()">
+                        <i class="fas fa-shield-alt me-1"></i> ESCANEAR
+                    </button>
                     <button class="btn btn-outline-danger btn-sm" onclick="logout()">
                         <i class="fas fa-power-off me-1"></i> SAIR
                     </button>
@@ -503,13 +550,11 @@ function showDashboard() {
                     <div class="row g-3">
                         <div class="col-md-6">
                             <div class="glass-card p-4 h-100 cursor-pointer border-info shadow-hover transition-all" onclick="showAIAssistant()">
-                                <h5 class="text-info"><i class="fas fa-robot me-2"></i>GEMMA ASSISTANT</h5>
-                                <p class="small text-muted">Apoio cognitivo e análise de performance tática em tempo real.</p>
-                                <div class="alert bg-black border-info p-2 mt-2 mb-0">
-                                    <code class="text-info" style="font-size:0.65rem;">
-                                        <i class="fas fa-comment-dots me-2"></i>
-                                        ${window.gemma ? window.gemma.getAdvice('dashboard') : 'Inicializando IA...'}
-                                    </code>
+                                <h5 class="text-info"><i class="fas fa-robot me-2"></i>ONYX ASSISTANT</h5>
+                                <div class="small text-white-50">
+                                    <i class="fas fa-microchip me-1"></i> Status: <span class="text-success">Ativo</span><br>
+                                    <i class="fas fa-brain me-1"></i> Dica: 
+                                    <span class="text-white">${window.onyx ? window.onyx.getAdvice('dashboard') : 'Inicializando IA...'}</span>
                                 </div>
                             </div>
                         </div>
@@ -568,8 +613,8 @@ function showAcademy() {
                     <div class="bg-black border border-info p-3 rounded d-flex align-items-center gap-3 animate__animated animate__pulse animate__infinite animate__slow">
                         <i class="fas fa-robot text-info fa-2x"></i>
                         <div>
-                            <p class="text-info fw-bold mb-0" style="font-size:0.75rem;">RECOMENDAÇÃO GEMMA AI:</p>
-                            <p class="text-white-50 small mb-0">${window.gemma ? window.gemma.getAdvice('dashboard') : 'Analisando perfil...'}</p>
+                            <p class="text-info fw-bold mb-0" style="font-size:0.75rem;">RECOMENDAÇÃO ONYX AI:</p>
+                            <p class="text-white-50 small mb-0">${window.onyx ? window.onyx.getAdvice('dashboard') : 'Analisando perfil...'}</p>
                         </div>
                     </div>
                 </div>
@@ -678,9 +723,9 @@ function loadGameInterface() {
                 `).join('')}
             </div>
             
-            <div id="gemmaHelpArea" class="mt-3">
-                <button class="btn btn-dark border-info text-info btn-sm w-100 py-2" onclick="askGemmaForHelp()">
-                    <i class="fas fa-robot me-2"></i> CONSULTAR GEMMA 4 (ASSISTENTE IA)
+            <div id="onyxHelpArea" class="mt-3">
+                <button class="btn btn-dark border-info text-info btn-sm w-100 py-2" onclick="askOnyxForHelp()">
+                    <i class="fas fa-robot me-2"></i> CONSULTAR ONYX (ASSISTENTE IA)
                 </button>
             </div>
 
@@ -1266,7 +1311,7 @@ window.triggerLoginFlow = function() {
     }
 
     document.getElementById('desktop-layer').classList.remove('d-none');
-    if (window.gemma) window.gemma.initBuddy();
+    if (window.onyx) window.onyx.initBuddy();
     if (!user.briefingShown) {
         showMissionBriefing();
         user.briefingShown = true;
@@ -1284,6 +1329,21 @@ window.addEventListener('load', () => {
     
     // Pre-cache the glossary in the background to ensure instant load
     initGlossaryCache();
+
+    // Connectivity Monitoring
+    const updateConnectivity = () => {
+        const dot = document.getElementById('conn-status-dot');
+        const text = document.getElementById('conn-status-text');
+        if (dot && text) {
+            const isOnline = navigator.onLine;
+            dot.className = isOnline ? 'dot active' : 'dot';
+            text.innerText = isOnline ? 'ONLINE (HYBRID)' : 'OFFLINE (LOCAL)';
+            text.className = isOnline ? 'small text-info font-monospace' : 'small text-muted font-monospace';
+        }
+    };
+    window.addEventListener('online', updateConnectivity);
+    window.addEventListener('offline', updateConnectivity);
+    updateConnectivity();
 
     document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -1601,10 +1661,10 @@ window.simulatePixSuccess = function(amount, itemType = 'credits', itemId = null
 };
 
 /**
- * GEMMA AI ASSISTANT MODULE
+ * ONYX AI ASSISTANT MODULE
  */
 function showAIAssistant() {
-    const analysis = window.gemma ? window.gemma.analyzeSystem() : null;
+    const analysis = window.onyx ? window.onyx.analyzeSystem() : null;
     const profile = analysis ? analysis.technicalProfile : { RECON: 0, LOGIC: 0, EXPLOITATION: 0 };
     
     const html = `
@@ -1614,7 +1674,7 @@ function showAIAssistant() {
                     <i class="fas fa-robot fa-2x text-dark"></i>
                 </div>
                 <div>
-                    <h3 class="text-info mb-0">GEMMA ASSISTANT</h3>
+                    <h3 class="text-info mb-0">ONYX ASSISTANT</h3>
                     <p class="text-muted small mb-0">Sistema de Assistência Cognitiva v2.0</p>
                 </div>
             </div>
@@ -1657,17 +1717,17 @@ function showAIAssistant() {
                     </div>
                 </div>
 
-                <!-- CONSELHOS GEMMA -->
+                <!-- CONSELHOS ONYX -->
                 <div class="col-md-6">
                     <div class="premium-glass p-4 h-100">
                         <h6 class="text-white border-bottom border-secondary pb-2 mb-3">CONSELHOS DA IA</h6>
                         <div class="gemma-chat-box bg-black rounded p-3 mb-3 border border-info" style="height: 150px; overflow-y: auto;">
-                            <p class="small text-info mb-2"><i class="fas fa-robot me-2"></i> ${window.gemma ? window.gemma.getAdvice('dashboard') : 'Conectando...'}</p>
+                            <p class="small text-info mb-2"><i class="fas fa-robot me-2"></i> ${window.onyx ? window.onyx.getAdvice('dashboard') : 'Conectando...'}</p>
                             ${analysis && analysis.criticalWeaknesses.length > 0 ? `
                                 <p class="small text-warning mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Detectei que você precisa melhorar em: <b>${analysis.criticalWeaknesses.map(w => w.cat.toUpperCase()).join(', ')}</b>.</p>
                             ` : '<p class="small text-success mb-2"><i class="fas fa-check-circle me-2"></i> Nenhum ponto crítico detectado. Continue o bom trabalho.</p>'}
                         </div>
-                        <button class="btn btn-info w-100 btn-sm fw-bold" onclick="window.gemma.optimizeSystem(); showAIAssistant();">
+                        <button class="btn btn-info w-100 btn-sm fw-bold" onclick="window.onyx.optimizeSystem(); showAIAssistant();">
                             <i class="fas fa-sync-alt me-1"></i> RE-ANALISAR PERFORMANCE
                         </button>
                     </div>
@@ -1676,10 +1736,10 @@ function showAIAssistant() {
                 <!-- LOG DE OTIMIZAÇÃO -->
                 <div class="col-md-12">
                     <div class="premium-glass p-4">
-                        <h6 class="text-white border-bottom border-secondary pb-2 mb-3">LOG SINÁPTICO GEMMA 4</h6>
+                        <h6 class="text-white border-bottom border-secondary pb-2 mb-3">LOG SINÁPTICO ONYX 4</h6>
                         <div class="bg-black p-2 rounded" style="max-height: 120px; overflow-y: auto; font-family: monospace; font-size: 0.7rem;">
-                            ${window.gemma && window.gemma.optimizationLog.length > 0 ? 
-                                window.gemma.optimizationLog.map(l => `<div class="mb-1 text-muted"><span class="text-info">[${l.time}]</span> ${l.message}</div>`).join('') :
+                            ${window.onyx && window.onyx.optimizationLog.length > 0 ? 
+                                window.onyx.optimizationLog.map(l => `<div class="mb-1 text-muted"><span class="text-info">[${l.time}]</span> ${l.message}</div>`).join('') :
                                 '<div class="text-muted">Aguardando telemetria...</div>'}
                         </div>
                     </div>
@@ -1690,8 +1750,8 @@ function showAIAssistant() {
     renderToModule('ai_assistant', html);
 }
 
-function askGemmaForHelp() {
-    if (!currentChallengeData || !window.gemma) return;
-    window.gemma.analyzeChallenge(currentChallengeData);
+function askOnyxForHelp() {
+    if (!currentChallengeData || !window.onyx) return;
+    window.onyx.analyzeChallenge(currentChallengeData);
     sfx.recon();
 }

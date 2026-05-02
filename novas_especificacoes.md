@@ -1,57 +1,46 @@
-# Especificações Técnicas - CyberOS v5.2 (2024-2025)
+# Especificações Técnicas - CyberOS Platinum v5.2 (2024-2025)
 
-Esta documentação detalha as novas funcionalidades, módulos de inteligência artificial e aprimoramentos de arquitetura implementados para modernizar a plataforma de treinamento.
+Esta documentação detalha as novas funcionalidades, módulos de inteligência artificial e aprimoramentos de arquitetura implementados para modernizar a plataforma de treinamento CyberOS.
 
 ---
 
-## 🤖 1. Módulo Gemma AI Assistant (v2.0)
-A IA nativa evoluiu de um otimizador passivo para um assistente cognitivo interativo.
+## 🤖 1. Assistente ONYX (Ex-Gemma AI)
+A inteligência artificial do sistema foi renomeada para **ONYX** (Electronic Cybernetic Heuristic Observer) e recebeu atualizações críticas de performance e segurança.
 
-*   **Análise de Perfil Técnico:** Monitoramento em tempo real de 3 trilhas de competência:
-    *   **RECON:** SSRF, IDOR, LFI/RFI, Network Scanning.
-    *   **LOGIC:** SQLi, XSS, Auth Bypass, CSRF, API Security.
-    *   **EXPLOIT:** RCE, Buffer Overflow, Deserialization, Cloud Security.
+*   **Identidade Hacker Própria:** Nome e diálogos reformulados para evitar problemas de direitos autorais e aumentar a imersão.
+*   **Deep System Scan:** Nova funcionalidade de varredura profunda que analisa logs de invasão e integridade do Kernel em tempo real.
+*   **Análise de Perfil Técnico:** Monitoramento de 3 trilhas de competência (RECON, LOGIC, EXPLOIT).
 *   **Sistema de Aconselhamento Contextual:**
-    *   **Dashboard:** Recomendações baseadas em fraquezas detectadas.
-    *   **Cyber Academy:** Sugestão de trilhas de especialização.
-    *   **Pentest Helper:** Botão "Consultar Gemma" que fornece análise técnica do vetor de ataque e dicas de exploração.
-*   **Transparência Sináptica:** Logs de otimização visíveis que explicam como a IA está ajustando os pesos do sistema para o usuário.
+    *   **Dashboard:** Recomendações proativas baseadas em fraquezas detectadas.
+    *   **Pentest Helper:** Função "Consultar ONYX" para análise técnica de vetores de ataque.
+*   **Transparência Sináptica:** Logs de otimização heurística visíveis ao usuário.
 
-## 🛡️ 2. Módulo de Defesa SOC & Resposta a Incidentes
-O motor de simulação foi atualizado para reconhecer ameaças de última geração.
+## 🛡️ 2. Módulo de Defesa SOC & Hardening (Silent Mode)
+O motor de segurança foi blindado contra inspeção externa e monitoramento não autorizado.
 
-*   **Novos Vetores de Ataque 2024-2025:**
-    *   **AI Prompt Injection:** Ataques contra LLMs integrados.
-    *   **Deepfake Vishing:** Engenharia social avançada por voz/vídeo.
-    *   **K8s RBAC Bypass:** Exploração de permissões em clusters Kubernetes.
-    *   **Dependency Confusion:** Ataques em cadeia de suprimentos (Supply Chain).
-    *   **Quishing (QR Code Phishing):** Vetores de phishing via QR Codes maliciosos.
-*   **Log de Nível Crítico:** Interface visual com alertas vermelhos pulsantes para ameaças de alto impacto.
-*   **Mitigação Dinâmica:** Novas contramedidas automatizadas e manuais (ex: Isolamento de Pods K8s, Reset de Tokens AI).
+*   **Rastreamento Silencioso de Invasão:** Tentativas de acesso via console ou inspeção de código são registradas de forma invisível em um sistema de arquivos virtual (`/var/log/invasions`) armazenado no `localStorage`.
+*   **Integração SOC em Tempo Real:** O painel SOC agora é reativo, atualizando métricas de MTTD (Mean Time to Detect), nível de ameaça e ataques bloqueados via eventos globais.
+*   **Novos Vetores de Ataque 2025:**
+    *   **AI Prompt Injection:** Ataques contra motores LLM.
+    *   **Deepfake Vishing:** Engenharia social via clonagem de voz.
+    *   **K8s RBAC Bypass:** Exploração de clusters Kubernetes.
+    *   **Quishing:** Phishing via QR Codes maliciosos.
 
-## 🔍 3. Glossário Modernizado (Metadata-Driven)
-O motor de renderização do glossário foi reconstruído para suportar grandes volumes de dados com alta performance.
+## 🏗️ 3. Arquitetura Premium & UI/UX
+A interface foi elevada ao nível "Platinum" com efeitos visuais de alta fidelidade.
 
-*   **Filtragem Dinâmica:** Filtros por Categoria, Impacto (Low, Medium, High, Critical) e Dificuldade.
-*   **Busca em Tempo Real:** Indexação de técnicas de ataque e defesa para busca instantânea.
-*   **Metadados MITRE ATT&CK:** Todas as técnicas agora incluem IDs MITRE, complexidade e impacto tático.
-*   **UI Reativa:** Badges coloridos e layout adaptativo para melhor legibilidade técnica.
+*   **Ultra-Glassmorphism:** Implementação de desfoque profundo (20px), saturação aumentada (180%) e bordas de neon adaptativas.
+*   **Área de Trabalho Limpa:** Ícones removidos do desktop para garantir foco total. Todos os recursos centralizados no **Menu Start** (Perfil, SOC, Arena, Toolkit, Glossário).
+*   **Kernel Hardening:** Proteção rigorosa contra `user-select` e `drag-and-drop` não autorizado, garantindo que o conteúdo do treinamento não seja copiado facilmente.
+*   **Error Resilience:** Implementação de `try-catch` em todos os módulos críticos de renderização, garantindo que o sistema recupere de falhas de dados sem interrupção para o usuário.
 
-## 🧬 4. EvoGen Engine (Motor de Evolução Genética)
-Um motor generativo que garante que o treinamento nunca se torne repetitivo.
+## 🧬 4. EvoGen Engine (Motor de Evolução)
+O motor generativo garante desafios únicos e adaptativos.
 
-*   **Algoritmo Genético:** Realiza "Crossover" entre templates de vulnerabilidades para criar desafios híbridos inéditos.
-*   **Ajuste de Dificuldade Adaptativo:** A rede neural local (SimpleNeuralNet) analisa o WinRate do jogador e escala a dificuldade (Iniciante → Lógica → Massiva) de forma autônoma.
-*   **Mutação Procedural:** Variação de nomes de variáveis, nomes de empresas e payloads para evitar a memorização de padrões.
-
-## 🏗️ 5. Arquitetura & UI/UX
-Refatoração completa para padrões profissionais de desenvolvimento web.
-
-*   **Desacoplamento de CSS:** 100% dos estilos internos e inline foram migrados para `css/style.css`, eliminando avisos de linter e melhorando a performance de carregamento.
-*   **Sistema de Notificações Gemma:** Alertas integrados ao SO que informam quando a IA realiza uma otimização de performance no ambiente.
-*   **Interface Premium:** Uso de glassmorphism avançado, animações de transição suaves e layout responsivo para mobile/desktop.
+*   **Algoritmo Genético:** Crossover entre templates de vulnerabilidades para criar desafios híbridos.
+*   **Rede Neural Local:** Ajuste autônomo de dificuldade baseado no desempenho real do jogador (WinRate).
 
 ---
 
-> [!TIP]
-> Use o novo ícone **GEMMA AI** no desktop para acessar seu relatório de auditoria e ver seu perfil cognitivo atualizado.
+> [!IMPORTANT]
+> Para acessar os logs de segurança e ver quem tentou invadir seu sistema, use o módulo **LOGS DE INVASÃO** no Menu Start.

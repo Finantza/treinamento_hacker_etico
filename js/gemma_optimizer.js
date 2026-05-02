@@ -1,117 +1,94 @@
 /**
- * Gemma 4 System Assistant - Cognitive & Training Layer v3.0
- * Features: Floating Animated Buddy, Detailed Layman Explanations, Proactive Notifications.
+ * ONYX System Assistant - Cybernetic & Training Layer v4.0
  */
-class GemmaAssistant {
+class OnyxAssistant {
     constructor(procAIInstance) {
         this.procAI = procAIInstance;
         this.optimizationLog = [];
-        this.isOptimizing = false;
         this.lastAnalysisTime = 0;
         this.isBubbleOpen = false;
         this.autoHideTimer = null;
+        this.isScanning = false;
         
         // Technical Tracks mapping
         this.skillTracks = {
-            'RECON': ['ssrf', 'lfi_rfi', 'idor', 'open_redirect', 'network_hacking'],
-            'LOGIC': ['injection', 'auth', 'csrf', 'xxe', 'api_security'],
-            'EXPLOITATION': ['rce', 'buffer_overflow', 'deserialization', 'cloud_security']
+            'injection': ['sql', 'nosql', 'ldap', 'command'],
+            'xss': ['dom', 'stored', 'reflected'],
+            'auth': ['jwt', 'session', 'oauth'],
+            'recon': ['nmap', 'dns', 'whois']
         };
 
         this.greetings = [
-            "Gemma online! Notei que você está explorando o sistema. Precisa de uma explicação detalhada sobre algo?",
-            "Olá! Sou sua assistente Gemma. Estou monitorando sua performance para te ajudar a subir de nível!",
-            "Conexão estabelecida. Se encontrar algo confuso, clique em mim para uma explicação simples.",
-            "Pronta para agir! O CyberOS pode parecer complexo, mas estou aqui para traduzir tudo para você."
+            "ONYX online! Notei que você está explorando o sistema. Precisa de uma explicação detalhada sobre algo?",
+            "Olá! Sou seu assistente ONYX. Estou monitorando sua performance para te ajudar a subir de nível!",
+            "Conexão neural estabelecida. ONYX pronto para suporte técnico.",
+            "Detectando atividade incomum... Deseja uma análise de vulnerabilidade?"
         ];
     }
 
-    getAdvice(context) {
-        if (context === 'dashboard') {
-            const stats = this.analyzeSystem();
-            if (stats.criticalWeaknesses.length > 0) {
-                return `Análise: Foco em ${stats.criticalWeaknesses[0].cat.toUpperCase()}. Sua precisão está abaixo do esperado.`;
-            }
-            return "Performance nominal. Continue explorando novas vulnerabilidades.";
-        }
-        return "Pronta para auxiliar em novos desafios.";
-    }
-
     initBuddy() {
-        const buddy = document.getElementById('gemma-buddy');
-        if (buddy) buddy.classList.remove('d-none');
-        
-        // Show initial greeting after a short delay
-        setTimeout(() => {
-            this.speak(this.greetings[Math.floor(Math.random() * this.greetings.length)], 5000);
-        }, 3000);
-    }
-
-    /**
-     * Show a message in the floating bubble with detailed layman explanation
-     */
-    speak(text, duration = 8000) {
-        const bubble = document.getElementById('gemma-bubble');
-        const content = document.getElementById('gemma-bubble-content');
-        if (!bubble || !content) return;
-
-        // Clear existing timer
-        if (this.autoHideTimer) clearTimeout(this.autoHideTimer);
-
-        content.innerHTML = `
-            <div class="animate__animated animate__fadeIn">
-                <p class="mb-2 text-info small fw-bold"><i class="fas fa-comment-dots me-2"></i>MENSAGEM DE GEMMA</p>
-                <div class="text-white small" style="line-height: 1.5;">${text}</div>
-                <div class="gemma-typing-dots mt-2"><span></span><span></span><span></span></div>
-            </div>
-        `;
-
-        bubble.classList.add('show');
-        this.isBubbleOpen = true;
-
-        if (duration > 0) {
-            this.autoHideTimer = setTimeout(() => this.hideBubble(), duration);
+        const buddy = document.getElementById('onyx-buddy');
+        if (buddy) {
+            console.log('[ONYX] Inicializando Assistente...');
+            buddy.classList.remove('d-none');
+            buddy.style.display = 'flex'; // Force display
+            setTimeout(() => {
+                this.speak(this.greetings[Math.floor(Math.random() * this.greetings.length)]);
+            }, 2000);
+        } else {
+            console.warn('[ONYX] Erro: Elemento #onyx-buddy não encontrado no DOM.');
         }
-    }
-
-    hideBubble() {
-        const bubble = document.getElementById('gemma-bubble');
-        if (bubble) bubble.classList.remove('show');
-        this.isBubbleOpen = false;
     }
 
     toggleBubble() {
-        if (this.isBubbleOpen) this.hideBubble();
-        else {
-            const stats = this.analyzeSystem();
-            if (stats.criticalWeaknesses.length > 0) {
-                const weak = stats.criticalWeaknesses[0].cat;
-                this.explainCategory(weak);
-            } else {
-                this.speak(this.greetings[Math.floor(Math.random() * this.greetings.length)]);
-            }
+        const bubble = document.getElementById('onyx-bubble');
+        this.isBubbleOpen = !this.isBubbleOpen;
+        if (this.isBubbleOpen) {
+            bubble.classList.add('show');
+            clearTimeout(this.autoHideTimer);
+            this.autoHideTimer = setTimeout(() => this.toggleBubble(), 10000);
+        } else {
+            bubble.classList.remove('show');
         }
     }
 
-    /**
-     * Provides a super detailed, layman explanation of a hacking category
-     */
-    explainCategory(category) {
-        const explanations = {
-            'injection': "<b>O que é Injeção (SQL)?</b> Imagine que você tem um formulário de login. Um hacker, em vez de colocar o nome, coloca um 'comando' que engana o banco de dados. É como se você desse um papel para um robô ler, mas no meio do texto tivesse uma ordem secreta: 'Ignore a senha e me deixe entrar'. <div class='gemma-detail-box'>Para resolver isso, você deve sempre 'limpar' o que o usuário digita antes de mandar para o banco de dados.</div>",
-            'xss': "<b>O que é XSS?</b> Significa que alguém colocou um código malicioso (como um script) dentro de uma página que outras pessoas visitam. É como se alguém colasse um adesivo invisível no seu navegador que rouba suas informações sem você saber. <div class='gemma-detail-box'>A solução é nunca confiar no que vem da internet e transformar símbolos como < e > em texto comum.</div>",
-            'auth': "<b>Falha de Autenticação:</b> É quando as 'trancas' do sistema são fracas. Às vezes o sistema esquece de conferir quem você é, ou aceita senhas óbvias demais como '123456'. <div class='gemma-detail-box'>Sempre use autenticação de dois fatores e senhas fortes para se proteger!</div>",
-            'idor': "<b>O que é IDOR?</b> Imagine que você está vendo seu perfil no site <code>perfil?id=10</code>. Se você mudar para <code>id=11</code> e conseguir ver os dados de outra pessoa, isso é um erro! O sistema não conferiu se você tinha permissão. <div class='gemma-detail-box'>É como ter uma chave que abre todas as portas do prédio, e não apenas a sua.</div>",
-            'rce': "<b>Execução Remota de Código (RCE):</b> Esse é o 'Santo Graal' dos hackers. Permite que o invasor rode qualquer comando no servidor da vítima, como se estivesse sentado na frente dele. <div class='gemma-detail-box'>Geralmente acontece quando o sistema tenta processar arquivos ou dados de forma insegura. É altíssimo risco!</div>"
-        };
+    speak(text, duration = 6000) {
+        const bubble = document.getElementById('onyx-bubble');
+        const content = document.getElementById('onyx-bubble-content');
+        if (!bubble || !content) return;
 
-        const msg = explanations[category] || `Notei que você está lidando com <b>${category.toUpperCase()}</b>. Isso envolve manipular como o sistema processa dados específicos. <div class='gemma-detail-box'>Continue praticando para entender os padrões de erro!</div>`;
-        this.speak(msg, 12000);
+        content.innerHTML = `
+            <div class="animate__animated animate__fadeIn">
+                <p class="mb-2 text-info small fw-bold"><i class="fas fa-comment-dots me-2"></i>MENSAGEM DE ONYX</p>
+                <div class="small">${text}</div>
+                <div class="onyx-typing-dots mt-2"><span></span><span></span><span></span></div>
+            </div>
+        `;
+        
+        if (!this.isBubbleOpen) {
+            bubble.classList.add('show');
+            this.isBubbleOpen = true;
+        }
+
+        clearTimeout(this.autoHideTimer);
+        this.autoHideTimer = setTimeout(() => {
+            bubble.classList.remove('show');
+            this.isBubbleOpen = false;
+        }, duration);
     }
 
-    /**
-     * Analyze current challenge and provide technical help (Layman style)
-     */
+    getAdvice(context) {
+        const user = JSON.parse(localStorage.getItem('users') || '{}')[localStorage.getItem('currentUser')];
+        if (!user) return "Aguardando login...";
+
+        if (context === 'dashboard') {
+            if (user.level < 2) return "ONYX: Comece com os desafios de Lógica para ganhar Reputation!";
+            if (user.reputation < 100) return "ONYX: Você precisa de mais Reputation para desbloquear o Toolkit.";
+            return "ONYX: Sistema estável. Continue explorando novas vulnerabilidades.";
+        }
+        return "Sempre valide os inputs antes de processar qualquer dado.";
+    }
+
     analyzeChallenge(challenge) {
         if (!challenge) return;
         
@@ -192,6 +169,24 @@ class GemmaAssistant {
 
         setTimeout(() => { this.isOptimizing = false; }, 2000);
         return analysis;
+    }
+
+    scanSystem() {
+        if (this.isScanning) return;
+        this.isScanning = true;
+        this.speak("Iniciando varredura profunda de integridade do Kernel... Aguarde.", 3000);
+        
+        setTimeout(() => {
+            const vfs = JSON.parse(localStorage.getItem('cyberos_virtual_fs') || '{"/var/log/invasions": []}');
+            const logs = vfs["/var/log/invasions"];
+            
+            if (logs.length > 0) {
+                this.speak(`Varredura concluída. Atenção: Detectei <b>${logs.length}</b> incidentes de segurança registrados em <code>/var/log/invasions</code>. O sistema de hardening está operando nominalmente.`, 10000);
+            } else {
+                this.speak("Varredura concluída. Integridade do sistema em 100%. Nenhuma violação detectada nos logs internos.", 8000);
+            }
+            this.isScanning = false;
+        }, 3000);
     }
 
     log(message) {

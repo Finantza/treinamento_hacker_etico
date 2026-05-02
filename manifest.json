@@ -1,100 +1,16 @@
 {
-    "name": "Ethical Hacker Premium",
-    "short_name": "EHack",
-    "description": "🏴‍☠️ Treinamento Avançado Penetration Testing | ProceduralAI Challenges | SQLi/XSS/RCE/Buffer Overflow | 150+ Exploits Offline",
-    "lang": "pt-BR",
-    "dir": "ltr",
-    "start_url": "/index.html",
-    "scope": "/",
+    "name": "CyberOS - Ethical Hacker Training",
+    "short_name": "CyberOS",
+    "description": "Plataforma de treinamento em segurança cibernética e defesa.",
+    "start_url": "./index.html",
     "display": "standalone",
-    "display_override": ["standalone", "minimal-ui", "browser"],
-    "orientation": "any", "prefer_related_applications": false,
-    "background_color": "#0a0a0a",
-    "theme_color": "#20c997",
-    "theme_color_data": "#20c997",
-    
-    "categories": [
-        "education",
-        "productivity",
-        "utilities",
-        "games"
-    ],
-    
+    "background_color": "#050505",
+    "theme_color": "#00ffff",
     "icons": [
         {
-            "src": "icon.png",
-            "sizes": "192x192 512x512",
-            "type": "image/png",
-            "purpose": "any maskable"
+            "src": "https://img.icons8.com/neon/512/security-shield.png",
+            "sizes": "512x512",
+            "type": "image/png"
         }
-    ],
-    
-    "screenshots": [],
-    
-    "shortcuts": [
-        {
-            "name": "🚀 Novo Challenge",
-            "short_name": "Challenge",
-            "description": "Gerar challenge ProceduralAI (SQLi/XSS/RCE)",
-            "url": "/index.html#new-challenge",
-            "icons": [{"src": "/icons/challenge.png", "sizes": "96x96"}]
-        },
-        {
-            "name": "💾 Progresso",
-            "short_name": "Progress",
-            "description": "Perfil + Conquistas + Dark Web Store",
-            "url": "/index.html#profile",
-            "icons": [{"src": "/icons/profile.png", "sizes": "96x96"}]
-        },
-        {
-            "name": "🎯 Payloads",
-            "short_name": "Payloads",
-            "description": "Reverse Shells/Webshells/PrivEsc (Offline)",
-            "url": "/index.html#payloads",
-            "icons": [{"src": "/icons/payload.png", "sizes": "96x96"}]
-        },
-        {
-            "name": "⚔️ Multiplayer",
-            "short_name": "RedBlue",
-            "description": "Red Team vs Blue Team Leaderboards",
-            "url": "/index.html#multiplayer",
-            "icons": [{"src": "/icons/multiplayer.png", "sizes": "96x96"}]
-        }
-    ],
-    
-    "prefer_related_applications": false,
-    "related_applications": [],
-    
-    "iarc_rating_id": "ESRBe10",
-    
-    "features": [
-        "Offline",
-        "Background Sync",
-        "Push Notifications"
-    ],
-    
-    "protocol_handlers": [
-        {
-            "protocol": "web+hack",
-            "title": "Abrir Challenge Ethical Hacker",
-            "url": "/index.html?challenge=%s"
-        }
-    ],
-    
-    "share_target": {
-        "action": "/index.html#share-target",
-        "method": "POST",
-        "enctype": "multipart/form-data",
-        "params": {
-            "title": "title",
-            "text": "text",
-            "url": "url",
-            "files": [
-                {
-                    "name": "file",
-                    "accept": ["*/*"]
-                }
-            ]
-        }
-    }
+    ]
 }

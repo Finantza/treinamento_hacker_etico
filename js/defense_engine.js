@@ -222,7 +222,7 @@ class DefenseEngine {
     }
 
     deployAutoDefense(type) {
-        this.log('🤖 Gemma AI: Iniciando mitigação automatizada (SOAR)...', 'info');
+        this.log('🤖 ONYX AI: Iniciando mitigação automatizada (SOAR)...', 'info');
         const mapping = {
             INJECTION: 'WAF_SQLI', BRUTEFORCE: 'IP_BLOCK', XSS: 'WAF_XSS',
             RCE: 'VIRTUAL_PATCH', RANSOMWARE: 'EDR', PASS_THE_HASH: 'ZERO_TRUST',
@@ -250,4 +250,4 @@ class DefenseEngine {
     }
 }
 
-window.defense = new DefenseEngine(window.gemma);
+window.defense = new DefenseEngine(window.onyx);

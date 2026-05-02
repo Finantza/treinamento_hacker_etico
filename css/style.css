@@ -459,27 +459,34 @@ body {
 
 .premium-glass {
     background: rgba(10, 15, 25, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.15);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     backdrop-filter: blur(20px) saturate(180%);
     border-radius: 12px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.premium-glass:hover {
+    border-color: rgba(0, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 255, 255, 0.1), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .glass-card {
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
     background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(0, 255, 255, 0.3);
-    transform: translateY(-5px);
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
 }
 
 .shadow-glow {
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
 }
 
 .shadow-hover:hover {
@@ -490,9 +497,9 @@ body {
 .transition-all { transition: all 0.3s ease; }
 
 /* =========================
-   GEMMA FLOATING BUDDY
+   ONYX FLOATING BUDDY
    ========================= */
-#gemma-buddy {
+#onyx-buddy {
     position: fixed;
     bottom: 30px;
     right: 30px;
@@ -503,7 +510,7 @@ body {
     pointer-events: none;
 }
 
-.gemma-avatar {
+.onyx-avatar {
     width: 65px;
     height: 65px;
     background: linear-gradient(135deg, #00ffff, #0088ff);
@@ -519,37 +526,37 @@ body {
     border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-.gemma-avatar:hover {
+.onyx-avatar:hover {
     transform: scale(1.1) rotate(5deg);
     box-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
 }
 
-.gemma-avatar i {
+.onyx-avatar i {
     font-size: 28px;
     color: #050505;
-    animation: gemma-float 3s ease-in-out infinite;
+    animation: onyx-float 3s ease-in-out infinite;
 }
 
-.gemma-pulse {
+.onyx-pulse {
     position: absolute;
     inset: -5px;
     border-radius: 50%;
     border: 2px solid #00ffff;
     opacity: 0;
-    animation: gemma-pulse 2s infinite;
+    animation: onyx-pulse 2s infinite;
 }
 
-@keyframes gemma-float {
+@keyframes onyx-float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
 }
 
-@keyframes gemma-pulse {
+@keyframes onyx-pulse {
     0% { transform: scale(1); opacity: 0.8; }
     100% { transform: scale(1.5); opacity: 0; }
 }
 
-.gemma-bubble {
+.onyx-bubble {
     background: rgba(10, 15, 25, 0.95);
     border: 1px solid rgba(0, 255, 255, 0.3);
     border-radius: 15px 15px 0 15px;
@@ -566,13 +573,13 @@ body {
     position: relative;
 }
 
-.gemma-bubble.show {
+.onyx-bubble.show {
     opacity: 1;
     transform: translateY(0) scale(1);
     pointer-events: auto;
 }
 
-.gemma-bubble::after {
+.onyx-bubble::after {
     content: '';
     position: absolute;
     bottom: -10px;
@@ -582,7 +589,7 @@ body {
     border-top: 10px solid rgba(0, 255, 255, 0.3);
 }
 
-.gemma-status-ring {
+.onyx-status-ring {
     position: absolute;
     bottom: 2px;
     right: 2px;
@@ -593,29 +600,29 @@ body {
     border-radius: 50%;
 }
 
-.gemma-typing-dots {
+.onyx-typing-dots {
     display: flex;
     gap: 4px;
     padding: 10px;
 }
 
-.gemma-typing-dots span {
+.onyx-typing-dots span {
     width: 6px;
     height: 6px;
     background: #00ffff;
     border-radius: 50%;
-    animation: gemma-typing 1s infinite;
+    animation: onyx-typing 1s infinite;
 }
 
-.gemma-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-.gemma-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+.onyx-typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.onyx-typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
-@keyframes gemma-typing {
+@keyframes onyx-typing {
     0%, 100% { opacity: 0.3; transform: scale(1); }
     50% { opacity: 1; transform: scale(1.2); }
 }
 
-.gemma-detail-box {
+.onyx-detail-box {
     background: rgba(0,0,0,0.4);
     border-radius: 8px;
     padding: 12px;
@@ -902,6 +909,10 @@ body {
 @keyframes burst-pulse { from { transform: scale(0.9); opacity: 0.5; } to { transform: scale(1.2); opacity: 1; } }
 @keyframes rotate-cw { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
 @keyframes rotate-ccw { from { transform: translate(-50%, -50%) rotate(360deg); } to { transform: translate(-50%, -50%) rotate(0deg); } }
+
+.conn-status-text {
+    font-size: 0.65rem;
+}
 
 /* =========================
    ACTIVE COUNTERMEASURE (INVASION ALERT)
