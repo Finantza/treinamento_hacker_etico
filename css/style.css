@@ -105,6 +105,17 @@ body {
     backdrop-filter: blur(10px);
     border-radius: var(--radius);
     width: 300px;
+    will-change: transform, opacity;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.05);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, background-color, border-color;
 }
 
 .auth-card input {
@@ -187,6 +198,7 @@ body {
     border-radius: var(--radius);
     display: flex;
     flex-direction: column;
+    will-change: transform, opacity, z-index;
 }
 
 .window-header {
@@ -909,6 +921,114 @@ body {
 @keyframes burst-pulse { from { transform: scale(0.9); opacity: 0.5; } to { transform: scale(1.2); opacity: 1; } }
 @keyframes rotate-cw { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
 @keyframes rotate-ccw { from { transform: translate(-50%, -50%) rotate(360deg); } to { transform: translate(-50%, -50%) rotate(0deg); } }
+
+/* =========================
+   NEW CYBER UI COMPONENTS
+========================= */
+.cyber-title {
+    font-weight: 900;
+    letter-spacing: 5px;
+    background: linear-gradient(135deg, #00ffff, #0088ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.cyber-input {
+    background: rgba(0, 0, 0, 0.6) !important;
+    border: 1px solid rgba(0, 255, 255, 0.2) !important;
+    color: #00ffff !important;
+    border-radius: 8px !important;
+    padding: 12px 15px !important;
+    transition: all 0.3s ease;
+}
+
+.cyber-input:focus {
+    border-color: #00ffff !important;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2) !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.btn-cyber {
+    border-radius: 8px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-cyber.primary {
+    background: #00ffff;
+    color: #000;
+}
+
+.btn-cyber.primary:hover {
+    background: #00cccc;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-cyber.outline-info {
+    border-color: #00ffff;
+    color: #00ffff;
+    background: transparent;
+}
+
+.btn-cyber.outline-info:hover {
+    background: rgba(0, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.btn-cyber.outline-warning {
+    border-color: #ffcc00;
+    color: #ffcc00;
+    background: transparent;
+}
+
+.btn-cyber.outline-warning:hover {
+    background: rgba(255, 204, 0, 0.1);
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.2);
+}
+
+.btn-cyber.outline-danger {
+    border-color: #ff3366;
+    color: #ff3366;
+    background: transparent;
+}
+
+.btn-cyber.outline-danger:hover {
+    background: rgba(255, 51, 102, 0.1);
+    box-shadow: 0 0 15px rgba(255, 51, 102, 0.2);
+}
+
+/* =========================
+   SECURITY VIOLATIONS
+ ========================= */
+.violation-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 9999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(15px);
+}
+
+.violation-content {
+    max-width: 500px;
+    width: 90%;
+    border: 2px solid var(--danger);
+    box-shadow: 0 0 50px rgba(255, 51, 102, 0.3);
+}
+
+.shadow-glow-red {
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.5);
+}
 
 .conn-status-text {
     font-size: 0.65rem;

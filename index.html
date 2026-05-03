@@ -3,21 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberOS - Ethical Hacker Premium</title>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data:; font-src 'self' data:;">
+    <title>CyberOS Elite - Ethical Hacker OS</title>
+    <!-- Content Security Policy - Hardened -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self';">
+
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/all.min.css">
     <link rel="stylesheet" href="css/animate.min.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="https://img.icons8.com/neon/512/security-shield.png">
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
-            });
+    
+    <style>
+        :root {
+            --vh: 1vh; /* Mobile height fix */
         }
-    </script>
+        body {
+            height: calc(var(--vh, 1vh) * 100);
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+    </style>
 </head>
 <body>
     <div class="cyber-grid"></div>
@@ -30,7 +36,7 @@
                 <div id="splash-progress" class="progress-bar bg-info splash-progress-bar"></div>
             </div>
             <div class="text-center mt-3">
-                <button class="btn btn-link btn-sm text-muted text-decoration-none skip-init-btn" onclick="os.hideSplash()">[ PULAR INICIALIZAÇÃO ]</button>
+                <button class="btn btn-link btn-sm text-muted text-decoration-none skip-init-btn" onclick="app.finalizeBoot()">[ PULAR INICIALIZAÇÃO ]</button>
             </div>
         </div>
     </div>
@@ -41,7 +47,7 @@
             <div class="glass-card p-5 rounded-4 shadow-glow auth-card-container">
                 <div class="text-center mb-5">
                     <h1 class="cyber-title fs-2 mb-2">ETHICAL HACKER</h1>
-                    <div class="badge bg-primary px-3 py-1">PREMIUM OS v5.2</div>
+                    <div class="badge bg-primary px-3 py-1">ELITE OS v6.0</div>
                 </div>
                 
                 <ul class="nav nav-pills nav-justified mb-4 bg-dark rounded-pill p-1">
@@ -53,18 +59,18 @@
                     <div class="tab-pane fade show active" id="login-pane">
                         <form id="loginForm">
                             <div class="mb-4">
-                                <label class="form-label small text-muted">USUÁRIO</label>
-                                <input type="text" class="form-control cyber-input" id="loginUsername" placeholder="Digite seu nome" required>
-                            </div>
-                            <div class="mb-4">
-                                <label class="form-label small text-muted">SENHA</label>
-                                <input type="password" class="form-control cyber-input" id="loginPassword" placeholder="Sua senha " required>
-                            </div>
+                                 <label for="loginUsername" class="form-label small text-muted">USUÁRIO</label>
+                                 <input type="text" class="form-control cyber-input" id="loginUsername" placeholder="Seu codinome" required>
+                             </div>
+                             <div class="mb-4">
+                                 <label for="loginPassword" class="form-label small text-muted">SENHA</label>
+                                 <input type="password" class="form-control cyber-input" id="loginPassword" placeholder="Sua senha de acesso" required>
+                             </div>
                             <button type="submit" class="btn btn-cyber primary w-100 py-3 mb-3">ENTRAR NO SISTEMA</button>
                             
                             <div class="text-center">
                                 <p class="text-muted small mb-3">OU</p>
-                                <button type="button" class="btn btn-outline-warning w-100 py-2" onclick="loginGuest()">
+                                <button type="button" class="btn btn-outline-warning w-100 py-2" id="guest-login-btn">
                                     <i class="fas fa-user-secret me-2"></i> ACESSO RÁPIDO (MODO CONVIDADO)
                                 </button>
                             </div>
@@ -72,9 +78,18 @@
                     </div>
                     <div class="tab-pane fade" id="register-pane">
                         <form id="registerForm">
-                            <div class="mb-3"><label class="form-label small text-muted">NOME REAL</label><input type="text" class="form-control cyber-input" id="registerName" title="Digite seu nome real" required></div>
-                            <div class="mb-3"><label class="form-label small text-muted">CODINOME</label><input type="text" class="form-control cyber-input" id="registerUsername" title="Escolha um codinome" required></div>
-                            <div class="mb-3"><label class="form-label small text-muted">SENHA</label><input type="password" class="form-control cyber-input" id="registerPassword" title="Crie uma senha segura" required></div>
+                            <div class="mb-3">
+                                <label for="registerName" class="form-label small text-muted">NOME REAL</label>
+                                <input type="text" class="form-control cyber-input" id="registerName" placeholder="Seu nome completo" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerUsername" class="form-label small text-muted">CODINOME</label>
+                                <input type="text" class="form-control cyber-input" id="registerUsername" placeholder="Como deseja ser chamado" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerPassword" class="form-label small text-muted">SENHA</label>
+                                <input type="password" class="form-control cyber-input" id="registerPassword" placeholder="Crie uma senha segura" required>
+                            </div>
                             <button type="submit" class="btn btn-success w-100 py-3">CADASTRAR</button>
                         </form>
                     </div>
@@ -88,10 +103,8 @@
         
         <!-- HERO GAME HUB -->
         <div id="hero-hub" class="hero-hub">
-            <!-- Particle canvas -->
             <canvas id="hero-particles" class="hero-canvas"></canvas>
 
-            <!-- Left column: taglines + stats -->
             <div class="hero-left">
                 <div class="hero-tag">🎮 SIMULADOR DE HACKING ÉTICO</div>
                 <h1 class="hero-title">
@@ -105,11 +118,11 @@
 
                 <div class="hero-stats">
                     <div class="stat-box">
-                        <div class="stat-num" data-target="18">0</div>
+                        <div class="stat-num" data-target="24">0</div>
                         <div class="stat-label">Vetores de Ataque</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-num" data-target="12">0</div>
+                        <div class="stat-num" data-target="15">0</div>
                         <div class="stat-label">Defesas Ativas</div>
                     </div>
                     <div class="stat-box">
@@ -125,16 +138,14 @@
                     <span class="hero-badge b-green">CYBER ACADEMY</span>
                 </div>
 
-                <button class="hero-cta" onclick="showDashboard()">
+                <button class="hero-cta" onclick="os.openWindow('dashboard')">
                     <i class="fas fa-terminal me-2"></i>INICIAR MISSÃO
                     <div class="cta-ripple"></div>
                 </button>
             </div>
 
-            <!-- Right column: the shield -->
             <div class="hero-right">
                 <div class="hero-shield-wrap">
-                    <!-- Orbiting tags -->
                     <div class="orbit-tag ot1"><i class="fas fa-bug"></i> XSS</div>
                     <div class="orbit-tag ot2"><i class="fas fa-database"></i> SQLi</div>
                     <div class="orbit-tag ot3"><i class="fas fa-wifi"></i> MITM</div>
@@ -142,12 +153,10 @@
                     <div class="orbit-tag ot5"><i class="fas fa-lock"></i> 0DAY</div>
                     <div class="orbit-tag ot6"><i class="fas fa-robot"></i> AI</div>
 
-                    <!-- Rings -->
                     <div class="h-ring h-ring-1"></div>
                     <div class="h-ring h-ring-2"></div>
                     <div class="h-ring h-ring-3"></div>
 
-                    <!-- Shield icon -->
                     <div class="hero-shield-icon">
                         <i class="fas fa-shield-halved"></i>
                         <div class="shield-scanline"></div>
@@ -163,368 +172,75 @@
             <button class="btn btn-primary btn-sm mx-2" onclick="os.toggleStartMenu()" id="start-btn">
                 <i class="fas fa-th-large me-1"></i> START
             </button>
+            
             <div id="start-menu" class="premium-glass p-3 d-none">
                 <div class="small text-muted mb-2 border-bottom border-secondary pb-1">SISTEMA</div>
-                <div class="start-menu-item" onclick="showDashboard(); os.toggleStartMenu()"><i class="fas fa-id-card me-2 text-primary"></i> PERFIL</div>
-                <div class="start-menu-item" onclick="showInvasionLogs(); os.toggleStartMenu()"><i class="fas fa-user-secret me-2 text-danger"></i> LOGS DE INVASÃO</div>
-                <div class="start-menu-item" onclick="startGame('logica'); os.toggleStartMenu()"><i class="fas fa-bug me-2 text-danger"></i> PENTEST</div>
-                <div class="start-menu-item" onclick="startDefenseMode(); os.toggleStartMenu()"><i class="fas fa-shield-alt me-2 text-info"></i> SOC</div>
-                <div class="start-menu-item" onclick="startBotWar(); os.toggleStartMenu()"><i class="fas fa-bolt me-2 text-warning"></i> ARENA</div>
-                <div class="start-menu-item" onclick="showGlossary(); os.toggleStartMenu()"><i class="fas fa-book me-2 text-success"></i> GLOSSÁRIO</div>
-                <div class="start-menu-item" onclick="showAIAssistant(); os.toggleStartMenu()"><i class="fas fa-brain me-2 text-info"></i> ASSISTENTE ONYX</div>
-                <div class="start-menu-item" onclick="showToolkit(); os.toggleStartMenu()"><i class="fas fa-toolbox me-2 text-primary"></i> TOOLKIT</div>
-                <div class="start-menu-item" onclick="showBlackMarket(); os.toggleStartMenu()"><i class="fas fa-shopping-cart me-2 text-danger"></i> MERCADO</div>
+                <div class="start-menu-item" onclick="os.openWindow('dashboard'); os.toggleStartMenu()"><i class="fas fa-id-card me-2 text-primary"></i> PERFIL</div>
+                <div class="start-menu-item" onclick="os.openWindow('pentest'); os.toggleStartMenu()"><i class="fas fa-bug me-2 text-danger"></i> PENTEST</div>
+                <div class="start-menu-item" onclick="os.openWindow('soc'); os.toggleStartMenu()"><i class="fas fa-shield-alt me-2 text-info"></i> SOC</div>
+                <div class="start-menu-item" onclick="os.openWindow('academy'); os.toggleStartMenu()"><i class="fas fa-university me-2 text-primary"></i> ACADEMIA</div>
+                <div class="start-menu-item" onclick="os.openWindow('glossary'); os.toggleStartMenu()"><i class="fas fa-book me-2 text-success"></i> GLOSSÁRIO</div>
+                <div class="start-menu-item" onclick="os.openWindow('onyx'); os.toggleStartMenu()"><i class="fas fa-brain me-2 text-info"></i> ASSISTENTE</div>
+                <div class="start-menu-item" onclick="os.openWindow('tracking'); os.toggleStartMenu()"><i class="fas fa-satellite-dish me-2 text-warning"></i> RASTREAMENTO</div>
+                
                 <div class="mt-3 border-top border-secondary pt-2">
                     <div class="start-menu-item text-danger" onclick="logout()"><i class="fas fa-power-off me-2"></i> SAIR</div>
                 </div>
             </div>
+
             <div id="taskbar-items" class="d-flex align-items-center flex-grow-1"></div>
+            
             <div class="taskbar-connectivity me-3 d-flex align-items-center gap-2">
                 <span id="conn-status-dot" class="dot"></span>
-                <span id="conn-status-text" class="small text-muted font-monospace conn-status-text">OFFLINE</span>
+                <span id="conn-status-text" class="small text-muted font-monospace">OFFLINE</span>
             </div>
-            <div class="taskbar-actions me-3">
-                <button class="btn btn-outline-danger btn-sm px-3" onclick="logout()" title="Encerrar Sessão">
-                    <i class="fas fa-power-off me-1"></i> SAIR
-                </button>
-            </div>
+
             <div class="taskbar-time text-end">
                 <div id="os-clock" class="fw-bold">00:00</div>
-                <div id="os-date" class="small text-muted">22 APR</div>
+                <div id="os-date" class="small text-muted">-- ---</div>
             </div>
         </div>
     </div>
-    
+
     <!-- ONYX FLOATING ASSISTANT -->
     <div id="onyx-buddy" class="d-none">
         <div id="onyx-bubble" class="onyx-bubble">
             <div id="onyx-bubble-content"></div>
         </div>
-        <div class="onyx-avatar" onclick="window.onyx.toggleBubble()">
+        <div class="onyx-avatar">
             <i class="fas fa-robot"></i>
             <div class="onyx-pulse"></div>
             <div class="onyx-status-ring"></div>
         </div>
     </div>
 
-    <!-- Core OS Logic -->
-    <script src="js/security.js"></script>
-    <script>
-        const os = {
-            windows: {},
-            zindex: 100,
-            introInterval: null,
-
-            init() {
-                this.updateClock(); // Call immediately
-                this.initIntro();
-                this.createNotificationContainer();
-                setInterval(() => this.updateClock(), 1000); 
-                
-                // Close start menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    const menu = document.getElementById('start-menu');
-                    const btn = document.getElementById('start-btn');
-                    if (menu && !menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-                        menu.classList.add('d-none');
-                    }
-                });
-
-                // Initialize Hardening
-                if (window.security && window.security.hardening) {
-                    window.security.hardening.init();
-                }
-            },
-
-            updateClock() {
-                const now = new Date();
-                const clock = document.getElementById('os-clock');
-                const dateEl = document.getElementById('os-date');
-                if (clock) clock.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                if (dateEl) {
-                    const day = now.getDate();
-                    const month = now.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-                    dateEl.textContent = `${day} ${month}`;
-                }
-            },
-
-            createNotificationContainer() {
-                if (!document.getElementById('notification-container')) {
-                    const container = document.createElement('div');
-                    container.id = 'notification-container';
-                    container.className = 'notification-container';
-                    document.body.appendChild(container);
-                }
-            },
-
-            showNotification(msg, type = 'info') {
-                const container = document.getElementById('notification-container');
-                if (!container) return;
-                const toast = document.createElement('div');
-                toast.className = `notification-toast animate__animated animate__slideInRight`;
-                if (type === 'success') toast.style.borderLeftColor = '#00ff88';
-                if (type === 'danger') toast.style.borderLeftColor = '#ff3366';
-                const safeMsg = typeof window.security !== 'undefined' ? security.escapeHTML(msg) : msg;
-                toast.innerHTML = `<div class="d-flex align-items-center"><i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'danger' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-3"></i><div>${safeMsg}</div></div>`;
-                container.appendChild(toast);
-                setTimeout(() => {
-                    toast.classList.replace('animate__slideInRight', 'animate__slideOutRight');
-                    setTimeout(() => toast.remove(), 500);
-                }, 4000);
-            },
-
-            hideSplash() {
-                const splash = document.getElementById('splash-intro');
-                if (splash) {
-                    splash.classList.add('loading-hidden');
-                    if (this.introInterval) clearInterval(this.introInterval);
-                }
-            },
-
-            initIntro() {
-                const term = document.getElementById('splash-terminal');
-                const progress = document.getElementById('splash-progress');
-                const logs = ["> INITIALIZING KERNEL...", "> LOADING NEURAL MODULES...", "> ESTABLISHING TUNNEL...", "> VERIFYING SYSTEM INTEGRITY...", "> SYSTEM READY."];
-                let i = 0;
-                this.introInterval = setInterval(() => {
-                    if (i < logs.length) {
-                        const div = document.createElement('div');
-                        div.textContent = logs[i];
-                        
-                        // Verification Check
-                        if (logs[i].includes("VERIFYING")) {
-                            if (!window.TECNICAS_DATA || !window.ARSENAL_DATA) {
-                                div.textContent = "> ERROR: DATABASE CORRUPT OR MISSING.";
-                                div.classList.add('text-danger');
-                                clearInterval(this.introInterval);
-                                return;
-                            }
-                        }
-
-                        if (term) term.appendChild(div);
-                        if (progress) progress.style.width = ((i+1)/logs.length)*100 + '%';
-                        i++;
-                    } else {
-                        clearInterval(this.introInterval);
-                        setTimeout(() => {
-                            this.hideSplash();
-                            if (!localStorage.getItem('currentUser')) {
-                                const auth = document.getElementById('auth-layer');
-                                if (auth) auth.classList.remove('d-none');
-                            } else {
-                                if (typeof window.triggerLoginFlow === 'function') {
-                                    window.triggerLoginFlow();
-                                }
-                            }
-                        }, 150);
-                    }
-                }, 120);
-            },
-
-            openWindow(id) {
-                if (this.windows[id]) { this.focusWindow(id); return; }
-                const win = document.createElement('div');
-                win.id = `win-${id}`;
-                win.className = 'window animate__animated animate__zoomIn';
-                const w = Math.min(window.innerWidth * 0.85, 1200);
-                const h = window.innerHeight * 0.8;
-                win.style.width = w + 'px';
-                win.style.height = h + 'px';
-                win.style.left = ((window.innerWidth - w) / 2) + 'px';
-                win.style.top = ((window.innerHeight - h) / 2) + 'px';
-                win.style.zIndex = ++this.zindex;
-                win.innerHTML = `<div class="window-header"><span class="fw-bold"><i class="fas fa-terminal me-2"></i> ${id.toUpperCase()}</span><div class="window-controls"><span class="bg-warning" onclick="os.minimizeWindow('${id}')"></span><span class="bg-danger" onclick="os.closeWindow('${id}')"></span></div></div><div class="window-body" id="body-${id}"><div class="p-5 text-center"><i class="fas fa-spinner fa-spin fa-3x"></i></div></div>`;
-                const container = document.getElementById('window-container');
-                if (container) {
-                    container.appendChild(win);
-                    this.windows[id] = win;
-                    this.addToTaskbar(id);
-                    this.makeDraggable(win);
-                }
-            },
-
-            closeWindow(id) {
-                if (this.windows[id]) {
-                    this.windows[id].classList.add('animate__zoomOut');
-                    setTimeout(() => {
-                        if (this.windows[id]) { this.windows[id].remove(); delete this.windows[id]; }
-                        const t = document.getElementById(`task-${id}`);
-                        if (t) t.remove();
-                    }, 200);
-                }
-            },
-
-            minimizeWindow(id) {
-                if (this.windows[id]) {
-                    const isMin = this.windows[id].style.display === 'none';
-                    this.windows[id].style.display = isMin ? 'flex' : 'none';
-                    const task = document.getElementById(`task-${id}`);
-                    if (task) task.classList.toggle('active', !isMin);
-                }
-            },
-
-            focusWindow(id) {
-                if (this.windows[id]) {
-                    this.windows[id].style.display = 'flex';
-                    this.windows[id].style.zIndex = ++this.zindex;
-                    document.querySelectorAll('.task-item').forEach(el => el.classList.remove('active'));
-                    const task = document.getElementById(`task-${id}`);
-                    if (task) task.classList.add('active');
-                }
-            },
-
-            toggleWindow(id) {
-                const win = this.windows[id];
-                if (!win) {
-                    if (id === 'dashboard') showDashboard();
-                    else if (id === 'pentest') startGame('logica');
-                    else if (id === 'soc') startDefenseMode();
-                    else if (id === 'botwar') startBotWar();
-                    else if (id === 'glossary') showGlossary();
-                    else if (id === 'ai_assistant') showAIAssistant();
-                    else if (id === 'toolkit') showToolkit();
-                    else if (id === 'blackmarket') { if (typeof showBlackMarket === 'function') showBlackMarket(); }
-                    return;
-                }
-                if (win.style.display === 'none') { this.minimizeWindow(id); this.focusWindow(id); }
-                else if (win.style.zIndex == this.zindex) { this.minimizeWindow(id); }
-                else { this.focusWindow(id); }
-            },
-
-            addToTaskbar(id) {
-                const items = document.getElementById('taskbar-items');
-                if (items) {
-                    const item = document.createElement('div');
-                    item.id = `task-${id}`;
-                    item.className = 'task-item active';
-                    item.textContent = id.toUpperCase();
-                    item.onclick = () => this.toggleWindow(id);
-                    items.appendChild(item);
-                }
-            },
-
-            makeDraggable(el) {
-                const header = el.querySelector('.window-header');
-                let nx = 0, ny = 0, x = 0, y = 0;
-                header.onmousedown = (e) => {
-                    e.preventDefault(); nx = e.clientX; ny = e.clientY;
-                    this.focusWindow(el.id.replace('win-', ''));
-                    document.onmouseup = () => { document.onmouseup = null; document.onmousemove = null; };
-                    document.onmousemove = (e) => {
-                        e.preventDefault(); x = nx - e.clientX; y = ny - e.clientY; nx = e.clientX; ny = e.clientY;
-                        el.style.top = (el.offsetTop - y) + "px"; el.style.left = (el.offsetLeft - x) + "px";
-                    };
-                };
-            },
-            
-            copyToClipboard(text) {
-                navigator.clipboard.writeText(text).then(() => {
-                    this.showNotification('Copiado para a área de transferência!', 'success');
-                }).catch(err => {
-                    console.error('Erro ao copiar: ', err);
-                });
-            },
-
-            toggleStartMenu() {
-                const menu = document.getElementById('start-menu');
-                if (menu) menu.classList.toggle('d-none');
-            }
-        };
-        window.os = os;
-    </script>
-
-    <!-- Dependencies -->
-    <script src="js/i18n.js"></script>
+    <!-- Data Sources -->
     <script src="data/arsenal.js"></script>
-    <script src="js/ai_generator.js"></script>
-    <script src="js/evolution_engine.js"></script>
-    <script src="js/gemma_optimizer.js"></script>
-    <script src="js/defense_engine.js"></script>
-    <script src="js/bot_war.js"></script>
     <script src="data/tecnicas.js"></script>
-    <script src="js/offline.js"></script>
+
+    <!-- Application Scripts -->
     <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/core/security_vault.js"></script>
+    <script src="js/services/storage_service.js"></script>
+    <script src="js/core/kernel.js"></script>
+    <script src="js/core/ui_engine.js"></script>
+    <script src="js/modules/dashboard.js"></script>
+    <script src="js/modules/pentest.js"></script>
+    <script src="js/modules/academy.js"></script>
+    <script src="js/modules/soc.js"></script>
+    <script src="js/modules/onyx.js"></script>
+    <script src="js/modules/tracking.js"></script>
+    <script src="js/modules/market.js"></script>
+    <script src="js/modules/bot_war.js"></script>
+    <script src="js/main.js"></script>
 
     <script>
-        window.addEventListener('load', () => os.init());
-
-        // ── HERO HUB ENGINE ──────────────────────────────────────────
-        function initHeroHub() {
-            const hub = document.getElementById('hero-hub');
-            if (!hub) return;
-
-            // Show/hide based on open windows
-            function syncHeroVisibility() {
-                const hasWindows = document.querySelector('#window-container .window');
-                hub.classList.toggle('visible', !hasWindows);
-            }
-            const winObs = new MutationObserver(syncHeroVisibility);
-            const wc = document.getElementById('window-container');
-            if (wc) winObs.observe(wc, { childList: true, subtree: false });
-            syncHeroVisibility();
-
-            // Stat counters
-            document.querySelectorAll('.stat-num').forEach(el => {
-                const target = parseInt(el.dataset.target);
-                let current = 0;
-                const step = Math.max(1, Math.floor(target / 30));
-                const timer = setInterval(() => {
-                    current = Math.min(current + step, target);
-                    el.textContent = current;
-                    if (current >= target) clearInterval(timer);
-                }, 50);
-            });
-
-            // Rotating word
-            const words = ['HACKER.', 'DEFENSOR.', 'ANALISTA.', 'PENTESTER.'];
-            let wi = 0;
-            const wordEl = document.getElementById('hero-rotating-word');
-            if (wordEl) {
-                setInterval(() => {
-                    wi = (wi + 1) % words.length;
-                    wordEl.style.opacity = '0';
-                    setTimeout(() => { wordEl.textContent = words[wi]; wordEl.style.opacity = '1'; }, 300);
-                }, 2200);
-                wordEl.style.transition = 'opacity 0.3s ease';
-            }
-
-            // Particle canvas
-            const canvas = document.getElementById('hero-particles');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            function resize() { canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; }
-            resize();
-            window.addEventListener('resize', resize);
-
-            const particles = Array.from({ length: 60 }, () => ({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                vx: (Math.random() - 0.5) * 0.4,
-                vy: (Math.random() - 0.5) * 0.4,
-                r: Math.random() * 1.5 + 0.5,
-                a: Math.random()
-            }));
-
-            function drawParticles() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => {
-                    p.x += p.vx; p.y += p.vy;
-                    if (p.x < 0) p.x = canvas.width;
-                    if (p.x > canvas.width) p.x = 0;
-                    if (p.y < 0) p.y = canvas.height;
-                    if (p.y > canvas.height) p.y = 0;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(0,255,255,${p.a * 0.4})`;
-                    ctx.fill();
-                });
-                requestAnimationFrame(drawParticles);
-            }
-            drawParticles();
+        // Register Service Worker if supported and NOT in file protocol
+        if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
+            navigator.serviceWorker.register('./sw.js')
+                .then(reg => console.log('[SW] Service Worker Registered', reg.scope))
+                .catch(err => console.warn('[SW] Registration failed', err));
         }
-
-        // Expose hero hub init — called by offline.js after login completes
-        window.initHeroHub = initHeroHub;
     </script>
 </body>
 </html>
