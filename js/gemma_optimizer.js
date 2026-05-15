@@ -1,7 +1,8 @@
 /**
- * ONYX System Assistant - Cybernetic & Training Layer v4.0
+ * GemmaOptimizer v4.5 - Neural System Assistant
+ * Adaptive performance, heuristic analysis, and elite guidance.
  */
-class OnyxAssistant {
+class GemmaOptimizer {
     constructor(procAIInstance) {
         this.procAI = procAIInstance;
         this.optimizationLog = [];
@@ -9,58 +10,65 @@ class OnyxAssistant {
         this.isBubbleOpen = false;
         this.autoHideTimer = null;
         this.isScanning = false;
+        this.isOptimizing = false;
         
-        // Technical Tracks mapping
+        // Technical Tracks mapping (Basic -> Advanced)
         this.skillTracks = {
-            'injection': ['sql', 'nosql', 'ldap', 'command'],
-            'xss': ['dom', 'stored', 'reflected'],
-            'auth': ['jwt', 'session', 'oauth'],
-            'recon': ['nmap', 'dns', 'whois']
+            'RECON': ['nmap', 'dns', 'whois', 'osint'],
+            'LOGIC': ['sqli', 'nosql', 'broken_auth'],
+            'EXPLOITATION': ['rce', 'bof', 'xss', 'deserialization']
         };
 
         this.greetings = [
-            "ONYX online! Notei que você está explorando o sistema. Precisa de uma explicação detalhada sobre algo?",
-            "Olá! Sou seu assistente ONYX. Estou monitorando sua performance para te ajudar a subir de nível!",
-            "Conexão neural estabelecida. ONYX pronto para suporte técnico.",
-            "Detectando atividade incomum... Deseja uma análise de vulnerabilidade?"
+            "Gemma Core online. Detectando padrões de aprendizado...",
+            "Conexão neural estabilizada. Otimização do sistema em 98.4%.",
+            "Saudações, Agente. Deseja uma análise heurística da sua última missão?",
+            "Monitorando vetores de ataque em tempo real. Como posso ajudar?"
         ];
     }
 
-    initBuddy() {
+    init() {
         const buddy = document.getElementById('onyx-buddy');
         if (buddy) {
-            console.log('[ONYX] Inicializando Assistente...');
+            console.log('%c[GEMMA AI] Interface Neural Inicializada.', 'color: #00d9ff; font-weight: bold;');
             buddy.classList.remove('d-none');
-            buddy.style.display = 'flex'; // Force display
+            buddy.style.display = 'flex'; 
+            
+            // Welcome message
             setTimeout(() => {
                 this.speak(this.greetings[Math.floor(Math.random() * this.greetings.length)]);
-            }, 2000);
-        } else {
-            console.warn('[ONYX] Erro: Elemento #onyx-buddy não encontrado no DOM.');
+            }, 3000);
         }
     }
 
     toggleBubble() {
         const bubble = document.getElementById('onyx-bubble');
+        if (!bubble) return;
+
         this.isBubbleOpen = !this.isBubbleOpen;
         if (this.isBubbleOpen) {
             bubble.classList.add('show');
             clearTimeout(this.autoHideTimer);
-            this.autoHideTimer = setTimeout(() => this.toggleBubble(), 10000);
+            this.autoHideTimer = setTimeout(() => {
+                if (this.isBubbleOpen) this.toggleBubble();
+            }, 12000);
         } else {
             bubble.classList.remove('show');
         }
     }
 
-    speak(text, duration = 6000) {
+    speak(text, duration = 8000) {
         const bubble = document.getElementById('onyx-bubble');
         const content = document.getElementById('onyx-bubble-content');
         if (!bubble || !content) return;
 
         content.innerHTML = `
             <div class="animate__animated animate__fadeIn">
-                <p class="mb-2 text-info small fw-bold"><i class="fas fa-comment-dots me-2"></i>MENSAGEM DE ONYX</p>
-                <div class="small">${text}</div>
+                <div class="d-flex align-items-center mb-2">
+                    <div class="onyx-status-dot me-2 animate__animated animate__pulse animate__infinite"></div>
+                    <span class="text-info x-small fw-bold">GEMMA_INTEL_STREAM</span>
+                </div>
+                <div class="small text-white-50">${text}</div>
                 <div class="onyx-typing-dots mt-2"><span></span><span></span><span></span></div>
             </div>
         `;
@@ -77,40 +85,38 @@ class OnyxAssistant {
         }, duration);
     }
 
-    getAdvice(context) {
-        const user = JSON.parse(localStorage.getItem('users') || '{}')[localStorage.getItem('currentUser')];
-        if (!user) return "Aguardando login...";
+    /**
+     * Heuristic analysis of player performance
+     */
+    analyzeSystem() {
+        if (!this.procAI || !this.procAI.playerStats) return null;
 
-        if (context === 'dashboard') {
-            if (user.level < 2) return "ONYX: Comece com os desafios de Lógica para ganhar Reputation!";
-            if (user.reputation < 100) return "ONYX: Você precisa de mais Reputation para desbloquear o Toolkit.";
-            return "ONYX: Sistema estável. Continue explorando novas vulnerabilidades.";
-        }
-        return "Sempre valide os inputs antes de processar qualquer dado.";
-    }
+        const stats = this.procAI.playerStats;
+        const analysis = {
+            weaknesses: [],
+            needsOptimization: false,
+            technicalProfile: this.calculateTechnicalProfile()
+        };
 
-    analyzeChallenge(challenge) {
-        if (!challenge) return;
-        
-        const cat = challenge.category;
-        const hint = this.procAI.generateHint(challenge);
-        
-        const msg = `
-            <b>Análise de Missão Detectada!</b><br>
-            Você está enfrentando um desafio de <b>${cat.toUpperCase()}</b>. 
-            Basicamente, o sistema tem uma falha onde ele aceita comandos que não deveria.<br>
-            <div class='gemma-detail-box'>
-                <i class='fas fa-lightbulb text-warning me-2'></i><b>DICA SIMPLIFICADA:</b><br>
-                ${hint}<br><br>
-                <span class='text-muted small'>Em termos leigos: Tente 'quebrar' a lógica do código usando caracteres especiais como aspas ou barras.</span>
-            </div>
-        `;
-        this.speak(msg, 15000);
+        // Check for struggling areas (accuracy < 50%)
+        Object.entries(stats.categoryStats || {}).forEach(([cat, data]) => {
+            const total = data.solved + data.failed;
+            if (total >= 2) {
+                const accuracy = (data.solved / total) * 100;
+                if (accuracy < 50) {
+                    analysis.weaknesses.push({ cat, accuracy });
+                    analysis.needsOptimization = true;
+                }
+            }
+        });
+
+        return analysis;
     }
 
     calculateTechnicalProfile() {
-        const stats = this.procAI.playerStats.categoryStats;
-        const profile = { RECON: 0, LOGIC: 0, EXPLOITATION: 0 };
+        if (!this.procAI || !this.procAI.playerStats) return {};
+        const stats = this.procAI.playerStats.categoryStats || {};
+        const profile = {};
         
         Object.entries(this.skillTracks).forEach(([track, cats]) => {
             let solved = 0;
@@ -126,90 +132,65 @@ class OnyxAssistant {
         return profile;
     }
 
-    analyzeSystem() {
-        const stats = this.procAI.playerStats;
-        const analysis = {
-            criticalWeaknesses: [],
-            optimizationNeeds: false,
-            recommendations: []
-        };
-
-        Object.entries(stats.categoryStats).forEach(([cat, data]) => {
-            const total = data.solved + data.failed;
-            if (total >= 2) {
-                const accuracy = (data.solved / total) * 100;
-                if (accuracy < 60) {
-                    analysis.criticalWeaknesses.push({ cat, accuracy });
-                    analysis.optimizationNeeds = true;
-                }
-            }
-        });
-
-        analysis.technicalProfile = this.calculateTechnicalProfile();
-        return analysis;
-    }
-
+    /**
+     * Adaptive System Optimization
+     * Adjusts challenge weights and system feedback based on analysis
+     */
     optimizeSystem() {
         if (this.isOptimizing) return;
         this.isOptimizing = true;
         
         const analysis = this.analyzeSystem();
-        this.lastAnalysisTime = Date.now();
-
-        if (analysis.optimizationNeeds) {
-            const weak = analysis.criticalWeaknesses[0].cat;
-            this.speak(`Detectei que você está tendo um pouco de dificuldade em <b>${weak.toUpperCase()}</b>. Vou ajustar o sistema para te ajudar a praticar mais esse ponto!`, 10000);
-            
-            analysis.criticalWeaknesses.forEach(w => {
-                const currentWeight = this.procAI.categories[w.cat].weight;
-                const newWeight = Math.min(currentWeight * 1.5, 50);
-                this.procAI.categories[w.cat].weight = newWeight;
-            });
+        if (!analysis) {
+            this.isOptimizing = false;
+            return;
         }
 
-        setTimeout(() => { this.isOptimizing = false; }, 2000);
-        return analysis;
+        this.lastAnalysisTime = Date.now();
+
+        if (analysis.needsOptimization) {
+            const primaryWeakness = analysis.weaknesses[0].cat;
+            this.speak(`Análise Heurística completa. Detectada baixa eficiência em <b>${primaryWeakness.toUpperCase()}</b>. Otimizando trilha de treinamento para reforçar fundamentos.`, 10000);
+            
+            // Adjust weights in Procedural AI
+            analysis.weaknesses.forEach(w => {
+                if (this.procAI.categories[w.cat]) {
+                    const currentWeight = this.procAI.categories[w.cat].weight;
+                    this.procAI.categories[w.cat].weight = Math.min(currentWeight * 1.4, 60);
+                }
+            });
+            this.log(`Otimização aplicada para: ${primaryWeakness}`);
+        } else {
+            this.log(`Sistema operando em alta eficiência.`);
+        }
+
+        setTimeout(() => { this.isOptimizing = false; }, 3000);
     }
 
-    scanSystem() {
+    scanIntegrity() {
         if (this.isScanning) return;
         this.isScanning = true;
-        this.speak("Iniciando varredura profunda de integridade do Kernel... Aguarde.", 3000);
+        this.speak("Iniciando auditoria de integridade do Kernel e memória volátil...", 4000);
         
         setTimeout(() => {
-            const vfs = JSON.parse(localStorage.getItem('cyberos_virtual_fs') || '{"/var/log/invasions": []}');
-            const logs = vfs["/var/log/invasions"];
-            
-            if (logs.length > 0) {
-                this.speak(`Varredura concluída. Atenção: Detectei <b>${logs.length}</b> incidentes de segurança registrados em <code>/var/log/invasions</code>. O sistema de hardening está operando nominalmente.`, 10000);
-            } else {
-                this.speak("Varredura concluída. Integridade do sistema em 100%. Nenhuma violação detectada nos logs internos.", 8000);
-            }
+            const auditResult = Math.random() > 0.8 ? "Anomalias leves detectadas no SecurityVault." : "Integridade do sistema verificada: 100%.";
+            this.speak(`<b>Relatório de Auditoria:</b><br>${auditResult}<br>Status: Protegido.`, 8000);
             this.isScanning = false;
-        }, 3000);
+            this.log("Auditoria manual concluída.");
+        }, 4000);
     }
 
     log(message) {
         const entry = {
             time: new Date().toLocaleTimeString(),
             message,
-            id: Date.now() + Math.random().toString(36).substr(2, 5)
+            id: 'gemma-' + Date.now()
         };
         this.optimizationLog.unshift(entry);
-        if (this.optimizationLog.length > 50) this.optimizationLog.pop();
+        if (this.optimizationLog.length > 30) this.optimizationLog.pop();
         window.dispatchEvent(new CustomEvent('gemma_log', { detail: entry }));
     }
 }
 
-// Global Instance & Integration
-window.gemma = new GemmaAssistant(window.procAI);
-
-// Global Toggle for UI
-window.toggleGemmaBubble = () => {
-    if (window.gemma) window.gemma.toggleBubble();
-};
-
-// Periodic Analysis (every 60s)
-setInterval(() => {
-    if (window.gemma) window.gemma.optimizeSystem();
-}, 60000);
+// Global initialization logic handled by IntelligenceCore
+window.GemmaOptimizer = GemmaOptimizer;

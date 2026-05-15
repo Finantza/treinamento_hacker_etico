@@ -8,9 +8,9 @@ class ProcessManager {
         this.processes = [
             { id: 101, name: 'KERNEL_CORE', cpu: '2.4%', mem: '128MB', status: 'RUNNING', user: 'SYSTEM' },
             { id: 204, name: 'SECURITY_VAULT', cpu: '1.1%', mem: '64MB', status: 'RUNNING', user: 'SYSTEM' },
+            { id: 400, name: 'INTELLIGENCE_CORE', cpu: '0.0%', mem: '1.2GB', status: 'ONLINE', user: 'SYSTEM' },
             { id: 512, name: 'UI_ENGINE_3D', cpu: '12.5%', mem: '256MB', status: 'RUNNING', user: 'USER' },
-            { id: 888, name: 'ONYX_NEURAL', cpu: '4.2%', mem: '512MB', status: 'SLEEP', user: 'USER' },
-            { id: 1024, name: 'NETWORK_UPLINK', cpu: '0.8%', mem: '32MB', status: 'RUNNING', user: 'SYSTEM' }
+            { id: 888, name: 'ONYX_NEURAL', cpu: '4.2%', mem: '512MB', status: 'SLEEP', user: 'USER' }
         ];
         this.interval = null;
     }
@@ -22,6 +22,15 @@ class ProcessManager {
         window.addEventListener('cleanup_procmgr', () => {
             if (this.interval) clearInterval(this.interval);
         }, { once: true });
+
+        window.addEventListener('intelligence_heartbeat', (e) => {
+            const aiProc = this.processes.find(p => p.id === 400);
+            if (aiProc) {
+                aiProc.cpu = e.detail.load + '%';
+                aiProc.status = e.detail.status;
+                this.renderTable();
+            }
+        });
     }
 
     startMonitoring() {

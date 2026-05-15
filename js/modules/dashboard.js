@@ -107,6 +107,27 @@ class Dashboard {
                             </div>
                         </div>
 
+                        <!-- AI ENGINE STATUS -->
+                        <div class="premium-glass p-4 border-info mb-4">
+                            <h5 class="text-info mb-3"><i class="fas fa-brain me-2"></i>NÚCLEO DE INTELIGÊNCIA</h5>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="x-small text-muted mb-1">STATUS_IA</div>
+                                    <div class="badge bg-success-subtle text-success border border-success w-100 py-2">GEMMA_CORE: ONLINE</div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="x-small text-muted mb-1">ADAPTIVE_TRAINING</div>
+                                    <div class="badge bg-primary-subtle text-primary border border-primary w-100 py-2" id="dash-training-level">BÁSICO</div>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="x-small text-muted mb-1">PERFIL_TÉCNICO (ANALISADO PELA IA)</div>
+                                <div class="d-flex flex-column gap-2" id="dash-ai-profile">
+                                    <div class="small opacity-50">Aguardando análise heurística...</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- ACHIEVEMENTS -->
                         <div class="premium-glass p-4 border-primary">
                             <h5 class="text-primary mb-3"><i class="fas fa-medal me-2"></i>CONQUISTAS & MEDALHAS</h5>
@@ -119,8 +140,10 @@ class Dashboard {
             </div>
         `;
         
-        const container = document.getElementById('body-dashboard');
-        if (container) container.innerHTML = html;
+        if (container) {
+            container.innerHTML = html;
+            this.updateAIStats();
+        }
     }
 
     renderMedals(user) {
@@ -152,6 +175,29 @@ class Dashboard {
             else break;
         }
         return current;
+    }
+
+    updateAIStats() {
+        const pathEl = document.getElementById('dash-training-level');
+        if (pathEl && window.intelligence) {
+            pathEl.textContent = window.intelligence.trainingPath.toUpperCase();
+        }
+
+        const profileEl = document.getElementById('dash-ai-profile');
+        if (profileEl && window.gemma) {
+            const profile = window.gemma.calculateTechnicalProfile();
+            if (Object.keys(profile).length > 0) {
+                profileEl.innerHTML = Object.entries(profile).map(([track, score]) => `
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="x-small font-mono text-white-50">${track}</span>
+                        <span class="x-small font-mono text-info">${score}%</span>
+                    </div>
+                    <div class="progress-track" style="height: 2px;">
+                        <div class="progress-fill bg-info" style="width: ${score}%"></div>
+                    </div>
+                `).join('');
+            }
+        }
     }
 
     getNextRank(xp) {

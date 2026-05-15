@@ -96,9 +96,9 @@ class SecurityVault {
             }
         });
 
-        setInterval(() => {
-            if (typeof console.clear === 'function') console.clear();
-        }, 2000);
+        // setInterval(() => {
+        //     if (typeof console.clear === 'function') console.clear();
+        // }, 2000);
 
         this.startAntiDebugger();
 

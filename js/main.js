@@ -22,6 +22,11 @@ class Main {
                 security.initAntiTamper();
             }
             
+            // Initialize Intelligence Core
+            if (window.intelligence) {
+                await window.intelligence.init();
+            }
+
             this.setupAppEvents();
             
             // Setup Splash Screen
