@@ -1,7 +1,6 @@
 /**
- * IntelligenceCore v1.0 - The "Hacker AI Engine"
- * Orchestrates ProceduralAI, EvoGenEngine, and GemmaOptimizer.
- * Enhances system performance and manages the training paths (Basic -> Advanced).
+ * IntelligenceCore v2.0 - The "Hacker AI Engine"
+ * Orchestrates ProceduralAI, EvoGenEngine, GemmaOptimizer, and HackerAIEngine.
  */
 class IntelligenceCore {
     constructor() {
@@ -15,20 +14,24 @@ class IntelligenceCore {
         this.ai = null;      // ProceduralAI
         this.evo = null;     // EvoGenEngine
         this.gemma = null;   // GemmaOptimizer
+        this.hackerAI = null; // HackerAIEngine
     }
 
     async init() {
         console.log('%c[INTELLIGENCE_CORE] Iniciando motor de IA Hacker...', 'color: #00ff00; font-weight: bold;');
         
-        // 1. Initialize Procedural AI (Content Engine)
+        // 1. Initialize HackerAI Engine (Knowledge Base)
+        this.hackerAI = window.HackerAIEngine;
+        
+        // 2. Initialize Procedural AI (Content Engine)
         this.ai = window.procAI || new window.ProceduralAI();
         window.procAI = this.ai;
 
-        // 2. Initialize EvoGen (Neural/Evolutionary Engine)
+        // 3. Initialize EvoGen (Neural/Evolutionary Engine)
         this.evo = window.evogen || new window.EvoGenEngine();
         window.evogen = this.evo;
 
-        // 3. Initialize Gemma (Optimization/Assistant Engine)
+        // 4. Initialize Gemma (Optimization/Assistant Engine)
         this.gemma = new window.GemmaOptimizer(this.ai);
         window.gemma = this.gemma;
         this.gemma.init();
@@ -42,12 +45,10 @@ class IntelligenceCore {
 
     startHeartbeat() {
         setInterval(() => {
-            // Simulate neural load based on active tasks
             const baseLoad = 5 + Math.random() * 5;
             const taskLoad = this.activeMissions * 15;
             this.neuralLoad = Math.min(100, Math.round(baseLoad + taskLoad));
             
-            // Dispatch update event for UI (like Procmgr)
             window.dispatchEvent(new CustomEvent('intelligence_heartbeat', {
                 detail: {
                     status: this.status,
@@ -56,7 +57,6 @@ class IntelligenceCore {
                 }
             }));
 
-            // Auto-optimize every 2 minutes if load is high
             if (this.neuralLoad > 60 && Math.random() > 0.8) {
                 this.gemma.optimizeSystem();
             }
@@ -64,16 +64,24 @@ class IntelligenceCore {
     }
 
     /**
-     * The core "Training Motor" requested by the user
+     * Enhanced Training Motor
+     * @param {string} moduleFilter - ID of the HackerAI module to focus on
      */
-    async getNextTrainingMission() {
+    async getNextTrainingMission(moduleFilter = null) {
         this.activeMissions++;
         
-        // 1. Ask EvoGen for difficulty adjustment
-        // 2. Use ProceduralAI to generate the challenge
-        const challenge = this.ai.gerar({}, this.trainingPath);
+        let challenge;
         
-        // 3. Gemma analyzes the challenge to provide guidance
+        if (moduleFilter && this.hackerAI) {
+            // Generate a specialized challenge based on the selected module
+            const module = this.hackerAI.getModule(moduleFilter);
+            challenge = this.generateSpecializedChallenge(module, moduleFilter);
+        } else {
+            // standard procedural generation
+            challenge = this.ai.gerar({}, this.trainingPath);
+        }
+        
+        // Feed to Gemma for guidance
         setTimeout(() => {
             if (this.gemma) this.gemma.analyzeChallenge(challenge);
         }, 1000);
@@ -81,38 +89,60 @@ class IntelligenceCore {
         return challenge;
     }
 
+    generateSpecializedChallenge(module, moduleId) {
+        // Create a challenge object that matches the ProceduralAI format
+        const difficulty = this.trainingPath;
+        const category = module.name;
+        
+        // Select a random lesson or technique from the module
+        let target = "General Knowledge";
+        let detail = "Multiple technical aspects.";
+        
+        if (module.lessons && module.lessons.length > 0) {
+            const lesson = module.lessons[Math.floor(Math.random() * module.lessons.length)];
+            target = lesson.title;
+            detail = lesson.topics ? lesson.topics[0] : (lesson.techniques ? lesson.techniques[0].name : "Training");
+        }
+
+        return {
+            id: `specialized_${moduleId}_${Date.now()}`,
+            category: category,
+            title: `Missão: ${target}`,
+            description: `A IA identificou necessidade de reforço em ${category}. Alvo: ${target}.`,
+            objective: `Explorar vulnerabilidades relacionadas a ${detail}.`,
+            difficulty: difficulty,
+            mitre: `T${1000 + parseInt(moduleId)}`,
+            options: this.ai.gerarAlternativas(target, difficulty), // Reuse ProcAI helper
+            answer: 0 // Placeholder, we'd need more logic for real answers here
+        };
+    }
+
     recordMissionResult(challenge, success, timeSpent) {
         this.activeMissions = Math.max(0, this.activeMissions - 1);
         
-        // Record in Procedural AI
-        this.ai.recordAttempt(challenge.id, success);
+        if (this.ai) this.ai.recordAttempt(challenge.id, success);
+        if (this.evo) this.evo.observe(challenge.category, success, timeSpent);
         
-        // Feed the Evolutionary Engine
-        this.evo.observe(challenge.category, success, timeSpent);
-        
-        // If player is doing too well, suggest advancing
-        if (success && this.ai.playerStats.streak >= 5 && this.trainingPath === 'iniciante') {
-            this.gemma.speak("Performance excepcional detectada. Recomendação: Evoluir para a Trilha de Lógica.");
+        if (success && this.ai && this.ai.playerStats.streak >= 5 && this.trainingPath === 'iniciante') {
+            this.gemma.speak("Performance excepcional. Recomendo evoluir para a Trilha de Lógica.");
         }
     }
 
     setTrainingPath(path) {
         if (['iniciante', 'logica', 'massiva'].includes(path)) {
             this.trainingPath = path;
-            this.gemma.speak(`Trilha de treinamento alterada para: <b>${path.toUpperCase()}</b>.`);
+            if (this.gemma) this.gemma.speak(`Trilha alterada para: <b>${path.toUpperCase()}</b>.`);
             return true;
         }
         return false;
     }
 
-    /**
-     * Performance and Efficiency Boost
-     */
     enhanceSystemEfficiency() {
-        this.gemma.optimizeSystem();
-        this.gemma.speak("Aprimorando alocação de recursos do Kernel... Eficiência aumentada em 12%.");
+        if (this.gemma) {
+            this.gemma.optimizeSystem();
+            this.gemma.speak("Aprimorando alocação de recursos do Kernel... Eficiência aumentada em 12%.");
+        }
     }
 }
 
-// Instantiate globally
 window.intelligence = new IntelligenceCore();
