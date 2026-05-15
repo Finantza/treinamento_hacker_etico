@@ -99,18 +99,24 @@ class Academy {
     }
 
     renderModuleDetail(id) {
-        const mod = this.engine.getModule(id);
-        if (!mod) return;
+        if (!this.engine) this.engine = window.HackerAIEngine;
+        const mod = this.engine ? this.engine.getModule(id) : null;
+        
+        if (!mod) {
+            os.showNotification("Módulo não encontrado ou em desenvolvimento.", "warning");
+            this.renderLibrary();
+            return;
+        }
 
         const html = `
             <div class="p-4 animate__animated animate__fadeIn">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 class="text-primary mb-0">${mod.name.toUpperCase()}</h3>
+                    <h3 class="text-primary mb-0">${mod.name ? mod.name.toUpperCase() : 'MÓDULO'}</h3>
                     <button class="btn btn-outline-secondary btn-sm" onclick="academy.renderLibrary()">VOLTAR</button>
                 </div>
 
                 <div class="premium-glass p-4 border-primary">
-                    ${mod.lessons ? mod.lessons.map(lesson => `
+                    ${mod.lessons && mod.lessons.length > 0 ? mod.lessons.map(lesson => `
                         <div class="mb-5 last-mb-0">
                             <h4 class="text-white mb-3"><i class="fas fa-chevron-right text-primary me-2"></i>${lesson.title}</h4>
                             <div class="row g-4">

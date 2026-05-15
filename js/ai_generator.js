@@ -625,6 +625,28 @@ class ProceduralAI {
         const choices = wrongAnswers[category] || ["Opção inválida 1", "Opção inválida 2", "Opção inválida 3", "Opção inválida 4"];
         return choices[Math.floor(Math.random() * choices.length)];
     }
+
+    gerarAlternativas(correctAnswer, category = 'injection') {
+        const options = new Set();
+        options.add(correctAnswer);
+        
+        const distractors = this.generateDistractors(category, correctAnswer);
+        distractors.forEach(d => options.add(d));
+        
+        // Fallback for distractions
+        const fallbacks = ["' OR 1=1--", "<script>alert(1)</script>", "../../../etc/passwd", "admin'--"];
+        let fIdx = 0;
+        while (options.size < 4) {
+            options.add(fallbacks[fIdx % fallbacks.length]);
+            fIdx++;
+        }
+        
+        const generatedOptions = Array.from(options).sort(() => Math.random() - 0.5);
+        return {
+            options: generatedOptions,
+            correct: generatedOptions.indexOf(correctAnswer)
+        };
+    }
 }
 
 // GLOBAL INSTANCE

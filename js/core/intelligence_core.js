@@ -104,6 +104,16 @@ class IntelligenceCore {
             detail = lesson.topics ? lesson.topics[0] : (lesson.techniques ? lesson.techniques[0].name : "Training");
         }
 
+        const categoryMap = {
+            "1": "network_hacking", "2": "network_hacking", "3": "injection", 
+            "4": "social_engineering", "5": "privilege_escalation", "6": "ssrf",
+            "7": "cloud_security", "8": "buffer_overflow", "9": "network_hacking",
+            "10": "defense_evasion", "11": "defense_evasion", "12": "lateral_movement",
+            "13": "cryptography", "14": "api_security", "15": "log_analysis"
+        };
+        const procCategory = categoryMap[moduleId] || 'injection';
+        const alternatives = this.ai.gerarAlternativas(target, procCategory);
+
         return {
             id: `specialized_${moduleId}_${Date.now()}`,
             category: category,
@@ -112,8 +122,10 @@ class IntelligenceCore {
             objective: `Explorar vulnerabilidades relacionadas a ${detail}.`,
             difficulty: difficulty,
             mitre: `T${1000 + parseInt(moduleId)}`,
-            options: this.ai.gerarAlternativas(target, difficulty), // Reuse ProcAI helper
-            answer: 0 // Placeholder, we'd need more logic for real answers here
+            options: alternatives.options,
+            correct: alternatives.correct,
+            xp: difficulty === 'massiva' ? 150 : (difficulty === 'logica' ? 75 : 40),
+            rep: difficulty === 'massiva' ? 50 : (difficulty === 'logica' ? 25 : 10)
         };
     }
 

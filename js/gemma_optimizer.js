@@ -180,6 +180,25 @@ class GemmaOptimizer {
         }, 4000);
     }
 
+    calculateTechnicalProfile() {
+        if (!this.procAI) return {};
+        const stats = this.procAI.playerStats.categoryStats;
+        const profile = {};
+
+        for (const [track, cats] of Object.entries(this.skillTracks)) {
+            let totalWins = 0;
+            let totalAttempts = 0;
+            cats.forEach(cat => {
+                const s = stats[cat] || { wins: 0, losses: 0 };
+                totalWins += s.wins;
+                totalAttempts += (s.wins + s.losses);
+            });
+            profile[track] = totalAttempts > 0 ? Math.round((totalWins / totalAttempts) * 100) : 0;
+        }
+
+        return profile;
+    }
+
     log(message) {
         const entry = {
             time: new Date().toLocaleTimeString(),

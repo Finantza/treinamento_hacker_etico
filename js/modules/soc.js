@@ -91,7 +91,19 @@ class DefenseEngine {
         if (container) {
             container.innerHTML = html;
             document.getElementById('mitigate-btn').addEventListener('click', () => this.mitigate());
+            document.getElementById('scan-btn').addEventListener('click', () => this.scan());
         }
+    }
+
+    scan() {
+        os.showNotification("Escaneamento profundo em andamento...", "info");
+        this.logs.unshift({ time: new Date().toLocaleTimeString(), msg: "Iniciando verificação de integridade heurística...", type: "info" });
+        setTimeout(() => {
+            const result = Math.random() > 0.5 ? "Nenhum rootkit detectado." : "Processos suspeitos isolados.";
+            this.logs.unshift({ time: new Date().toLocaleTimeString(), msg: `SCAN COMPLETO: ${result}`, type: "success" });
+            this.render();
+        }, 2000);
+        this.render();
     }
 
     mitigate() {

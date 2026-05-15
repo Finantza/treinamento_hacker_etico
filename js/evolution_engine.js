@@ -112,7 +112,7 @@ class EvoGenEngine {
         const child = {
             id: `evo-${category}-${Date.now()}`,
             description: `[EVO-GEN] ${parentA.description.split('.')[0]}. Além disso, ${parentB.description.split('.')[0]}.`,
-            vulnerableCode: parentA.vulnerableCode ? parentA.vulnerableCode + "\n// EvoGen Injection\n" + parentB.vulnerableCode : undefined,
+            vulnerableCode: (parentA.vulnerableCode && parentB.vulnerableCode) ? parentA.vulnerableCode + "\n// EvoGen Hybrid Injection\n" + parentB.vulnerableCode : parentA.vulnerableCode,
             solution: parentA.solution,
             exploitType: `hybrid_${parentA.exploitType}_${parentB.exploitType}`
         };
